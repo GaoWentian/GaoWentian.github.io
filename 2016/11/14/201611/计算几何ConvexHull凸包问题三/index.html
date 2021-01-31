@@ -1,0 +1,165 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>【计算几何】Convex Hull凸包问题（三） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="上回介绍的凸包算法的时间复杂度是O(n^3)，还远远不能满足我们的需求，现在来改进这个算法。上个算法是遍历边来找到极边，来判断凸包，但是遍历整个边又要浪费许多时间。于是我们就改进成下面的算法:通过下面的5个图来还原整个算法首先通过遍历，找到一个极点。找到X轴最接近下面的一个点，就可以确定这个点是极点">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="【计算几何】Convex Hull凸包问题（三）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2016-11-14T10:45:13.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2016-11-14
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">【计算几何】Convex Hull凸包问题（三）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <p>上回介绍的凸包算法的时间复杂度是O(n^3)，还远远不能满足我们的需求，现在来改进这个算法。<br/><br>上个算法是遍历边来找到极边，来判断凸包，但是遍历整个边又要浪费许多时间。于是我们就改进成下面的算法:<br>通过下面的5个图来还原整个算法<br>首先通过遍历，找到一个极点。找到X轴最接近下面的一个点，就可以确定这个点是极点（如果最下面存在一条线，有两个点，我们就选最靠近左面的点。）。这样我们通过O(n)的时间复杂度，就找到了一个极点。<br/><br>找到这个点之后，我们根据这个点，再找到另外一个能确定极边的点，通过这样不断的找，直到最后一个点回到原点。通过这种方式我们就完成了整个凸包的判断</p>
+<p><img src="/img/blog/2350612-872f07dbdb35c4d5.png" alt="Alt text"></p>
+<p>在判断一条边是否为极边的时候，我们继续使用第一个算法介绍的toLeft()函数，就这样我们就改进了这个算法。<br/><br>下面是代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">Created on Mon Nov 23 22:20:11 2015</span><br><span class="line">@author: gavin</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">def Area(p,q,s):</span><br><span class="line">    return p[0]*q[1]-p[1]*q[0]+q[0]*s[1]-q[1]*s[0]+s[0]*p[1]-s[1]*p[0]</span><br><span class="line">def toLeft(p,q,s):</span><br><span class="line">    </span><br><span class="line">    return Area(p,q,s)&gt;0</span><br><span class="line">#找最低的点，找不到就比较最左的点，返回一个极点</span><br><span class="line">def LTL(S,n):</span><br><span class="line">    lt &#x3D; k &#x3D; 0</span><br><span class="line">    for k in range(1,n):</span><br><span class="line">        if S[k][1]&lt;S[lt][1] or (S[k][1]&#x3D;&#x3D;S[lt][1] and S[k][0]&lt;S[lt][0]):</span><br><span class="line">            lt &#x3D; k</span><br><span class="line">    return lt</span><br><span class="line">def markEE(S,n):</span><br><span class="line">    newList &#x3D; []</span><br><span class="line">    k &#x3D; p &#x3D; q &#x3D; 0</span><br><span class="line">    #初始化所有点都是非极点</span><br><span class="line">    for k in range(0,n):</span><br><span class="line">        S[k][2] &#x3D; 0     </span><br><span class="line">    lt &#x3D; LTL(S,n)  #先找到一个最低点，这个最低点就是一个极点</span><br><span class="line">    k &#x3D; lt</span><br><span class="line">    newList.append(S[k])#添加第一个极点到极点列表里面</span><br><span class="line">    while 1:   </span><br><span class="line">        S[k][2] &#x3D; 1</span><br><span class="line">        s &#x3D; -1</span><br><span class="line">        for t in range(0,n):</span><br><span class="line">            #如果要判断的t,k,s不相等，并且为相连的极点</span><br><span class="line">            if t !&#x3D; k and t !&#x3D; s and (s &#x3D;&#x3D; -1 or toLeft(S[k],S[s],S[t])):</span><br><span class="line">                s &#x3D; t</span><br><span class="line">        k &#x3D; s</span><br><span class="line">        if k &#x3D;&#x3D; lt:</span><br><span class="line">            break</span><br><span class="line">        newList.append(S[s])</span><br><span class="line">    return newList</span><br><span class="line">    #print S</span><br><span class="line">lineList &#x3D; []</span><br><span class="line">pointList &#x3D; [[4,3,0],[5,1,0],[2,3,0],[2,2,0],[3,2,0],[3,3,0],[1,1,0],[1,3,0],[2,4,0]] #二维数组，前两位是坐标，后一位存储是否为极点，0非极点，1极点</span><br><span class="line">lineList &#x3D; markEE(pointList,len(pointList))</span><br><span class="line">print lineList </span><br></pre></td></tr></table></figure>
+<p>运行结果：</p>
+<p><img src="/img/blog/2350612-a9244f2bb771adcc.png" alt="Alt text"></p>
+<p>通过这种算法，我们将算法时间复杂度降到了O(n^2), 并且的到了一个已经排序好的极点列表。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2016/11/14/201611/计算几何ConvexHull凸包问题四/" class="prev">上一篇：【计算几何】Convex Hull凸包问题（四）</a>
+    
+    
+    <a href="/2016/11/14/201611/计算几何ConvexHull凸包问题二/" class="next">下一篇：【计算几何】Convex Hull凸包问题（二）</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

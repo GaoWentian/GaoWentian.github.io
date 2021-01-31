@@ -1,0 +1,185 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Redis高级应用--阻塞的原因 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介Redis是单线程架构，如果该线程出现阻塞，将导致Redis不能提供服务。导致阻塞问题的场景大致分为两种原因：
+
+内在原因：不合理使用API或数据库、CPU饱和、持久化阻塞
+外在原因：CPU竞争、内存交换和网络问题等内在原因API或数据结构使用不合理Redis可以使用慢查询功能获取慢查询命令，默">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Redis高级应用--阻塞的原因"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-12-26T14:33:47.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-12-26
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Redis高级应用--阻塞的原因</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%9C%A8%E5%8E%9F%E5%9B%A0"><span class="toc-number">2.</span> <span class="toc-text">内在原因</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#API%E6%88%96%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E4%BD%BF%E7%94%A8%E4%B8%8D%E5%90%88%E7%90%86"><span class="toc-number">2.1.</span> <span class="toc-text">API或数据结构使用不合理</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CPU%E9%A5%B1%E5%92%8C"><span class="toc-number">2.2.</span> <span class="toc-text">CPU饱和</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8C%81%E4%B9%85%E5%8C%96%E9%98%BB%E5%A1%9E"><span class="toc-number">2.3.</span> <span class="toc-text">持久化阻塞</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#fork%E9%98%BB%E5%A1%9E"><span class="toc-number">2.3.1.</span> <span class="toc-text">fork阻塞</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#AOF%E5%88%B7%E7%9B%98%E9%98%BB%E5%A1%9E"><span class="toc-number">2.3.2.</span> <span class="toc-text">AOF刷盘阻塞</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#HugePage%E5%86%99%E6%93%8D%E4%BD%9C%E9%98%BB%E5%A1%9E"><span class="toc-number">2.3.3.</span> <span class="toc-text">HugePage写操作阻塞</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%96%E5%9C%A8%E5%8E%9F%E5%9B%A0"><span class="toc-number">3.</span> <span class="toc-text">外在原因</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#CPU%E7%AB%9E%E4%BA%89"><span class="toc-number">3.1.</span> <span class="toc-text">CPU竞争</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E4%BA%A4%E6%8D%A2"><span class="toc-number">3.2.</span> <span class="toc-text">内存交换</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BD%91%E7%BB%9C%E9%97%AE%E9%A2%98"><span class="toc-number">3.3.</span> <span class="toc-text">网络问题</span></a></li></ol></li></ol>
+    </div>
+    
+    <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Redis是单线程架构，如果该线程出现阻塞，将导致Redis不能提供服务。导致阻塞问题的场景大致分为两种原因：</p>
+<ul>
+<li>内在原因：不合理使用API或数据库、CPU饱和、持久化阻塞</li>
+<li>外在原因：CPU竞争、内存交换和网络问题等<h3 id="内在原因"><a href="#内在原因" class="headerlink" title="内在原因"></a>内在原因</h3><h4 id="API或数据结构使用不合理"><a href="#API或数据结构使用不合理" class="headerlink" title="API或数据结构使用不合理"></a>API或数据结构使用不合理</h4>Redis可以使用慢查询功能获取慢查询命令，默认超过10毫秒的命令都记录到定长队列（默认128）中。如果命令执行时间是毫秒级，实际OPS只有1000多，因此需要找到慢的查询指令，并进行优化。Redis两个和慢查询日志相关的选项：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">slowlog-log-slower-than    1 # 指定超过1毫秒的命令会被记录到日志上</span><br><span class="line">slowlog-max-len 128 # 设置保存128条日志（先进先出，超过128条会丢掉前面的日志）</span><br><span class="line"></span><br><span class="line">slowlog get &#123;n&#125;     # 获取n条慢查询命令，不适用n则获取全部慢查询日志</span><br></pre></td></tr></table></figure>
+发现慢查询后，可以对命令及时调整：</li>
+<li>修改为低时间复杂度的命令，禁用keys、sort等命令</li>
+<li>调整大对象：将大对象拆分为多个小对象</li>
+</ul>
+<h4 id="CPU饱和"><a href="#CPU饱和" class="headerlink" title="CPU饱和"></a>CPU饱和</h4><p>Redis使用单线程，CPU饱和是指Redis将CPU跑到接近100%，其他命令就无法执行，从而造成阻塞。使用top命令，可以看到Redis线程使用CPU达到92.3%。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">PID USER      PR  NI    VIRT    RES    SHR S  %CPU %MEM     TIME+ COMMAND</span><br><span class="line"> 28 gavin     20   0  582064 537320   1660 R  92.3  6.5   0:39.32 redis-server</span><br><span class="line"> 44 gavin     20   0   20840   1372   1000 S   0.0  0.0   0:00.03 redis-cli</span><br></pre></td></tr></table></figure>
+<h4 id="持久化阻塞"><a href="#持久化阻塞" class="headerlink" title="持久化阻塞"></a>持久化阻塞</h4><p>持久化阻塞操作有：fork阻塞、AOF刷盘阻塞和HugePage写操作阻塞三种。</p>
+<h5 id="fork阻塞"><a href="#fork阻塞" class="headerlink" title="fork阻塞"></a>fork阻塞</h5><p>Redis做RDB和AOF重写和持久化时，需要执行fork操作创建子进程（bgsave操作），子进程不拷贝父进程物理内存空间，但是会复制父进程的空间内存页表（10g的Redis进程，需要复制20MB的内存页表）。因此如果fork操作本身耗时过长，也会导致主线程的阻塞。</p>
+<h5 id="AOF刷盘阻塞"><a href="#AOF刷盘阻塞" class="headerlink" title="AOF刷盘阻塞"></a>AOF刷盘阻塞</h5><p>开启AOF持久化时，文件刷盘一般每秒一次，后台线程每秒对AOF文件做fsync操作。硬盘压力过大时，fsync操作需要等待，直到写入完成。如果主线程发现距离上次的fsync成功超过两秒，为了数据安全性会阻塞到后台线程fsync操作完成。</p>
+<h5 id="HugePage写操作阻塞"><a href="#HugePage写操作阻塞" class="headerlink" title="HugePage写操作阻塞"></a>HugePage写操作阻塞</h5><p>子进程在执行重写期间利用Linux写时复制降低内存开销，因此只有写操作是Redis才会复制要修改的内存页。如果开启Transparent HugePage，每次写入命令引起的复制内存页单位由4K变为2MB，放大512倍，拖慢写操作的执行时间。</p>
+<h3 id="外在原因"><a href="#外在原因" class="headerlink" title="外在原因"></a>外在原因</h3><h4 id="CPU竞争"><a href="#CPU竞争" class="headerlink" title="CPU竞争"></a>CPU竞争</h4><ul>
+<li>进程竞争<br>如果其他进程过度消耗CPU，会严重影响Redis的吞吐量。</li>
+<li>绑定CPU<br>部署Redis时，可以将Redis绑定在CPU上，但是一些情况下会出现问题。当Redis父进程创建子进程执行RDB/AOF持久化时，如果绑定了CPU，子进程和父进程有可能会共享一个CPU，影响Redis稳定性。<h4 id="内存交换"><a href="#内存交换" class="headerlink" title="内存交换"></a>内存交换</h4>内存交换是指操作系统将Redis使用的部分内存换到硬盘上去，造成Redis性能急剧下降。因此需要保证机器有充足的内存，防止内存交换。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis-cli info server | grep process_id        #获取Redis进程号</span><br><span class="line">cat &#x2F;proc&#x2F;4476&#x2F;smaps | grep Swap 87            #根据进程号查询内存交换信息</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h4 id="网络问题"><a href="#网络问题" class="headerlink" title="网络问题"></a>网络问题</h4>网络问题经常是引起Redis阻塞的问题。常见网络问题有：连接拒接、网络延迟、网卡软中断等</li>
+</ul>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/12/28/201912/我的书单/" class="prev">上一篇：我的书单</a>
+    
+    
+    <a href="/2019/12/25/201912/Redis高级应用对象的实现原理/" class="next">下一篇：Redis高级应用--对象的实现原理</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

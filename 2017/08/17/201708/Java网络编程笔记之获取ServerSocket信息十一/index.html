@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java网络编程笔记之获取 ServerSocket 信息（十一） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="与 ServerSocket 对象相关的信息有两个：绑定端口和绑定 IP 地址。绑定端口可以通过 getLocalPort方法获得。绑定 IP 地址可以通过 getInetAddress 方法获得
+getLocalPort 方法
+ServerSocket 对象未绑定端口，getLocalPort 方">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java网络编程笔记之获取 ServerSocket 信息（十一）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-08-16T17:11:28.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-08-17
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java网络编程笔记之获取 ServerSocket 信息（十一）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#getLocalPort-%E6%96%B9%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">getLocalPort 方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#getInetAddress-%E6%96%B9%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">getInetAddress 方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#getLocalSocketAddress"><span class="toc-number">3.</span> <span class="toc-text">getLocalSocketAddress</span></a></li></ol>
+    </div>
+    
+    <p>与 ServerSocket 对象相关的信息有两个：绑定端口和绑定 IP 地址。绑定端口可以通过 getLocalPort方法获得。绑定 IP 地址可以通过 getInetAddress 方法获得</p>
+<h4 id="getLocalPort-方法"><a href="#getLocalPort-方法" class="headerlink" title="getLocalPort 方法"></a>getLocalPort 方法</h4><ol>
+<li>ServerSocket 对象未绑定端口，getLocalPort 方法的返回值为-1。</li>
+<li>ServerSocket 对象绑定了一个固定的端口，getLocalPort 方法返回固定端口。</li>
+<li>ServerSocket 对象的绑定端口为 0，getLocalPort 方法返回一个随机的端口也被称为匿名端口。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.ServerSocket;</span><br><span class="line"></span><br><span class="line">public class getLocalPort &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws IOException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		for(int i &#x3D;1 ; i &lt;&#x3D; 5;i++)&#123;</span><br><span class="line">			System.out.println(&quot;随机端口&quot;+i+&quot;:&quot;);</span><br><span class="line">			System.out.println(new ServerSocket(0).getLocalPort());</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+输出结果是：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">随机端口1:</span><br><span class="line">49556</span><br><span class="line">随机端口2:</span><br><span class="line">49557</span><br><span class="line">随机端口3:</span><br><span class="line">49558</span><br><span class="line">随机端口4:</span><br><span class="line">49559</span><br><span class="line">随机端口5:</span><br><span class="line">49560</span><br></pre></td></tr></table></figure>
+<h4 id="getInetAddress-方法"><a href="#getInetAddress-方法" class="headerlink" title="getInetAddress 方法"></a>getInetAddress 方法</h4>getInetAddress 可以得到 ServerSocket 对象绑定的 IP 地址。如果 ServerSocket 对象未绑定 IP 地址，返回 0.0.0.0。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.InetSocketAddress;</span><br><span class="line">import java.net.ServerSocket;</span><br><span class="line"></span><br><span class="line">public class getInetAddress &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws IOException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		ServerSocket serverSocket &#x3D; new ServerSocket();</span><br><span class="line">		serverSocket.bind(new InetSocketAddress(&quot;192.168.107.1&quot;,0));</span><br><span class="line">		System.out.println(serverSocket.getInetAddress().getHostAddress());</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+运行结果：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">192.168.107.1</span><br></pre></td></tr></table></figure>
+<h4 id="getLocalSocketAddress"><a href="#getLocalSocketAddress" class="headerlink" title="getLocalSocketAddress"></a>getLocalSocketAddress</h4>使用 getLocalSocketAddress 方法可以同时得到绑定端口和绑定 IP 地址。 这个方法返回了一个 SocketAddress 对象。SocketAddress 类是一个抽象类，要想分别得到端口和 IP 地址，必须将 SocketAddress 对象转换成 InetSocketAddress 对象（InetSocketAddress 类是从 SocketAddress 类继承的）<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.InetSocketAddress;</span><br><span class="line">import java.net.ServerSocket;</span><br><span class="line"></span><br><span class="line">public class getInetAddress &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws IOException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		ServerSocket serverSocket &#x3D; new ServerSocket();</span><br><span class="line">		serverSocket.bind(new InetSocketAddress(&quot;192.168.107.1&quot;,1234));</span><br><span class="line">		System.out.println(serverSocket.getLocalSocketAddress());</span><br><span class="line">		InetSocketAddress nsa &#x3D; (InetSocketAddress) serverSocket.getLocalSocketAddress();</span><br><span class="line">		System.out.println(nsa.getAddress().getHostAddress());</span><br><span class="line">		System.out.println(nsa.getPort());	</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+输出结果：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;192.168.107.1:1234</span><br><span class="line">192.168.107.1</span><br><span class="line">1234</span><br></pre></td></tr></table></figure></li>
+</ol>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/08/19/201708/Java基础之IO/" class="prev">上一篇：Java基础之I/O</a>
+    
+    
+    <a href="/2017/08/12/201708/Java网络编程笔记之关闭服务端连接十/" class="next">下一篇：Java网络编程笔记之关闭服务端连接（十）</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

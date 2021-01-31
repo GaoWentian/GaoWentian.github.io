@@ -1,0 +1,336 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Zookeeper基础--简单用法 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="概述Zookeeper 是一个分布式协调服务的框架，用来解决分布式集群中的一致性问题。Zookeeper 本质上是一个分布式小文件存储系统，提供类似于目录树的方式存储数据，通过对数据状态变化的监控，实现基于数据的集群管理。Zookeeper 有一下应用场景：
+
+维护配置信息
+分布式锁服务
+集群管理
+">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Zookeeper基础--简单用法"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2020-03-21T09:01:52.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-03-21
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Zookeeper基础--简单用法</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A6%82%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">概述</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E6%A8%A1%E5%9E%8B"><span class="toc-number">2.</span> <span class="toc-text">数据模型</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8A%82%E7%82%B9%E4%BF%A1%E6%81%AF"><span class="toc-number">2.1.</span> <span class="toc-text">节点信息</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8A%82%E7%82%B9%E7%B1%BB%E5%9E%8B"><span class="toc-number">2.2.</span> <span class="toc-text">节点类型</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%89%E8%A3%85"><span class="toc-number">3.</span> <span class="toc-text">安装</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-JDK"><span class="toc-number">3.1.</span> <span class="toc-text">安装 JDK</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%89%E8%A3%85-Zookeeper"><span class="toc-number">3.2.</span> <span class="toc-text">安装 Zookeeper</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Zookeeper-%E5%B8%B8%E7%94%A8-Shell-%E5%91%BD%E4%BB%A4"><span class="toc-number">4.</span> <span class="toc-text">Zookeeper 常用 Shell 命令</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B0%E5%A2%9E%E8%8A%82%E7%82%B9"><span class="toc-number">4.1.</span> <span class="toc-text">新增节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9B%B4%E6%96%B0%E8%8A%82%E7%82%B9"><span class="toc-number">4.2.</span> <span class="toc-text">更新节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9"><span class="toc-number">4.3.</span> <span class="toc-text">删除节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E8%8A%82%E7%82%B9%E5%92%8C%E6%9F%A5%E7%9C%8B%E8%8A%82%E7%82%B9%E7%8A%B6%E6%80%81"><span class="toc-number">4.4.</span> <span class="toc-text">查看节点和查看节点状态</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E7%9C%8B%E8%8A%82%E7%82%B9%E5%88%97%E8%A1%A8"><span class="toc-number">4.5.</span> <span class="toc-text">查看节点列表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%91%E5%90%AC%E5%99%A8"><span class="toc-number">4.6.</span> <span class="toc-text">监听器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ACL-%E6%9D%83%E9%99%90%E6%8E%A7%E5%88%B6"><span class="toc-number">5.</span> <span class="toc-text">ACL 权限控制</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8E%88%E6%9D%83%E6%A8%A1%E5%BC%8F"><span class="toc-number">5.1.</span> <span class="toc-text">授权模式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8E%88%E4%BA%88%E6%9D%83%E9%99%90"><span class="toc-number">5.2.</span> <span class="toc-text">授予权限</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8E%88%E6%9D%83%E7%9B%B8%E5%85%B3%E5%91%BD%E4%BB%A4"><span class="toc-number">5.3.</span> <span class="toc-text">授权相关命令</span></a></li></ol></li></ol>
+    </div>
+    
+    <h3 id="概述"><a href="#概述" class="headerlink" title="概述"></a>概述</h3><p>Zookeeper 是一个分布式协调服务的框架，用来解决分布式集群中的一致性问题。Zookeeper 本质上是一个分布式小文件存储系统，提供类似于目录树的方式存储数据，通过对数据状态变化的监控，实现基于数据的集群管理。Zookeeper 有一下应用场景：</p>
+<ul>
+<li>维护配置信息</li>
+<li>分布式锁服务</li>
+<li>集群管理</li>
+<li>生成分布式唯一 ID</li>
+</ul>
+<h3 id="数据模型"><a href="#数据模型" class="headerlink" title="数据模型"></a>数据模型</h3><p>Zookeeper 数据节点是树状结构，树中的节点称为 znode，一个 znode 有多个子节点，变现为树状。可以使用路径来定位某个 znode，比如/xxx1/xxx2/xxx3 其中 xxx1 为根节点，xxx2 为 2 级节点，xxx3 为 3 级节点，依次类推。znode 兼具文件和目录两种特点，即像文件一样维护数据、元信息、ACL、时间戳等数据结构，又像目录一样作为路径标识的一部分。<br>znode 大体分为三部分：</p>
+<ul>
+<li>节点数据：节点 path，节点 data</li>
+<li>节点的子节点 children</li>
+<li>节点的状态：描述当前节点创建和修改记录</li>
+</ul>
+<h4 id="节点信息"><a href="#节点信息" class="headerlink" title="节点信息"></a>节点信息</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 3] get &#x2F;test0000000000</span><br><span class="line">123</span><br><span class="line">cZxid &#x3D; 0x2</span><br><span class="line">ctime &#x3D; Fri Mar 20 15:53:30 UTC 2020</span><br><span class="line">mZxid &#x3D; 0x2</span><br><span class="line">mtime &#x3D; Fri Mar 20 15:53:30 UTC 2020</span><br><span class="line">pZxid &#x3D; 0x2</span><br><span class="line">cversion &#x3D; 0</span><br><span class="line">dataVersion &#x3D; 0</span><br><span class="line">aclVersion &#x3D; 0</span><br><span class="line">ephemeralOwner &#x3D; 0x0</span><br><span class="line">dataLength &#x3D; 3</span><br><span class="line">numChildren &#x3D; 0</span><br></pre></td></tr></table></figure>
+<p>查看 test0000000000 节点，第一行展示的是节点的数据。</p>
+<ul>
+<li>cZxid：数据节点创建时的事务 ID</li>
+<li>ctime：数据节点创建时的时间</li>
+<li>mZxid：数据节点左后一次更新时的事务 ID</li>
+<li>mtime：数据节点最后一次更新时的时间</li>
+<li>pZxid：数据节点的子节点最后一次被修改时的事务 ID</li>
+<li>cversion：子节点的更改次数</li>
+<li>dataVersion：节点数据的更改次数</li>
+<li>aclVersion：节点的 ACL 的更改次数</li>
+<li>ephemeralOwner：如果节点是临时节点，则表示创建节点的会话的 SessionID;如果创建的节点是持久节点，则该属性值为 0.</li>
+<li>dataLength：数据内容的长度</li>
+<li>numChildren：数据节点当前的子节点个数</li>
+</ul>
+<h4 id="节点类型"><a href="#节点类型" class="headerlink" title="节点类型"></a>节点类型</h4><p>Zookeeper 中的节点有两种，分别是临时节点和永久节点。节点的类型在创建时即被确定，不能改变。</p>
+<ul>
+<li>临时节点：该节点的生命周期依赖于创建它们的会话。一旦会话结束，临时节点将被自动删除，也可以手动删除。Zookeeper 的临时节点不允许拥有子节点。</li>
+<li>持久化节点：该节点的生命周期不依赖于会话，并且只有在客户端执行删除操作的时候，它们才会被删除。</li>
+</ul>
+<h3 id="安装"><a href="#安装" class="headerlink" title="安装"></a>安装</h3><h4 id="安装-JDK"><a href="#安装-JDK" class="headerlink" title="安装 JDK"></a>安装 JDK</h4><p>Zookeeper 依赖 JDK，因此需要先安装 JDK.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;解压JDK文件</span><br><span class="line">tar -xzvf jdk-8u231-linux-x64.tar.gz</span><br><span class="line">&#x2F;&#x2F;打开.bash_profile文件</span><br><span class="line">vim ~&#x2F;.bash_profile</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;编辑以下内容，&#x2F;data&#x2F;app&#x2F;jdk1.8.0_231为刚刚解压的文件夹。</span><br><span class="line">JAVA_HOME&#x3D;&#x2F;data&#x2F;app&#x2F;jdk1.8.0_231</span><br><span class="line">export JAVA_HOME</span><br><span class="line"></span><br><span class="line">PATH&#x3D;$JAVA_HOME&#x2F;bin:$PATH</span><br><span class="line">export PATH</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;保存退出后，使用以下命令使bash_profile文件生效</span><br><span class="line">source ~&#x2F;.bash_profile</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 查看Java是否安装成功</span><br><span class="line">root@master:&#x2F;data&#x2F;app# java -version</span><br><span class="line">java version &quot;1.8.0_231&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_231-b11)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.231-b11, mixed mode)</span><br></pre></td></tr></table></figure>
+<h4 id="安装-Zookeeper"><a href="#安装-Zookeeper" class="headerlink" title="安装 Zookeeper"></a>安装 Zookeeper</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;解压Zookeeper压缩包</span><br><span class="line">tar -xzvf zookeeper-3.4.9.tar.gz</span><br><span class="line">&#x2F;&#x2F;进入Zookeeper配置文件夹</span><br><span class="line">cd zookeeper-3.4.9&#x2F;conf</span><br><span class="line">&#x2F;&#x2F;Zookeeper复制官方配置文件示例</span><br><span class="line">cp zoo_sample.cfg zoo.cfg</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>zoo.cfg 配置文件如下所示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br></pre></td><td class="code"><pre><span class="line"># CS通信心跳时间，单位是毫秒，默认是2000毫秒。tickTime主要是客户端与服务器端或者是服务器与服务器端之间维持心跳。</span><br><span class="line">tickTime&#x3D;2000</span><br><span class="line"># 集群中的follower服务器与leader服务器之间初始连接时能容忍的最多心跳数</span><br><span class="line">initLimit&#x3D;10</span><br><span class="line"># 集群中flower服务器和leader服务器之间的请求和应答最多能容忍的心跳数</span><br><span class="line">syncLimit&#x3D;5</span><br><span class="line"># 此路径存储Zookeeper数据的内存快照以及事务日志文件，因此需要修改，这里修改到Zookeeper文件夹的data文件夹中</span><br><span class="line">dataDir&#x3D;&#x2F;data&#x2F;app&#x2F;zookeeper-3.4.9&#x2F;data</span><br><span class="line"># the port at which the clients will connect</span><br><span class="line">clientPort&#x3D;2181</span><br><span class="line"># the maximum number of client connections.</span><br><span class="line"># increase this if you need to handle more clients</span><br><span class="line">#maxClientCnxns&#x3D;60</span><br><span class="line">#</span><br><span class="line"># Be sure to read the maintenance section of the</span><br><span class="line"># administrator guide before turning on autopurge.</span><br><span class="line">#</span><br><span class="line"># http:&#x2F;&#x2F;zookeeper.apache.org&#x2F;doc&#x2F;current&#x2F;zookeeperAdmin.html#sc_maintenance</span><br><span class="line">#</span><br><span class="line"># The number of snapshots to retain in dataDir</span><br><span class="line">#autopurge.snapRetainCount&#x3D;3</span><br><span class="line"># Purge task interval in hours</span><br><span class="line"># Set to &quot;0&quot; to disable auto purge feature</span><br><span class="line">#autopurge.purgeInterval&#x3D;1</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;进入zookeeper的bin文件夹中</span><br><span class="line">cd bin&#x2F;</span><br><span class="line">&#x2F;&#x2F; 启动</span><br><span class="line">.&#x2F;zkServer.sh start</span><br><span class="line">&#x2F;&#x2F; 停止</span><br><span class="line">.&#x2F;zkServer.sh stop</span><br><span class="line">&#x2F;&#x2F; 查看状态</span><br><span class="line">.&#x2F;zkServer.sh status</span><br></pre></td></tr></table></figure>
+<h3 id="Zookeeper-常用-Shell-命令"><a href="#Zookeeper-常用-Shell-命令" class="headerlink" title="Zookeeper 常用 Shell 命令"></a>Zookeeper 常用 Shell 命令</h3><h4 id="新增节点"><a href="#新增节点" class="headerlink" title="新增节点"></a>新增节点</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">create [-s] [-e] path data # -s为有序节点， -e为临时节点</span><br></pre></td></tr></table></figure>
+<p>节点可以分为 4 小类，分别是：</p>
+<ul>
+<li>持久化节点</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 0] create &#x2F;hadoop &quot;123456&quot;</span><br><span class="line">Created &#x2F;hadoop</span><br></pre></td></tr></table></figure>
+<ul>
+<li>持久化有序节点<br>创建持久化有序节点，创建的节点名为指定节点名 + 自增序号</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 0] create -s &#x2F;a &quot;aaa&quot;</span><br><span class="line">Created &#x2F;a0000000002</span><br><span class="line">[zk: localhost:2181(CONNECTED) 0] create -s &#x2F;b &quot;bbb&quot;</span><br><span class="line">Created &#x2F;b0000000003</span><br></pre></td></tr></table></figure>
+<ul>
+<li>临时节点<br>创建临时节点，临时节点会在会话过期后删除</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 0] create -e &#x2F;tmp &quot;tmp&quot;</span><br><span class="line">Created &#x2F;tmp</span><br></pre></td></tr></table></figure>
+<ul>
+<li>临时有序节点</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 0] create -s -e &#x2F;aa &#39;aaa&#39;</span><br><span class="line">Created &#x2F;aa0000000005</span><br></pre></td></tr></table></figure>
+<h4 id="更新节点"><a href="#更新节点" class="headerlink" title="更新节点"></a>更新节点</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set path [version]</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 0] get &#x2F;hadoop</span><br><span class="line">123456</span><br><span class="line">cZxid &#x3D; 0x5</span><br><span class="line">ctime &#x3D; Sat Mar 21 03:26:13 UTC 2020</span><br><span class="line">mZxid &#x3D; 0x5</span><br><span class="line">mtime &#x3D; Sat Mar 21 03:26:13 UTC 2020</span><br><span class="line">pZxid &#x3D; 0x5</span><br><span class="line">cversion &#x3D; 0</span><br><span class="line">dataVersion &#x3D; 0</span><br><span class="line">aclVersion &#x3D; 0</span><br><span class="line">ephemeralOwner &#x3D; 0x0</span><br><span class="line">dataLength &#x3D; 6</span><br><span class="line">numChildren &#x3D; 0</span><br><span class="line">[zk: localhost:2181(CONNECTED) 1] set &#x2F;hadoop &quot;654321&quot;</span><br><span class="line">cZxid &#x3D; 0x5</span><br><span class="line">ctime &#x3D; Sat Mar 21 03:26:13 UTC 2020</span><br><span class="line">mZxid &#x3D; 0x16</span><br><span class="line">mtime &#x3D; Sat Mar 21 03:47:22 UTC 2020</span><br><span class="line">pZxid &#x3D; 0x5</span><br><span class="line">cversion &#x3D; 0</span><br><span class="line">dataVersion &#x3D; 1</span><br><span class="line">aclVersion &#x3D; 0</span><br><span class="line">ephemeralOwner &#x3D; 0x0</span><br><span class="line">dataLength &#x3D; 6</span><br><span class="line">numChildren &#x3D; 0</span><br></pre></td></tr></table></figure>
+<p>dataVersion 参数记录数据的版本号，每次修改数据之后，版本号也发生变化。set 命令也可以加入版本号，如果版本号不匹配，Zookeeper 会拒绝更新数据，类似于乐观锁机制。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 0] get &#x2F;hadoop</span><br><span class="line">654321</span><br><span class="line">cZxid &#x3D; 0x5</span><br><span class="line">ctime &#x3D; Sat Mar 21 03:26:13 UTC 2020</span><br><span class="line">mZxid &#x3D; 0x16</span><br><span class="line">mtime &#x3D; Sat Mar 21 03:47:22 UTC 2020</span><br><span class="line">pZxid &#x3D; 0x5</span><br><span class="line">cversion &#x3D; 0</span><br><span class="line">dataVersion &#x3D; 1</span><br><span class="line">aclVersion &#x3D; 0</span><br><span class="line">ephemeralOwner &#x3D; 0x0</span><br><span class="line">dataLength &#x3D; 6</span><br><span class="line">numChildren &#x3D; 0</span><br><span class="line">[zk: localhost:2181(CONNECTED) 1] set &#x2F;hadoop &quot;111&quot; 0</span><br><span class="line">version No is not valid : &#x2F;hadoop</span><br><span class="line">[zk: localhost:2181(CONNECTED) 2] set &#x2F;hadoop &quot;111&quot; 1</span><br><span class="line">cZxid &#x3D; 0x5</span><br><span class="line">ctime &#x3D; Sat Mar 21 03:26:13 UTC 2020</span><br><span class="line">mZxid &#x3D; 0x1a</span><br><span class="line">mtime &#x3D; Sat Mar 21 03:49:37 UTC 2020</span><br><span class="line">pZxid &#x3D; 0x5</span><br><span class="line">cversion &#x3D; 0</span><br><span class="line">dataVersion &#x3D; 2</span><br><span class="line">aclVersion &#x3D; 0</span><br><span class="line">ephemeralOwner &#x3D; 0x0</span><br><span class="line">dataLength &#x3D; 3</span><br><span class="line">numChildren &#x3D; 0</span><br></pre></td></tr></table></figure>
+<h4 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">delete path [version]</span><br></pre></td></tr></table></figure>
+<p>和更新节点一样，delete 命令可以添加版本号，如果版本号不一致，不允许删除。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 0] get &#x2F;hadoop</span><br><span class="line">111</span><br><span class="line">cZxid &#x3D; 0x5</span><br><span class="line">ctime &#x3D; Sat Mar 21 03:26:13 UTC 2020</span><br><span class="line">mZxid &#x3D; 0x1a</span><br><span class="line">mtime &#x3D; Sat Mar 21 03:49:37 UTC 2020</span><br><span class="line">pZxid &#x3D; 0x5</span><br><span class="line">cversion &#x3D; 0</span><br><span class="line">dataVersion &#x3D; 2</span><br><span class="line">aclVersion &#x3D; 0</span><br><span class="line">ephemeralOwner &#x3D; 0x0</span><br><span class="line">dataLength &#x3D; 3</span><br><span class="line">numChildren &#x3D; 0</span><br><span class="line">[zk: localhost:2181(CONNECTED) 1] delete &#x2F;hadoop 1</span><br><span class="line">version No is not valid : &#x2F;hadoop</span><br><span class="line">[zk: localhost:2181(CONNECTED) 2] delete &#x2F;hadoop 2</span><br><span class="line">[zk: localhost:2181(CONNECTED) 3] get &#x2F;hadoop</span><br><span class="line">Node does not exist: &#x2F;hadoop</span><br></pre></td></tr></table></figure>
+<p>要删除节点和后代节点，可以使用递归删除：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">rmr path</span><br></pre></td></tr></table></figure>
+<h4 id="查看节点和查看节点状态"><a href="#查看节点和查看节点状态" class="headerlink" title="查看节点和查看节点状态"></a>查看节点和查看节点状态</h4><p>使用 get 命令可以看到节点的数据和状态。stat 命令只能查看状态，不能查看数据。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 2] get &#x2F;hadoop</span><br><span class="line">321</span><br><span class="line">cZxid &#x3D; 0x21</span><br><span class="line">ctime &#x3D; Sat Mar 21 03:54:30 UTC 2020</span><br><span class="line">mZxid &#x3D; 0x22</span><br><span class="line">mtime &#x3D; Sat Mar 21 03:54:41 UTC 2020</span><br><span class="line">pZxid &#x3D; 0x21</span><br><span class="line">cversion &#x3D; 0</span><br><span class="line">dataVersion &#x3D; 1</span><br><span class="line">aclVersion &#x3D; 0</span><br><span class="line">ephemeralOwner &#x3D; 0x0</span><br><span class="line">dataLength &#x3D; 3</span><br><span class="line">numChildren &#x3D; 0</span><br><span class="line">[zk: localhost:2181(CONNECTED) 3] stat &#x2F;hadoop</span><br><span class="line">cZxid &#x3D; 0x21</span><br><span class="line">ctime &#x3D; Sat Mar 21 03:54:30 UTC 2020</span><br><span class="line">mZxid &#x3D; 0x22</span><br><span class="line">mtime &#x3D; Sat Mar 21 03:54:41 UTC 2020</span><br><span class="line">pZxid &#x3D; 0x21</span><br><span class="line">cversion &#x3D; 0</span><br><span class="line">dataVersion &#x3D; 1</span><br><span class="line">aclVersion &#x3D; 0</span><br><span class="line">ephemeralOwner &#x3D; 0x0</span><br><span class="line">dataLength &#x3D; 3</span><br><span class="line">numChildren &#x3D; 0</span><br></pre></td></tr></table></figure>
+<h4 id="查看节点列表"><a href="#查看节点列表" class="headerlink" title="查看节点列表"></a>查看节点列表</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ls path</span><br><span class="line">ls2 path</span><br></pre></td></tr></table></figure>
+<p>使用 ls 和 ls2 命令可以查看某个节点下的所有子节点。ls2 可以返回当前节点的状态。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">[zk: localhost:2181(CONNECTED) 6] create &#x2F;hadoop&#x2F;node1 &quot;123&quot;</span><br><span class="line">Created &#x2F;hadoop&#x2F;node1</span><br><span class="line">[zk: localhost:2181(CONNECTED) 8] create &#x2F;hadoop&#x2F;node2 &quot;321&quot;</span><br><span class="line">Created &#x2F;hadoop&#x2F;node2</span><br><span class="line">[zk: localhost:2181(CONNECTED) 9] ls &#x2F;hadoop</span><br><span class="line">[node2, node1]</span><br><span class="line">[zk: localhost:2181(CONNECTED) 0] ls2 &#x2F;hadoop</span><br><span class="line">[node2, node1]</span><br><span class="line">cZxid &#x3D; 0x21</span><br><span class="line">ctime &#x3D; Sat Mar 21 03:54:30 UTC 2020</span><br><span class="line">mZxid &#x3D; 0x22</span><br><span class="line">mtime &#x3D; Sat Mar 21 03:54:41 UTC 2020</span><br><span class="line">pZxid &#x3D; 0x27</span><br><span class="line">cversion &#x3D; 2</span><br><span class="line">dataVersion &#x3D; 1</span><br><span class="line">aclVersion &#x3D; 0</span><br><span class="line">ephemeralOwner &#x3D; 0x0</span><br><span class="line">dataLength &#x3D; 3</span><br><span class="line">numChildren &#x3D; 2</span><br></pre></td></tr></table></figure>
+<h4 id="监听器"><a href="#监听器" class="headerlink" title="监听器"></a>监听器</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">get path [watch]</span><br><span class="line">stat path [watch]</span><br><span class="line">ls\ls2 path [watch]</span><br></pre></td></tr></table></figure>
+<ul>
+<li>get path watch 注册的监听器能够在节点内容发生改变时，向客户端发送通知。Zookeeper 的触发器是一次性的，触发一次后就失效。</li>
+<li>stat path [watch]注册的监听器能够在节点状态发生改变时，向客户端发出通知。</li>
+<li>ls\ls2 path [watch]监听器能够监听该节点下所有子节点的增加和删除操作。</li>
+</ul>
+<h3 id="ACL-权限控制"><a href="#ACL-权限控制" class="headerlink" title="ACL 权限控制"></a>ACL 权限控制</h3><p>ACL 权限控制，使用 scheme：id：permission 来标识，其中：</p>
+<ul>
+<li>权限模式（scheme）：授权的策略</li>
+<li>授权对象（id）：授权的对象</li>
+<li>权限（permission 来标识）：授权的权限</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">setAcl &#x2F;test ip:192.168.1.1:crwda  #设置&#x2F;test节点的权限到IP地址为192.168.1.1的客户端，授予增、删、改、查、管理权限。</span><br></pre></td></tr></table></figure>
+<p>Zookeeper 基于每个节点来设置权限，需要多每个节点设置权限。每个 znode 支持设置多种权限控制方案和多个权限。子节点不会继承父节点权限，客户端可能无权访问某个节点，但是可以访问子节点。</p>
+<h4 id="授权模式"><a href="#授权模式" class="headerlink" title="授权模式"></a>授权模式</h4><table>
+<thead>
+<tr>
+<th>模式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>world</td>
+<td>只有一个用户：anyone</td>
+</tr>
+<tr>
+<td>ip</td>
+<td>对客户端使用 ip 地址认证</td>
+</tr>
+<tr>
+<td>auth</td>
+<td>使用已添加认证的用户认证</td>
+</tr>
+<tr>
+<td>digest</td>
+<td>使用“用户：密码”的方式认证</td>
+</tr>
+</tbody></table>
+<h4 id="授予权限"><a href="#授予权限" class="headerlink" title="授予权限"></a>授予权限</h4><table>
+<thead>
+<tr>
+<th>权限</th>
+<th>ACL 缩写</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>create</td>
+<td>c</td>
+<td>可以创建子节点</td>
+</tr>
+<tr>
+<td>delete</td>
+<td>d</td>
+<td>可以删除子节点</td>
+</tr>
+<tr>
+<td>read</td>
+<td>r</td>
+<td>可以读取节点数据以及显示子节点列表</td>
+</tr>
+<tr>
+<td>write</td>
+<td>w</td>
+<td>可以设置节点数据</td>
+</tr>
+<tr>
+<td>admin</td>
+<td>a</td>
+<td>可以设置节点访问控制列表权限</td>
+</tr>
+</tbody></table>
+<h4 id="授权相关命令"><a href="#授权相关命令" class="headerlink" title="授权相关命令"></a>授权相关命令</h4><table>
+<thead>
+<tr>
+<th>命令</th>
+<th>使用方式</th>
+<th>描述</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>getAcl</td>
+<td>getAcl [path]</td>
+<td>读取 ACL 权限</td>
+</tr>
+<tr>
+<td>setAcl</td>
+<td>setAcl [path] [acl]</td>
+<td>设置 ACL 权限</td>
+</tr>
+<tr>
+<td>addauth</td>
+<td>addauth [scheme] [auth]</td>
+<td>添加认证用户</td>
+</tr>
+</tbody></table>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2020/04/21/202004/Kubernetes基础Pod用法/" class="prev">上一篇：Kubernetes基础--Pod用法</a>
+    
+    
+    <a href="/2020/03/08/202003/Maven中dependencyManagement标签/" class="next">下一篇：Maven中dependencyManagement标签</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

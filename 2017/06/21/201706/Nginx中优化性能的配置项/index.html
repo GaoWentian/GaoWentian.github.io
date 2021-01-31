@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Nginx中优化性能的配置项 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="（1） Nginx worker 进程数量语法： worker_processes  number;默认：worker_processes  1;在master/worker 方式运行下，定义worker进程个数。具体配置个数跟实际业务有关。&amp;gt;&amp;gt;&amp;gt;线程数究竟设多少合理&amp;lt;&amp;lt">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Nginx中优化性能的配置项"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-06-20T22:43:09.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-06-21
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Nginx中优化性能的配置项</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <p>（1） Nginx worker 进程数量<br>语法： worker_processes  number;<br>默认：worker_processes  1;<br>在master/worker 方式运行下，定义worker进程个数。具体配置个数跟实际业务有关。<br><a target="_blank" rel="noopener" href="http://mp.weixin.qq.com/s?__biz=MjM5ODYxMDA5OQ==&mid=404369373&idx=1&sn=cab2ac9ec0edf92e744a2329662b16cd&scene=21#wechat_redirect">&gt;&gt;&gt;线程数究竟设多少合理&lt;&lt;&lt;</a><br>（2）绑定Nginx worker 进程到指定的CPU内核<br>语法： worker_cpu_affinity cpumask [cpumask..]<br>假设每个worker进程都是非常忙的，如果有多个worker进程都在抢一个CPU，就会出现同步问题。反之，如果每个worker进程都独享一个CPU，则在内核调度策略上实现了完全并发。<br>配置规则为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">2核cpu，开启2个进程</span><br><span class="line">worker_processes     2;</span><br><span class="line">worker_cpu_affinity 01 10;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">2核cpu，开启4个进程</span><br><span class="line">worker_processes     4;</span><br><span class="line">worker_cpu_affinity 01 10 01 10;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">4个cpu，开启4个进程</span><br><span class="line">worker_processes     4;</span><br><span class="line">worker_cpu_affinity 0001 0010 0100 1000;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">4核cpu，开启2个进程</span><br><span class="line">worker_processes     2;</span><br><span class="line">worker_cpu_affinity 0101 1010;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">8核cpu，开启8个进程</span><br><span class="line">worker_processes     8;</span><br><span class="line">worker_cpu_affinity 00000001 00000010 00000100 00001000 00010000 00100000 01000000 10000000;</span><br></pre></td></tr></table></figure>
+<p>（3）SSL硬件加速<br>语法：ssl_engine device;<br>如果设备上有SSL硬件加速设备，那么可以配置加快SSL协议的处理速度。可以使用OpenSSL命令查看是否有SSL硬件设备：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">openssl engine -t</span><br></pre></td></tr></table></figure>
+<p>（4）系统调用gettimeofday的执行频率<br>语法：timer_resolution t;<br>默认情况下，每次内核时间调用返回时都会执行一次gettimeofday，实现用内核的时钟来更新Nginx中的缓存时钟。设置timer_resolution  100ms; 表示至少100ms才会调用一次gettimeofday。早期linux调用gettimeofday代价比较大，现在代价并不大，一般不用配置这个。<br>（5）Nginx worker 进程优先级设置<br>语法: worker_priority nice;<br>默认: worker_priority 0;<br>该项配置用于设置Nginx worker进程的nice优先级。在linux系统中，进程分配的CPU时间片大小和进程优先级有关，优先级越高，进程分配到的时间片越大（在默认配置下，最小时间片5ms，最大800ms）。优先级越高占用系统资源时间越多。</p>
+<p>参考资料：<br>1、陶辉. 深入理解Nginx（第二版）[M]. 机械工业出版社.<br>2、<a target="_blank" rel="noopener" href="http://blog.csdn.net/u011957758/article/details/50959823">解读：nginx的一个神秘配置worker_cpu_affinity</a></p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/06/22/201706/算法导论学习笔记二叉搜索树/" class="prev">上一篇：算法导论学习笔记--二叉搜索树</a>
+    
+    
+    <a href="/2017/06/17/201706/算法导论学习笔记散列表/" class="next">下一篇：算法导论学习笔记--散列表</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,190 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Redis高级应用--事务和分布式锁 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简单用法Redis使用MULTI、EXEC、DISCARD和WATCH等命令实现事务。下面是Redis事务的用法，使用MULTI命令开始后，Redis会判断输入的命令是否是MULTI、EXEC、DISCARD和WATCH中的一个，如果是，则执行命令，否则会将命令保存在队列中，最后执行EXEC命令提交">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Redis高级应用--事务和分布式锁"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-12-12T15:39:23.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-12-12
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Redis高级应用--事务和分布式锁</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E5%8D%95%E7%94%A8%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">简单用法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#WATCH%E5%91%BD%E4%BB%A4"><span class="toc-number">2.</span> <span class="toc-text">WATCH命令</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9B%9E%E6%BB%9A"><span class="toc-number">3.</span> <span class="toc-text">回滚</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%86%E5%B8%83%E5%BC%8F%E9%94%81"><span class="toc-number">4.</span> <span class="toc-text">分布式锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%AD%BB%E9%94%81"><span class="toc-number">5.</span> <span class="toc-text">死锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">6.</span> <span class="toc-text">参考资料</span></a></li></ol>
+    </div>
+    
+    <h3 id="简单用法"><a href="#简单用法" class="headerlink" title="简单用法"></a>简单用法</h3><p>Redis使用MULTI、EXEC、DISCARD和WATCH等命令实现事务。下面是Redis事务的用法，使用MULTI命令开始后，Redis会判断输入的命令是否是MULTI、EXEC、DISCARD和WATCH中的一个，如果是，则执行命令，否则会将命令保存在队列中，最后执行EXEC命令提交事务。Redis执行事务期间，服务器不会去执行其他命令，等事务中所有命令执行完毕才会处理其他请求。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; MULTI  # 事务开始</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; SET name &quot;11231&quot; #命令入队</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; GET name  #命令入队</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; EXEC  #事务执行</span><br><span class="line">1) OK</span><br><span class="line">2) &quot;11231&quot;</span><br></pre></td></tr></table></figure>
+<p>Redis提供DISCARD命令取消事务：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; SET name &quot;123&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; GET name</span><br><span class="line">&quot;123&quot;</span><br><span class="line">127.0.0.1:6379&gt; MULTI</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; DEL name</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; DISCARD   # 取消事务</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; GET name</span><br><span class="line">&quot;123&quot;</span><br></pre></td></tr></table></figure>
+<p>如果输入的命令语法错误，会直接报错.但是Redis无法判断输入的指令是否存在逻辑错误。例如下面的例子，Redis在事务执行前可以判断出来”XPUSH”是不合法的命令，但是无法判断”name”是字符串类型，而不是列表型，只有执行后才报错。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; MULTI</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; XPUSH 123 123</span><br><span class="line">(error) ERR unknown command &#39;XPUSH&#39;</span><br><span class="line">127.0.0.1:6379&gt; EXEC</span><br><span class="line">(error) EXECABORT Transaction discarded because of previous errors.</span><br><span class="line"></span><br><span class="line">127.0.0.1:6379&gt; del name</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; SET name 123  # name是字符串类型</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; GET name</span><br><span class="line">&quot;123&quot;</span><br><span class="line">127.0.0.1:6379&gt; MULTI</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; LPUSH name 123 321  # 将name作为列表型保存</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; EXEC</span><br><span class="line">1) (error) WRONGTYPE Operation against a key holding the wrong kind of value</span><br></pre></td></tr></table></figure>
+<h3 id="WATCH命令"><a href="#WATCH命令" class="headerlink" title="WATCH命令"></a>WATCH命令</h3><p>WATCH命令是一个乐观锁，它可以在EXEC命令执行之前，监视任意数量的key，并在EXEC命令执行时，检查被监视的键是否至少有一个已经修改，如果是的话，服务器拒绝执行事务，并返回空恢复。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; WATCH name  # 开始监视name键</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; SET name 321 # 这个命令修改了name的值，这里模拟的是其他客户端修改name得值</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; MULTI</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; SET haha 321  # 这里可以执行任意指令，因为watch监视的键，和事务中操作的键没有关联。</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; EXEC # EXEC命令执行前，name的值已经被修改，所以返回nil</span><br><span class="line">(nil)</span><br><span class="line">127.0.0.1:6379&gt; MULTI</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; SET name 321</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; EXEC # 第二次执行事务，WATCH的监视已经消失，虽然前面name已经被修改，这里还可以操作name</span><br><span class="line">1) OK</span><br><span class="line">127.0.0.1:6379&gt; GET name</span><br><span class="line">&quot;321&quot;</span><br></pre></td></tr></table></figure>
+<p>还可以使用UNWATCH命令取消所有键的监视。</p>
+<h3 id="回滚"><a href="#回滚" class="headerlink" title="回滚"></a>回滚</h3><p>Redis的事务和关系型数据库事务最大的区别是没有事务失败后的回滚操作。如下例子，如果事务执行失败，在失败命令之前的命令都会执行，并且无法回滚，需要手动回滚。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; KEYS *</span><br><span class="line">(empty list or set)</span><br><span class="line">127.0.0.1:6379&gt; SET name gavin # name是字符串类型</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; MULTI</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; SET age 1 </span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; LPUSH name 123 321 # name是字符串型，这里当成数组使用，会报错</span><br><span class="line">QUEUED</span><br><span class="line">127.0.0.1:6379&gt; EXEC</span><br><span class="line">1) OK  </span><br><span class="line">2) (error) WRONGTYPE Operation against a key holding the wrong kind of value</span><br><span class="line">127.0.0.1:6379&gt; KEYS *  #事务执行后，虽然报错，但是age已经被添加进去，没有回滚</span><br><span class="line">1) &quot;age&quot;</span><br><span class="line">2) &quot;name&quot;</span><br><span class="line">127.0.0.1:6379&gt;</span><br></pre></td></tr></table></figure>
+<h3 id="分布式锁"><a href="#分布式锁" class="headerlink" title="分布式锁"></a>分布式锁</h3><p>分布式使用SETNX（set if not exists）设置公共锁。SETNX命令，可以判断key是否有值，有值返回设置失败，无值则返回设置成功。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SETNX key value</span><br></pre></td></tr></table></figure>
+<ul>
+<li>对于返回设置成功的，拥有控制权，进行下一步的业务操作</li>
+<li>对于返回设置失败的，不具有控制权，则排队或者等待</li>
+</ul>
+<h3 id="死锁"><a href="#死锁" class="headerlink" title="死锁"></a>死锁</h3><p>Redis分布式锁中，使用SETNX命令进行简单的上锁，如果上锁的机器因为一些原因掉线，将会一直占用锁，造成死锁，因此需要一些特殊处理。参考资料中Redisson给出了一个很好的解决办法：<br>首先使用正常的方式加锁，再为myLock设置30秒的生存时间，避免发生死锁。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SETNX myLock 客户端id #设置客户端id，这样客户端在下次进入时判断哪个客户端占用锁，实现可重入锁</span><br><span class="line">pexpire myLock 30000</span><br><span class="line">.....     # 执行业务操作</span><br><span class="line">del myLock   # 执行完毕删除锁</span><br></pre></td></tr></table></figure>
+<p>然后客户端通过一个线程每10s就去判断客户端是否释放锁，如果客户端还持有锁，然后就延长锁的生存时间。这样就保证了客户端存活时一直占有锁，掉线时则自动过期，让别的客户端取占有锁。当然真实业务中不可能持有锁30秒，一般使用如下规则：</p>
+<ul>
+<li>例如：持有锁的操作最长执行时间127ms，最短执行时间7ms</li>
+<li>测试百万次最长执行时间对应命令的最大耗时，测试百万次网络延迟平均耗时</li>
+<li>锁时间设定推荐：最大耗时 * 120% + 平均网络延迟* 110%</li>
+<li>如果业务最大耗时&lt;&lt;网络平均延迟，通常为2个数量级，取其中单个耗时较长即可</li>
+</ul>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p><a target="_blank" rel="noopener" href="https://juejin.im/post/5bf3f15851882526a643e207">Redis分布式锁</a></p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/12/17/201912/Redis高级应用主从复制/" class="prev">上一篇：Redis高级应用--主从复制</a>
+    
+    
+    <a href="/2019/11/30/201911/Servlet总结/" class="next">下一篇：Servlet总结</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

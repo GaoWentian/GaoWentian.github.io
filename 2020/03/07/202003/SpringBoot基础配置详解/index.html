@@ -1,0 +1,238 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>SpringBoot基础--配置详解 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介SpringBoot 使用约定大于配置的开发原则，减少人为配置，直接使用默认配置就能开发。SpringBoot 使用全局的配置文件，开发过程中可以修改配置文件来修改 SpringBoot 自动配置的默认值。在 SpringBoot 中配置文件名是固定的：
+
+application.propert">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="SpringBoot基础--配置详解"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2020-03-07T08:52:35.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-03-07
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">SpringBoot基础--配置详解</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E5%8D%95%E7%94%A8%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">简单用法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%99%AE%E9%80%9A%E5%80%BC"><span class="toc-number">2.1.</span> <span class="toc-text">普通值</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1"><span class="toc-number">2.2.</span> <span class="toc-text">对象</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%95%B0%E7%BB%84"><span class="toc-number">2.3.</span> <span class="toc-text">数组</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E6%B3%A8%E5%85%A5"><span class="toc-number">3.</span> <span class="toc-text">配置文件注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ConfigurationProperties"><span class="toc-number">3.1.</span> <span class="toc-text">@ConfigurationProperties</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Value"><span class="toc-number">3.2.</span> <span class="toc-text">@Value</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8C%BA%E5%88%AB"><span class="toc-number">3.3.</span> <span class="toc-text">区别</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#PropertySource"><span class="toc-number">3.4.</span> <span class="toc-text">@PropertySource</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ImportResource"><span class="toc-number">3.5.</span> <span class="toc-text">@ImportResource</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Profile"><span class="toc-number">4.</span> <span class="toc-text">Profile</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%85%8D%E7%BD%AE%E6%96%87%E4%BB%B6%E5%8A%A0%E8%BD%BD%E4%BD%8D%E7%BD%AE"><span class="toc-number">5.</span> <span class="toc-text">配置文件加载位置</span></a></li></ol>
+    </div>
+    
+    <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>SpringBoot 使用约定大于配置的开发原则，减少人为配置，直接使用默认配置就能开发。SpringBoot 使用全局的配置文件，开发过程中可以修改配置文件来修改 SpringBoot 自动配置的默认值。在 SpringBoot 中配置文件名是固定的：</p>
+<ul>
+<li>application.properties</li>
+<li>application.yml</li>
+</ul>
+<h3 id="简单用法"><a href="#简单用法" class="headerlink" title="简单用法"></a>简单用法</h3><h4 id="普通值"><a href="#普通值" class="headerlink" title="普通值"></a>普通值</h4><p>k:value 形式，字符串默认不用加引号。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&quot;&quot; 双引号；不会转移特殊字符,\n会表示换行</span><br><span class="line">&#39;&#39; 单引号；转移特殊字符,\n转义为字符</span><br></pre></td></tr></table></figure>
+<h4 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h4><figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="attr">friends:</span></span><br><span class="line">	<span class="attr">name:</span> <span class="string">xxx</span></span><br><span class="line">	<span class="attr">age:</span> <span class="number">21</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight yml"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="string">friends:&#123;name:xxx,</span> <span class="string">age:20&#125;</span></span><br></pre></td></tr></table></figure>
+<h4 id="数组"><a href="#数组" class="headerlink" title="数组"></a>数组</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">student:</span><br><span class="line">	- a</span><br><span class="line">	- b</span><br><span class="line">	- c</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">student:[a,b,c]</span><br></pre></td></tr></table></figure>
+<h3 id="配置文件注入"><a href="#配置文件注入" class="headerlink" title="配置文件注入"></a>配置文件注入</h3><h4 id="ConfigurationProperties"><a href="#ConfigurationProperties" class="headerlink" title="@ConfigurationProperties"></a>@ConfigurationProperties</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@Component</span><br><span class="line">@ConfigurationProperties(prefix &#x3D; &quot;student&quot;)</span><br><span class="line">public class Student &#123;</span><br><span class="line">    private String name;</span><br><span class="line">    private Integer age;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">student:</span><br><span class="line">  name: gavin</span><br><span class="line">  age: 20</span><br></pre></td></tr></table></figure>
+<ul>
+<li>@ConfigurationProperties 将类中的每一个属性与配置文件中的配置进行关联</li>
+<li>prefix = “student” 表示配置文件中哪一个字段下面的属性</li>
+<li>必须加@Component，表示是容器中的组件</li>
+</ul>
+<p>显示 Spring Boot Configutation annotation processor not found in classpath,可以添加下面的依赖，可以提示配置：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.springframework.boot<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>spring-boot-configuration-processor<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">	<span class="tag">&lt;<span class="name">optional</span>&gt;</span>true<span class="tag">&lt;/<span class="name">optional</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<h4 id="Value"><a href="#Value" class="headerlink" title="@Value"></a>@Value</h4><ul>
+<li>@Value(“#{}”) 可以使用 SpEL 表达式</li>
+<li>@Value(“${}”)可以从配置文件中获取值，只可以获取单个值。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">@Data</span><br><span class="line">@Component</span><br><span class="line">public class Student &#123;</span><br><span class="line">    @Value(&quot;$&#123;student.name&#125;&quot;)</span><br><span class="line">    private String name;</span><br><span class="line">    @Value(&quot;#&#123;20&#125;&quot;)</span><br><span class="line">    private Integer age;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">student:</span><br><span class="line">  name: gavin</span><br></pre></td></tr></table></figure>
+<h4 id="区别"><a href="#区别" class="headerlink" title="区别"></a>区别</h4><table>
+<thead>
+<tr>
+<th></th>
+<th>@ConfigurationProperties</th>
+<th>@Value</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>功能</td>
+<td>批量注入属性</td>
+<td>单个属性指定</td>
+</tr>
+<tr>
+<td>松散语法</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>SpEL</td>
+<td>不支持</td>
+<td>支持</td>
+</tr>
+<tr>
+<td>JSR303 数据校验</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+<tr>
+<td>复杂类型封装</td>
+<td>支持</td>
+<td>不支持</td>
+</tr>
+</tbody></table>
+<ul>
+<li>松散语法是指：支持 frist-name,FristName,frist_name 等变量表示。@Value 只能和配置文件中的参数完全相等。</li>
+</ul>
+<h4 id="PropertySource"><a href="#PropertySource" class="headerlink" title="@PropertySource"></a>@PropertySource</h4><p>@ConfigurationProperties(prefix = “student”)默认从全局配置文件中读取配置信息，也可以使用@PropertySource 指定 properties 文件来获取配置信息，注意@PropertySource 注解只能读取 properties 文件，不能读取 yml 文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">@PropertySource(value &#x3D; &#123;&quot;classpath:default.properties&quot;&#125;)</span><br><span class="line">@Component</span><br><span class="line">@ConfigurationProperties(prefix &#x3D; &quot;student&quot;)</span><br><span class="line">public class Student &#123;</span><br><span class="line">    private String name;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;default.propertie文件</span><br><span class="line">student.name: default</span><br></pre></td></tr></table></figure>
+<h4 id="ImportResource"><a href="#ImportResource" class="headerlink" title="@ImportResource"></a>@ImportResource</h4><p>SpringBoot 没有 Spring 配置文件，可以使用@ImportResource 注解加载 Spring 配置文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">@ImportResource(locations &#x3D; &#123;&quot;classpath:beans.xml&quot;&#125;)</span><br></pre></td></tr></table></figure>
+<h3 id="Profile"><a href="#Profile" class="headerlink" title="Profile"></a>Profile</h3><p>配置文件名字可以是 application-{profile}.properties/yml。默认使用 application.properties/yml 的配置。可以在主配置文件中使用下面语句激活指定 profile 来切换生产环境和开发环境。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">spring.profiles.active&#x3D;dev  </span><br></pre></td></tr></table></figure>
+<h3 id="配置文件加载位置"><a href="#配置文件加载位置" class="headerlink" title="配置文件加载位置"></a>配置文件加载位置</h3><p>SpringBoot 启动会依次扫描下面位置的 application.properties 或 application.yml 文件作为 SpringBoot 的配置文件。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-file:.&#x2F;config&#x2F;          &#x2F;&#x2F;file：项目根目录</span><br><span class="line">-file:.&#x2F;</span><br><span class="line">-classpath:&#x2F;config&#x2F;</span><br><span class="line">-classpath:&#x2F;</span><br></pre></td></tr></table></figure>
+<p>优先级由高到底，高优先级的配置会覆盖低优先级的配置。SpringBoot 从这四个位置全部加载配置文件，并互补配置。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2020/03/08/202003/Maven中dependencyManagement标签/" class="prev">上一篇：Maven中dependencyManagement标签</a>
+    
+    
+    <a href="/2020/02/20/202002/idea运行项目正常debug模式编译时卡住的解决方法/" class="next">下一篇：idea运行项目正常，debug模式编译时卡住的解决方法</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

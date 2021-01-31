@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java网络编程笔记之ServerSocket 对象（八） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="ServerSocket 类的构造方法有四种重载形式，它们的定义如下：
+1234public ServerSocket() throws IOExceptionpublic ServerSocket(int port) throws IOExceptionpublic ServerSocket(in">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java网络编程笔记之ServerSocket 对象（八）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-08-11T22:43:24.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-08-12
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java网络编程笔记之ServerSocket 对象（八）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95%E7%BB%91%E5%AE%9A%E7%AB%AF%E5%8F%A3"><span class="toc-number">1.</span> <span class="toc-text">通过构造方法绑定端口</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%AE%BE%E7%BD%AE%E8%AF%B7%E6%B1%82%E9%98%9F%E5%88%97%E7%9A%84%E9%95%BF%E5%BA%A6"><span class="toc-number">2.</span> <span class="toc-text">设置请求队列的长度</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%91%E5%AE%9AIP%E5%9C%B0%E5%9D%80"><span class="toc-number">3.</span> <span class="toc-text">绑定IP地址</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%BB%98%E8%AE%A4%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95%E7%9A%84%E4%BD%BF%E7%94%A8"><span class="toc-number">4.</span> <span class="toc-text">默认构造方法的使用</span></a></li></ol>
+    </div>
+    
+    <p>ServerSocket 类的构造方法有四种重载形式，它们的定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public ServerSocket() throws IOException</span><br><span class="line">public ServerSocket(int port) throws IOException</span><br><span class="line">public ServerSocket(int port, int backlog) throws IOException</span><br><span class="line">public ServerSocket(int port, int backlog, InetAddress bindAddr) throws IOException</span><br></pre></td></tr></table></figure>
+<p>　　其中 port 是 ServerSocket 对象要绑定的端口，backlog 是请求队列的长度，bindAddr 是 ServerSocket 对象要绑定的 IP 地址。</p>
+<h4 id="通过构造方法绑定端口"><a href="#通过构造方法绑定端口" class="headerlink" title="通过构造方法绑定端口"></a>通过构造方法绑定端口</h4><p>通过构造方法绑定端口是创建 ServerSocket 对象最常用的方式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public ServerSocket(int port) throws IOException</span><br></pre></td></tr></table></figure>
+<p>　　如果 port 参数所指定的端口已经被绑定，构造方法就会抛出 IOException 异常。但实际上抛出的异常是 BindException。如果 port 的值为 0，系统就会随机选取一个端口号。但随机选取的端口意义不大，因为客户端在连接服务器时需要明确知道服务端程序的端口号。可以通过 ServerSocket 的 toString 方法输出和 ServerSocket对象相关的信息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket serverSocket &#x3D; new ServerSocket(1320);</span><br><span class="line">System.out.println(serverSocket);</span><br></pre></td></tr></table></figure>
+<p>输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket[addr&#x3D;0.0.0.0&#x2F;0.0.0.0,port&#x3D;0,localport&#x3D;1234]</span><br></pre></td></tr></table></figure>
+<p>　　addr 是服务端绑定的 IP 地址，如果未绑定 IP 地址，这个值是 0.0.0.0，在这种情况下，ServerSocket 对象将监听服务端所有网络接口的所有 IP 地址。port 永远是 0。localport 是 ServerSocket 绑定的端口， 如果 port 值为 0 （此处不指输出结果的 port， 指 ServerSocket 构造方法的参数 port），localport（此处指输出结果的 port）是一个随机选取的端口号.<br>在操作系统中规定 1 ~ 1023 为系统使用的端口号。端口号的最小值是 1，最大值是 65535。在 Windows 中用户编写的程序可以绑定端口号小于 1024 的端口， 但在 Linux/Unix 下必须使用 root 登录才可以绑定小于 1024 的端口。</p>
+<h4 id="设置请求队列的长度"><a href="#设置请求队列的长度" class="headerlink" title="设置请求队列的长度"></a>设置请求队列的长度</h4><p>　　在编写服务端程序时，一般会通过多线程来同时处理多个客户端请求。也就是说，使用一个线程来接收客户端请求，当接到一个请求后（得到一个 Socket 对象），会创建一个新线程，将这个客户端请求交给这个新线程处理。而那个接收客户端请求的线程则继续接收客户端请求</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket serverSocket &#x3D; new ServerSocket(1234); &#x2F;&#x2F; 绑定端口</span><br><span class="line">    &#x2F;&#x2F; 处理其他任务的代码</span><br><span class="line">    while(true)</span><br><span class="line">    &#123;</span><br><span class="line">        Socket socket &#x3D; serverSocket.accept(); &#x2F;&#x2F; 等待接收客户端请求</span><br><span class="line">        ….&#x2F;&#x2F; 处理其他任务的代码</span><br><span class="line">        new ThreadClass(socket).start(); &#x2F;&#x2F; 创建并运行处理客户端请求的线程</span><br><span class="line">    &#125;</span><br></pre></td></tr></table></figure>
+<p>　　这段代码只要服务器配置足够高，就能处理所有的请求。但是实际情况下，如果需要处理的请求太过复杂，执行时间也会变长，意味着服务器不能够及时响应客户端的请求。<br>　　假设循环内的代码是 Thread.sleep(3000)，这将使程序延迟 3 秒。那么在这 3 秒内，程序不会执行 accept 方法.这段程序只是将端口绑定到了 1234 上，并未开始接收客户端请求。如果在这时一个客户端向端口 1234 发来了一个请求，从理论上讲，客户端应该出现拒绝连接错误，但客户端却显示连接成功。究其原因，就是这节要讨论的请求队列在起作用。<br>　　在使用 ServerSocket 对象绑定一个端口后，操作系统就会为这个端口分配一个先进先出的队列（这个队列长度的默认值一般是 50），这个队列用于保存未处理的客户端请求，因此叫请求队列。而 ServerSocket 类的 accept 方法负责从这个队列中读取未处理的客户端请求。如果请求队列为空，accept 则处于阻塞状态。每当客户端向服务端发来一个请求，服务端会首先将这个客户端请求保存在请求队列中，然后 accept 再从请求队列中读取。这也可以很好地解释为什么上面的代码在还未执行到 accept 方法时，仍然可以接收一定数量的客户端请求。 如果请求队列中的客户端请求数达到请求队列的最大容量时， 服务端将无法再接收客户端请求。如果这时客户端再向服务端发请求，客户端将会抛出一个 SocketException 异常。<br>服务器端处理：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">public class TestRequestQueue &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws IOException, InterruptedException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		if(args.length &#x3D;&#x3D; 0)&#123;</span><br><span class="line">			return;</span><br><span class="line">		&#125;</span><br><span class="line">		int queueLength &#x3D; Integer.parseInt(args[0]);</span><br><span class="line">		ServerSocket serverSocket &#x3D; new ServerSocket(1234,queueLength);</span><br><span class="line">		System.out.println(&quot;端口：1234已经绑定，按回车开始处理客户端请求&quot;);</span><br><span class="line">		System.in.read();</span><br><span class="line">		int n &#x3D; 0;</span><br><span class="line">		while(true)&#123;</span><br><span class="line">			System.out.println(&quot;准备接收第&quot;+(++n)+&quot;个客户端请求！&quot;);</span><br><span class="line">			Socket socket &#x3D; serverSocket.accept();</span><br><span class="line">			System.out.println(&quot;正在处理第&quot;+n+&quot;个客户端请求！&quot;);</span><br><span class="line">			Thread.sleep(3000);</span><br><span class="line">			System.out.println(&quot;第&quot;+n+&quot;个客户端请求处理完成！&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;*</span><br><span class="line">&#x2F;&#x2F;设置队列长度为：20</span><br><span class="line">端口：1234已经绑定，按回车开始处理客户端请求</span><br><span class="line">准备接收第1个客户端请求！</span><br><span class="line">正在处理第1个客户端请求！</span><br><span class="line">第1个客户端请求处理完成！</span><br><span class="line">准备接收第2个客户端请求！</span><br><span class="line">正在处理第2个客户端请求！</span><br><span class="line">第2个客户端请求处理完成！</span><br><span class="line">准备接收第3个客户端请求！</span><br><span class="line">正在处理第3个客户端请求！</span><br><span class="line">第3个客户端请求处理完成！</span><br><span class="line">准备接收第4个客户端请求！</span><br><span class="line">正在处理第4个客户端请求！</span><br><span class="line">第4个客户端请求处理完成！</span><br><span class="line">准备接收第5个客户端请求！</span><br><span class="line">正在处理第5个客户端请求！</span><br><span class="line">第5个客户端请求处理完成！</span><br><span class="line">准备接收第6个客户端请求！</span><br><span class="line">正在处理第6个客户端请求！</span><br><span class="line">第6个客户端请求处理完成！</span><br><span class="line">准备接收第7个客户端请求！</span><br><span class="line">正在处理第7个客户端请求！</span><br><span class="line">第7个客户端请求处理完成！</span><br><span class="line">准备接收第8个客户端请求！</span><br><span class="line">正在处理第8个客户端请求！</span><br><span class="line">第8个客户端请求处理完成！</span><br><span class="line">准备接收第9个客户端请求！</span><br><span class="line">正在处理第9个客户端请求！</span><br><span class="line">第9个客户端请求处理完成！</span><br><span class="line">准备接收第10个客户端请求！</span><br><span class="line">正在处理第10个客户端请求！</span><br><span class="line">第10个客户端请求处理完成！</span><br><span class="line">准备接收第11个客户端请求！</span><br><span class="line">*&#x2F;</span><br></pre></td></tr></table></figure>
+<p>客户端请求：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.Socket;</span><br><span class="line">import java.net.UnknownHostException;</span><br><span class="line"></span><br><span class="line">public class RequestQueue &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws UnknownHostException, IOException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		for(int i &#x3D; 0;i &lt; 10;i++)&#123;</span><br><span class="line">			Socket socket &#x3D; new Socket(&quot;localhost&quot;,1234);</span><br><span class="line">			socket.getOutputStream().write(1);</span><br><span class="line">			System.out.println(&quot;已经创建第&quot;+String.valueOf(i+1)+&quot;个客户端连接！&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;*</span><br><span class="line">已经创建第1个客户端连接！</span><br><span class="line">已经创建第2个客户端连接！</span><br><span class="line">已经创建第3个客户端连接！</span><br><span class="line">已经创建第4个客户端连接！</span><br><span class="line">已经创建第5个客户端连接！</span><br><span class="line">已经创建第6个客户端连接！</span><br><span class="line">已经创建第7个客户端连接！</span><br><span class="line">已经创建第8个客户端连接！</span><br><span class="line">已经创建第9个客户端连接！</span><br><span class="line">已经创建第10个客户端连接！</span><br><span class="line">*&#x2F;</span><br></pre></td></tr></table></figure>
+<h4 id="绑定IP地址"><a href="#绑定IP地址" class="headerlink" title="绑定IP地址"></a>绑定IP地址</h4><p>在有多个网络接口或多个 IP 地址的计算机上可以使用如下的构造方法将服务端绑定在某一个 IP 地址上：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public ServerSocket(int port, int backlog, InetAddress bindAddr) throws IOException</span><br></pre></td></tr></table></figure>
+<p>bindAddr 参数就是要绑定的 IP 地址。如果将服务端绑定到某一个 IP 地址上，就只有可以访问这个 IP地址的客户端才能连接到服务器上。如一台机器上有两块网卡，一块网卡连接内网，另一块连接外网。如果用Java 实现一个 Email 服务器，并且只想让内网的用户使用它。就可以使用这个构造方法将 ServerSocket 对象绑定到连接内网的 IP 地址上。这样外网就无法访问 Email 服务器了。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket serverSocket &#x3D; new ServerSocket(1234, 0, InetAddress.getByName(&quot;192.168.18.10&quot;));</span><br></pre></td></tr></table></figure>
+<h4 id="默认构造方法的使用"><a href="#默认构造方法的使用" class="headerlink" title="默认构造方法的使用"></a>默认构造方法的使用</h4><p>　　除了使用 ServerSocket 类的构造方法绑定端口外， 还可以用 ServerSocket 的 bind 方法来完成构造方法所做的工作。要想使用 bind 方法，必须得用 ServerSocket 类的默认构造方法(没有参数的构造方法)来创建 ServerSocket 对象。bind 方法有两个重载形式</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public void bind(SocketAddress endpoint) throws IOException</span><br><span class="line">public void bind(SocketAddress endpoint, int backlog) throws IOException</span><br></pre></td></tr></table></figure>
+<p>　　bind 方法不仅可以绑定端口，也可以设置请求队列的长度以及绑定 IP 地址。bind 方法的作用是为了在建立 ServerSocket 对象后设置 ServerSocket 类的一些选项。而这些选项必须在绑定端口之前设置，一但绑定了端口后，再设置这些选项将不再起作用。下面的代码演示了 bind 方法的使用及如何设置 ServerSocket 类的选项。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket serverSocket1 &#x3D; new ServerSocket();</span><br><span class="line">serverSocket1.setReuseAddress(true);</span><br><span class="line">serverSocket1.bind(new InetSocketAddress(1234));</span><br><span class="line">ServerSocket serverSocket2 &#x3D; new ServerSocket();</span><br><span class="line">serverSocket2.setReuseAddress(true);</span><br><span class="line">serverSocket2.bind(new InetSocketAddress(&quot;192.168.18.10&quot;, 1234));</span><br><span class="line">ServerSocket serverSocket3 &#x3D; new ServerSocket();</span><br><span class="line">serverSocket3.setReuseAddress(true);</span><br><span class="line">serverSocket3.bind(new InetSocketAddress(&quot;192.168.18.10&quot;, 1234), 30);</span><br></pre></td></tr></table></figure>
+<p>在上面的代码中设置了 SO_REUSEADDR 选项。如果使用下面的代码，这个选项将不起作用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">ServerSocket serverSocket3 &#x3D; new ServerSocket(1234);</span><br><span class="line">serverSocket3.setReuseAddress(true);</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/08/12/201708/Java网络编程笔记之服务端接收和发送数据九/" class="prev">上一篇：Java网络编程笔记之服务端接收和发送数据（九）</a>
+    
+    
+    <a href="/2017/08/10/201708/Java网络编程笔记之HTTP模拟请求七/" class="next">下一篇：Java网络编程笔记之HTTP模拟请求（七）</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

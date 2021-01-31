@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>算法导论学习笔记--数据结构的扩张 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="动态顺序统计前面介绍过 顺序统计的概念。在一个无序的集合中，任意的顺序统计量都可以在 O ( n )时间内找到。而这里我们将介绍如何在 O ( lg n )时间内确定任意的顺序统计量。还将看到如何在 O ( lg n )的时间内计算一个元素的秩,即它在集合线性序中的位置。　　下图显示的是一种支持快速">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="算法导论学习笔记--数据结构的扩张"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-08-30T21:20:02.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-08-31
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">算法导论学习笔记--数据结构的扩张</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E9%A1%BA%E5%BA%8F%E7%BB%9F%E8%AE%A1"><span class="toc-number">1.</span> <span class="toc-text">动态顺序统计</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE%E5%85%B7%E6%9C%89%E7%BB%99%E5%AE%9A%E7%A7%A9%E7%9A%84%E5%85%83%E7%B4%A0"><span class="toc-number">1.1.</span> <span class="toc-text">查找具有给定秩的元素</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%A1%AE%E5%AE%9A%E4%B8%80%E4%B8%AA%E5%85%83%E7%B4%A0%E7%9A%84%E7%A7%A9"><span class="toc-number">1.2.</span> <span class="toc-text">确定一个元素的秩</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84%E6%89%A9%E5%BC%A0"><span class="toc-number">2.</span> <span class="toc-text">数据结构扩张</span></a></li></ol>
+    </div>
+    
+    <h2 id="动态顺序统计"><a href="#动态顺序统计" class="headerlink" title="动态顺序统计"></a>动态顺序统计</h2><p>前面介绍过 顺序统计的概念。在一个无序的集合中，任意的顺序统计量都可以在 <em>O</em> ( <em>n</em> )时间内找到。而这里我们将介绍如何在 <em>O</em> ( lg <em>n</em> )时间内确定任意的顺序统计量。还将看到如何在 <em>O</em> ( lg <em>n</em> )的时间内计算一个元素的<strong>秩</strong>,即它在集合线性序中的位置。<br>　　下图显示的是一种支持快速顺序统计量操作的数据结构。一棵 顺序统计树 T 通过在红黑树的每个结点中存入附加信息而成。在一个结点 x 内，增加域 x.size 。该域包含以结点 x 为根的子树的（内部）结点数（包括 x 本身），即子树的大小。设 T.nil.size 为0，则有</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">x.size &#x3D; x.left.size + x.right.size + 1 </span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-c0bc0da00a6e242b.png" alt="image.png"></p>
+<h3 id="查找具有给定秩的元素"><a href="#查找具有给定秩的元素" class="headerlink" title="查找具有给定秩的元素"></a>查找具有给定秩的元素</h3><p>过程 OS-SELECT(x, i) 返回一个指向以 x 为根的子树中包含第 i 小关键字的结点的指针。为找出顺序统计树 T 中的第 i 小关键字，调用过程 OS-SELECT(T.root, i) 。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">OS-SELECT(x, i)</span><br><span class="line">&#123;</span><br><span class="line">   r &#x3D; x.left.size + 1</span><br><span class="line">   if i &#x3D;&#x3D; r&#123;</span><br><span class="line">       return x</span><br><span class="line">   &#125;</span><br><span class="line">   elseif i &lt; r&#123;</span><br><span class="line">       return OS-SELECT(x.left, i)</span><br><span class="line">   &#125;else&#123;</span><br><span class="line">       return OS-SELECT(x.right, i)</span><br><span class="line">   &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>对含 n 个元素的动态集合， OS-SELECT 的运行时间为 O ( lg n )。</p>
+<h3 id="确定一个元素的秩"><a href="#确定一个元素的秩" class="headerlink" title="确定一个元素的秩"></a>确定一个元素的秩</h3><p>　　给定指向一顺序统计树 T 中结点 x 的指针，过程 OS-RANK 返回在对 T 进行中序遍历后得到的线性序中 x 的位置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">OS-RANK(T, x)</span><br><span class="line">&#123;</span><br><span class="line">    r &#x3D; x.left.size + 1</span><br><span class="line">   y &#x3D; x</span><br><span class="line">   while y !&#x3D; T.root&#123;</span><br><span class="line">       if y &#x3D;&#x3D; y.p.right&#123;</span><br><span class="line">            r &#x3D; r + y.p.left.size + 1</span><br><span class="line">       &#125;</span><br><span class="line">       y &#x3D; y.p</span><br><span class="line">    &#125;</span><br><span class="line">   return r</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>x 的秩可以视为在对树的中序遍历中，排在 x 之前的结点个数再加1（ x 本身）。在最坏情况下，对含 n 个结点的顺序统计树， OS-RANK 的运行时间为 O ( lg n )。<br>假设我们要确定关键值为38的结点的秩时，while开始循环时，值的变化为：</p>
+<p><img src="/img/blog/2350612-3b0666ac082ccd24.png" alt="image.png"></p>
+<h2 id="数据结构扩张"><a href="#数据结构扩张" class="headerlink" title="数据结构扩张"></a>数据结构扩张</h2><p>在算法设计过程中，经常需要对基本的数据结构进行扩张，以便支持一些新功能。而对一种数据结构的扩张过程通常可以分为四个步骤：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">选择基础数据结构</span><br><span class="line">确定要在基础数据结构中添加哪些信息</span><br><span class="line">验证可用基础数据结构上的基本修改操作来维护这些新添加的信息</span><br><span class="line">设计新的操作</span><br></pre></td></tr></table></figure>
+<p>以上只是给出了一个一般模式，设计顺序统计树时，我们就依照了这些步骤。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/09/01/201709/MySQL索引/" class="prev">上一篇：MySQL索引</a>
+    
+    
+    <a href="/2017/08/30/201708/Java事务处理/" class="next">下一篇：Java 事务处理</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

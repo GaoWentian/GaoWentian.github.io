@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>设计模式-简单工厂模式 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简单工厂模式是创建型模式，又叫静态工厂方法模式。简单工厂模式是由一个工厂对象决定创建哪一种类。被创建的实例通常具有共同的父类。 　　简单工厂模式(Simple Factory Pattern)：定义一个工厂类，它可以根据参数的不同返回不同类的实例，被创建的实例通常都具有共同的父类。因为在简单工厂模式">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="设计模式-简单工厂模式"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-04-22T22:43:58.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-04-23
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">设计模式-简单工厂模式</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <p>简单工厂模式是创建型模式，又叫静态工厂方法模式。简单工厂模式是由一个工厂对象决定创建哪一种类。被创建的实例通常具有共同的父类。<br> 　　简单工厂模式(Simple Factory Pattern)：定义一个工厂类，它可以根据参数的不同返回不同类的实例，被创建的实例通常都具有共同的父类。因为在简单工厂模式中用于创建实例的方法是静态(static)方法，因此简单工厂模式又被称为静态工厂方法(Static Factory Method)模式，它属于类创建型模式。<br><img src="/img/blog/QQ%E6%88%AA%E5%9B%BE20170724214450.jpg" alt="简单工厂模式"><br>共同的父类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">package factoryMethod;</span><br><span class="line"></span><br><span class="line">public interface Sender&#123;</span><br><span class="line">	public void Send();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>被创建的实例</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">package factoryMethod;</span><br><span class="line"></span><br><span class="line">public class MailSender implements Sender&#123;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line">	public void Send() &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		System.out.println(&quot;这是 电子邮件&quot;);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">package factoryMethod;</span><br><span class="line"></span><br><span class="line">public class SmsSender implements Sender&#123;</span><br><span class="line"></span><br><span class="line">	@Override</span><br><span class="line">	public void Send() &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		System.out.println(&quot;这是 Sms&quot;);</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>工厂方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">package factoryMethod;</span><br><span class="line"></span><br><span class="line">public class SendFactory &#123;</span><br><span class="line">	public Sender produce(String type)&#123;</span><br><span class="line">		if (&quot;mail&quot;.equals(type))&#123;</span><br><span class="line">			return new MailSender();</span><br><span class="line">		&#125;else if (&quot;sms&quot;.equals(type))&#123;</span><br><span class="line">			return new SmsSender();</span><br><span class="line">		&#125;else&#123;</span><br><span class="line">			System.out.println(&quot;请输入正确的类型！&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">		return null;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>客户端</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">package factoryMethod;</span><br><span class="line"></span><br><span class="line">public class learning_4_17 &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		SendFactory factory &#x3D; new SendFactory();</span><br><span class="line">		Sender sender &#x3D; factory.produce(&quot;mail&quot;);&#x2F;&#x2F;后面就是一个类</span><br><span class="line">		sender.Send();</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+<p>模式的核心是工厂类，这个类负责产品的创建，而客户端可以免去产品创建的责任，这实现了责任的分割。<br>但由于工厂类集中了所有产品创建逻辑的，如果不能正常工作的话会对系统造成很大的影响。如果增加新产品必须修改工厂角色的源码。<br>对于客户端来说，违反了开闭原则，可以将参数存放在xml或其他配置文件中，，这样如果需要更换参数，只需要更改配置文件即可，符合开闭原则。<br>参考资料<br>[1] 程杰. 大话设计模式[M]. 清华大学出版社, 2007.<br>[2] <a target="_blank" rel="noopener" href="http://blog.csdn.net/zhangerqing/article/details/8194653/">Java之美从菜鸟到高手演变之设计模式</a>.</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/04/24/201704/设计模式工厂方法模式/" class="prev">上一篇：设计模式-工厂方法模式</a>
+    
+    
+    <a href="/2017/03/11/201703/ApacheBenchab测试/" class="next">下一篇：ApacheBench（ab）测试</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

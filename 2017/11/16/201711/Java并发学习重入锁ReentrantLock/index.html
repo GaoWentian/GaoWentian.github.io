@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java并发学习--重入锁ReentrantLock | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介　　在Java5.0之前，在协调对共享对象的访问时可以使用的机制只有Synchronized和volatile。Java5.0增加了一个新的机制ReentrantLock。ReentrantLock是一个可重入的互斥锁。　　Synchronized有一些功能性的限制，Synchronized无法">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java并发学习--重入锁ReentrantLock"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-11-15T20:31:48.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-16
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java并发学习--重入锁ReentrantLock</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%AE%E8%AF%A2%E9%94%81%E4%B8%8E%E5%AE%9A%E6%97%B6%E9%94%81"><span class="toc-number">2.</span> <span class="toc-text">轮询锁与定时锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%AC%E5%B9%B3%E6%80%A7"><span class="toc-number">3.</span> <span class="toc-text">公平性</span></a></li></ol>
+    </div>
+    
+    <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>　　在Java5.0之前，在协调对共享对象的访问时可以使用的机制只有Synchronized和volatile。Java5.0增加了一个新的机制ReentrantLock。ReentrantLock是一个可重入的互斥锁。<br>　　Synchronized有一些功能性的限制，Synchronized无法中断一个正在等候获得锁的线程，也无法通过投票得到锁，如果不想等下去，也就没法得到锁。 ReentrantLock 类实现了Lock，它拥有与synchronized 相同的并发性和内存语义，但是添加了类似锁投票、定时锁等候和可中断锁等候的一些特性。此外，它还提供了在激烈争用情况下更佳的性能。<br>　　下面的代码提供了一种标准的Lock接口使用方式，注意一定要在finally块中释放锁。否则，如果在 被保护的代码中抛出了异常，那么锁将永远不会释放。这也是ReentrantLock无法完全代替Synchronized的原因，ReentrantLock更加危险。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">import java.util.concurrent.locks.Lock;</span><br><span class="line">import java.util.concurrent.locks.ReentrantLock;</span><br><span class="line">public class lockTest &#123;</span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		Lock lock &#x3D; new ReentrantLock();  </span><br><span class="line">		lock.lock();  </span><br><span class="line">		try &#123;   </span><br><span class="line">		  &#x2F;&#x2F; update object state  </span><br><span class="line">		&#125;  </span><br><span class="line">		finally &#123;  </span><br><span class="line">		  lock.unlock();   </span><br><span class="line">		&#125;  </span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="轮询锁与定时锁"><a href="#轮询锁与定时锁" class="headerlink" title="轮询锁与定时锁"></a>轮询锁与定时锁</h3><p>　　轮询锁与定时锁的获取模式是由tryLock方法实现的，具有更完善的错误恢复机制，可以避免死锁的发生。<br>如果不能获取所有需要的锁，那么可以使用可定时的或者可轮询的锁获取方式，从而使你重新获取控制权，它会释放已经获得的锁，然后重新尝试获取所有的锁。</p>
+<h3 id="公平性"><a href="#公平性" class="headerlink" title="公平性"></a>公平性</h3><p>　　ReentrantLock的构造函数中提供了两种公平性选择：创建一个非公平的锁（默认）或者一个公平的锁。在公平的锁上，线程将按照它们发出的请求顺序来获得锁，但在非公平锁上，运行“插队”：当一个线程请求非公平锁时，如果在发出请求的同时该锁的状态变为可用，那么这个线程将跳过队列中所有等待的线程，并获得这个锁。</p>
+<p>学习资料：<br>[1] BrianGoetz, 戈茨, 童云兰. Java并发编程实战[M]. 机械工业出版社, 2012.</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/11/18/201711/Java并发学习信号量Semaphore/" class="prev">上一篇：Java并发学习--信号量 (Semaphore)</a>
+    
+    
+    <a href="/2017/11/13/201711/Java并发学习读写锁ReentrantReadWriteLock/" class="next">下一篇：Java并发学习--读写锁ReentrantReadWriteLock</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

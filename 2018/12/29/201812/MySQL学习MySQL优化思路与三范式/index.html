@@ -1,0 +1,428 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>MySQL学习--MySQL优化思路与三范式 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="MySQL 优化的思路
+1、表的设计要合理，符合三范式
+2、添加适当索引（index）：普通索引、主键索引、唯一索引 unique、全文索引（有时候加上：空间索引）
+3、分表技术（水平分割、垂直分割）
+4、读写（写：updata/dalete/add）分离
+5、存储过程（不建议）[模块化编程，不用编">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="MySQL学习--MySQL优化思路与三范式"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2018-12-28T19:18:20.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2018-12-29
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">MySQL学习--MySQL优化思路与三范式</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#MySQL-%E4%BC%98%E5%8C%96%E7%9A%84%E6%80%9D%E8%B7%AF"><span class="toc-number">1.</span> <span class="toc-text">MySQL 优化的思路</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3NF-%E8%8C%83%E5%BC%8F"><span class="toc-number">2.</span> <span class="toc-text">3NF(范式)</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%B8%80%E8%8C%83%E5%BC%8F"><span class="toc-number">2.1.</span> <span class="toc-text">第一范式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AC%AC%E4%BA%8C%E8%8C%83%E5%BC%8F"><span class="toc-number">2.2.</span> <span class="toc-text">第二范式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89%E8%8C%83%E5%BC%8F"><span class="toc-number">2.3.</span> <span class="toc-text">三范式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%8D%E8%8C%83%E5%BC%8F"><span class="toc-number">2.4.</span> <span class="toc-text">反范式</span></a></li></ol></li></ol>
+    </div>
+    
+    <h3 id="MySQL-优化的思路"><a href="#MySQL-优化的思路" class="headerlink" title="MySQL 优化的思路"></a>MySQL 优化的思路</h3><ul>
+<li>1、表的设计要合理，符合三范式</li>
+<li>2、添加适当索引（index）：普通索引、主键索引、唯一索引 unique、全文索引（有时候加上：空间索引）</li>
+<li>3、分表技术（水平分割、垂直分割）</li>
+<li>4、读写（写：updata/dalete/add）分离</li>
+<li>5、存储过程（不建议）[模块化编程，不用编译，提高速度]</li>
+<li>6、对 MySQL 文件修改配置文件（my.ini: max_connections = 100,可以调整到 1000 左右）</li>
+<li>7、MySQL 服务器硬件升级</li>
+<li>8、定时清除不需要的数据，定时进行碎片整理（MyISAM）</li>
+</ul>
+<h3 id="3NF-范式"><a href="#3NF-范式" class="headerlink" title="3NF(范式)"></a>3NF(范式)</h3><h4 id="第一范式"><a href="#第一范式" class="headerlink" title="第一范式"></a>第一范式</h4><p>有主关键字、主键不能为空、主键不能重复，、字段不可以再分</p>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>sex</th>
+<th>contact</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>john</td>
+<td>male</td>
+<td>email:<a href="mailto:&#x6b;&#x6b;&#107;&#107;&#64;&#x78;&#120;&#46;&#99;&#111;&#109;">&#x6b;&#x6b;&#107;&#107;&#64;&#x78;&#120;&#46;&#99;&#111;&#109;</a>,phone:222456</td>
+</tr>
+<tr>
+<td>2</td>
+<td>mary</td>
+<td>famale</td>
+<td>email:<a href="mailto:&#107;&#107;&#x6b;&#64;&#x78;&#x78;&#46;&#99;&#x6f;&#x6d;">&#107;&#107;&#x6b;&#64;&#x78;&#x78;&#46;&#99;&#x6f;&#x6d;</a> phone:123455</td>
+</tr>
+<tr>
+<td>上面这个不符和一范式，因为 contact 字段可以再分，改为下面即可符合一范式：</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>id</th>
+<th>name</th>
+<th>sex</th>
+<th>email</th>
+<th>phone</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>john</td>
+<td>male</td>
+<td><a href="mailto:&#107;&#x6b;&#107;&#x6b;&#x40;&#120;&#120;&#x2e;&#99;&#111;&#x6d;">&#107;&#x6b;&#107;&#x6b;&#x40;&#120;&#120;&#x2e;&#99;&#111;&#x6d;</a></td>
+<td>222456</td>
+</tr>
+<tr>
+<td>2</td>
+<td>mary</td>
+<td>famale</td>
+<td><a href="mailto:&#x6b;&#107;&#107;&#64;&#x78;&#120;&#46;&#99;&#x6f;&#x6d;">&#x6b;&#107;&#107;&#64;&#x78;&#120;&#46;&#99;&#x6f;&#x6d;</a></td>
+<td>123455</td>
+</tr>
+</tbody></table>
+<h4 id="第二范式"><a href="#第二范式" class="headerlink" title="第二范式"></a>第二范式</h4><ul>
+<li>是表必须有一个主键；</li>
+<li>二是没有包含在主键中的列必须完全依赖于主键，而不能只依赖于主键的一部分。也就是说消除了传递依赖</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>学生 id</th>
+<th>院系 id</th>
+<th>姓名</th>
+<th>院系名</th>
+<th>院系地址</th>
+<th>学生手机号</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>003</td>
+<td>张三</td>
+<td>计科系</td>
+<td>xxx 路</td>
+<td>123456</td>
+</tr>
+<tr>
+<td>2</td>
+<td>004</td>
+<td>李四</td>
+<td>数学系</td>
+<td>aaa 路</td>
+<td>222222</td>
+</tr>
+<tr>
+<td>上面这个也是不符和二范式的，因为存在传递依赖。院系名和院系地址依赖院系 id，而院系 id 依赖学生 id，因此不符合二范式</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>学生 id</th>
+<th>院系 id</th>
+<th>姓名</th>
+<th>学生手机号</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>003</td>
+<td>张三</td>
+<td>123456</td>
+</tr>
+<tr>
+<td>2</td>
+<td>004</td>
+<td>李四</td>
+<td>222222</td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>院系 id</th>
+<th>院系名</th>
+<th>院系地址</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>003</td>
+<td>计科系</td>
+<td>xxx 路</td>
+</tr>
+<tr>
+<td>004</td>
+<td>数学系</td>
+<td>aaa 路</td>
+</tr>
+<tr>
+<td>这样消除了传递依赖，符合二范式。</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<h4 id="三范式"><a href="#三范式" class="headerlink" title="三范式"></a>三范式</h4><p>任何非主键字段不能依赖于其他非主键字段</p>
+<table>
+<thead>
+<tr>
+<th>学生 id</th>
+<th>课程 id</th>
+<th>课程名称</th>
+<th>学生名称</th>
+<th>学生成绩</th>
+<th>课程学分</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>003</td>
+<td>计算机导论</td>
+<td>张三</td>
+<td>98</td>
+<td>3</td>
+</tr>
+<tr>
+<td>2</td>
+<td>004</td>
+<td>数据结构</td>
+<td>李四</td>
+<td>99</td>
+<td>4</td>
+</tr>
+<tr>
+<td>上面的表结构是符合二范式的，由学生 id 和课程 id 组成的联合主键，因此不存在依赖传递，但不符合三范式</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+<tr>
+<td>学生表：</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>学生 id</th>
+<th>学生名称</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>张三</td>
+</tr>
+<tr>
+<td>2</td>
+<td>李四</td>
+</tr>
+<tr>
+<td>课程表：</td>
+<td></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>课程 id</th>
+<th>课程名称</th>
+<th>课程学分</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>003</td>
+<td>计算机导论</td>
+<td>3</td>
+</tr>
+<tr>
+<td>004</td>
+<td>数据结构</td>
+<td>4</td>
+</tr>
+<tr>
+<td>学生-课程 成绩表：</td>
+<td></td>
+<td></td>
+</tr>
+</tbody></table>
+<table>
+<thead>
+<tr>
+<th>学生 id</th>
+<th>课程 id</th>
+<th>学生成绩</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1</td>
+<td>003</td>
+<td>98</td>
+</tr>
+<tr>
+<td>2</td>
+<td>004</td>
+<td>99</td>
+</tr>
+</tbody></table>
+<p>这样就符合三范式。</p>
+<h4 id="反范式"><a href="#反范式" class="headerlink" title="反范式"></a>反范式</h4><p>以前数据库设计都是用时间换空间，现在出现了用空间换时间，通过一些冗余设计，来达到快速响应的目的</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2018/12/29/201812/深入理解Java虚拟机Java内存模型/" class="prev">上一篇：深入理解Java虚拟机--Java内存模型</a>
+    
+    
+    <a href="/2018/12/28/201812/Java源码分析LinkedList/" class="next">下一篇：Java源码分析--LinkedList</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

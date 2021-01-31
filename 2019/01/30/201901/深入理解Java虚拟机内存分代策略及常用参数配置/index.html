@@ -1,0 +1,233 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>深入理解Java虚拟机--内存分代策略及常用参数配置 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="内存分代策略简介HotSpot中为了提高内存对象内存分配和垃圾回收的效率，将内存分为了新生代（Eden+From Survivor+To Survivor）、老年代（OldGen）和永久代（PermGen）。新创建的对象分配在新生代，多次回收还存活的对象放在老年代，类信息、静态变量和字符串常量等存放">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="深入理解Java虚拟机--内存分代策略及常用参数配置"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-01-30T15:08:13.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-01-30
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">深入理解Java虚拟机--内存分代策略及常用参数配置</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%86%85%E5%AD%98%E5%88%86%E4%BB%A3%E7%AD%96%E7%95%A5"><span class="toc-number">1.</span> <span class="toc-text">内存分代策略</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B0%E7%94%9F%E4%BB%A3"><span class="toc-number">1.2.</span> <span class="toc-text">新生代</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%80%81%E5%B9%B4%E4%BB%A3"><span class="toc-number">1.3.</span> <span class="toc-text">老年代</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#JVM%E5%B8%B8%E7%94%A8%E5%8F%82%E6%95%B0%E9%85%8D%E7%BD%AE"><span class="toc-number">2.</span> <span class="toc-text">JVM常用参数配置</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%8E%E6%A0%B7%E8%AE%BE%E7%BD%AEJVM%E5%8F%82%E6%95%B0"><span class="toc-number">2.1.</span> <span class="toc-text">怎样设置JVM参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Trace%E8%B7%9F%E8%B8%AA%E5%8F%82%E6%95%B0"><span class="toc-number">2.2.</span> <span class="toc-text">Trace跟踪参数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%93%E5%8D%B0GC%E7%AE%80%E8%A6%81%E4%BF%A1%E6%81%AF"><span class="toc-number">2.2.1.</span> <span class="toc-text">打印GC简要信息</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%93%E5%8D%B0GC%E8%AF%A6%E7%BB%86%E4%BF%A1%E6%81%AF"><span class="toc-number">2.2.2.</span> <span class="toc-text">打印GC详细信息</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%96%87%E4%BB%B6%E8%BE%93%E5%87%BAGC-log"><span class="toc-number">2.2.3.</span> <span class="toc-text">文件输出GC log</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%9B%91%E6%8E%A7%E5%8A%A0%E8%BD%BD%E4%BA%86%E5%93%AA%E4%BA%9B%E7%B1%BB"><span class="toc-number">2.2.4.</span> <span class="toc-text">监控加载了哪些类</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%93%E5%8D%B0%E7%B1%BB%E7%9A%84%E4%BF%A1%E6%81%AF"><span class="toc-number">2.2.5.</span> <span class="toc-text">打印类的信息</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A0%86%E7%9A%84%E5%88%86%E9%85%8D%E5%8F%82%E6%95%B0"><span class="toc-number">2.3.</span> <span class="toc-text">堆的分配参数</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%8C%87%E5%AE%9A%E6%9C%80%E5%A4%A7%E5%A0%86%E5%92%8C%E6%9C%80%E5%B0%8F%E5%A0%86"><span class="toc-number">2.3.1.</span> <span class="toc-text">指定最大堆和最小堆</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A0%86%E7%9A%84%E5%85%B6%E4%BB%96%E5%8F%82%E6%95%B0"><span class="toc-number">2.3.2.</span> <span class="toc-text">堆的其他参数</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#OOM%E5%86%85%E5%AD%98%E6%BA%A2%E5%87%BA"><span class="toc-number">2.3.3.</span> <span class="toc-text">OOM内存溢出</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E9%BB%98%E8%AE%A4%E9%85%8D%E7%BD%AE"><span class="toc-number">2.3.4.</span> <span class="toc-text">默认配置</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B0%B8%E4%B9%85%E5%8C%BA%E5%88%86%E9%85%8D%E5%8F%82%E6%95%B0"><span class="toc-number">2.4.</span> <span class="toc-text">永久区分配参数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%88%E7%A9%BA%E9%97%B4%E5%88%86%E9%85%8D"><span class="toc-number">2.5.</span> <span class="toc-text">栈空间分配</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">3.</span> <span class="toc-text">参考资料</span></a></li></ol>
+    </div>
+    
+    <h3 id="内存分代策略"><a href="#内存分代策略" class="headerlink" title="内存分代策略"></a>内存分代策略</h3><h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>HotSpot中为了提高内存对象内存分配和垃圾回收的效率，将内存分为了新生代（Eden+From Survivor+To Survivor）、老年代（OldGen）和永久代（PermGen）。新创建的对象分配在新生代，多次回收还存活的对象放在老年代，类信息、静态变量和字符串常量等存放在永久代中。新生代中需要频繁执行垃圾回收，老年代中不需要频繁垃圾回收，永久代一般来说不实现垃圾回收。这样对不同的区域实行不同的垃圾回收算法，可以提高垃圾回收效率。<br>在Java7之前，方法区在永久代，永久代和堆隔离，使用的是堆空间，永久代大小在启动JVM时设置一个固定的值，不可变;Java7中将static从永久代移到堆中；Java8中取消永久代，使用元空间（Metaspace）替代，与堆共享物理内存，逻辑上可以认为和堆在一起。元空间使用的是系统内存，因此有足够空间。<br><img src="https://www.gwt.fun/upload/d8f82f725f44431682fc0b6c65ed043f_QQ20190130132723.jpg" alt="图片来源网络"> </p>
+<h4 id="新生代"><a href="#新生代" class="headerlink" title="新生代"></a>新生代</h4><p>新生代垃圾回收效率高，Minor GC是新生代的GC，回收速度快，Eden空间不足时会触发Minor GC进行回收操作。新生代分为三块空间，一个Eden和两个Survivor（通常称为To Survivor和From Survivor），当Eden被填满，会执行Minor GC，将存活下来的对象转移到To Survivor，From Survivor中存活的对象，判断年龄阈值（默认15，一轮GC表示增加一岁），如果超过阈值就放到老年代中，没超过的存到To Survivor中，然后将To Survivor 和From Survivor互换，也就是To Survivor在GC之后永远是空的。</p>
+<h4 id="老年代"><a href="#老年代" class="headerlink" title="老年代"></a>老年代</h4><p>老年代包含长期存活的对象和多次Minor GC后存活下来的对象，通常老年代被占满或者显式调用System.gc()方法才开始垃圾回收，老年代垃圾回收也就叫Full GC/Major GC，</p>
+<h3 id="JVM常用参数配置"><a href="#JVM常用参数配置" class="headerlink" title="JVM常用参数配置"></a>JVM常用参数配置</h3><p>了解了内存分代策略，下面可以学习一下常用的参数配置，并查看不同内存区域的变化情况。</p>
+<h4 id="怎样设置JVM参数"><a href="#怎样设置JVM参数" class="headerlink" title="怎样设置JVM参数"></a>怎样设置JVM参数</h4><p>方法很多，可以上网查询，我这里说我使用的Eclipse中设置方式。<br>在运行Java的按钮下面，Run As下面，有一个Run Configurations-&gt;Arguments-&gt;VMarguments<br><img src="https://www.gwt.fun/upload/7b7d038a1aaf47109be6f439a0c27ae3_QQ20190130141444.jpg" alt="QQ20190130141444jpg"> </p>
+<h4 id="Trace跟踪参数"><a href="#Trace跟踪参数" class="headerlink" title="Trace跟踪参数"></a>Trace跟踪参数</h4><p>Trace跟踪参数就是跟踪GC运行的参数。  </p>
+<h5 id="打印GC简要信息"><a href="#打印GC简要信息" class="headerlink" title="打印GC简要信息"></a>打印GC简要信息</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-verbose:gc  </span><br><span class="line">-XX:+PrintGC</span><br></pre></td></tr></table></figure>
+<p>-verbose:gc   表示输出虚拟机中GC的情况<br>-XX:+PrintGC  功能和-verbose:gc一样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">   Object obj &#x3D; new byte[1*1024*1024];</span><br><span class="line">obj &#x3D; null;</span><br><span class="line">System.gc();</span><br><span class="line">&#x2F;* 输出：</span><br><span class="line">[GC (System.gc())  3020K-&gt;704K(125952K), 0.0008022 secs]</span><br><span class="line">   [Full GC (System.gc())  704K-&gt;514K(125952K), 0.0049984 secs]</span><br><span class="line">*&#x2F;</span><br></pre></td></tr></table></figure>
+<p>上面的代码，将obj设置为null，让GC回收创建的BYTE数组，是属于新生代的Minor GC。调用System.gc()，是Full GC</p>
+<h5 id="打印GC详细信息"><a href="#打印GC详细信息" class="headerlink" title="打印GC详细信息"></a>打印GC详细信息</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-XX:+PrintGCDetails     &#x2F;&#x2F;打印GC详细信息</span><br><span class="line">-XX:+PrintGCTimeStamps  &#x2F;&#x2F;打印GC发生的时间戳 </span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">-XX:+PrintGCDetails的输出：</span><br><span class="line">Heap</span><br><span class="line"> PSYoungGen      total 38400K, used 3686K [0x00000000d5f00000, 0x00000000d8980000, 0x0000000100000000)</span><br><span class="line">  eden space 33280K, 11% used [0x00000000d5f00000,0x00000000d6299b30,0x00000000d7f80000)</span><br><span class="line">  from space 5120K, 0% used [0x00000000d8480000,0x00000000d8480000,0x00000000d8980000)</span><br><span class="line">  to   space 5120K, 0% used [0x00000000d7f80000,0x00000000d7f80000,0x00000000d8480000)</span><br><span class="line"> ParOldGen       total 87552K, used 0K [0x0000000081c00000, 0x0000000087180000, 0x00000000d5f00000)</span><br><span class="line">  object space 87552K, 0% used [0x0000000081c00000,0x0000000081c00000,0x0000000087180000)</span><br><span class="line"> Metaspace       used 2633K, capacity 4486K, committed 4864K, reserved 1056768K</span><br><span class="line">  class space    used 280K, capacity 386K, committed 512K, reserved 1048576K</span><br></pre></td></tr></table></figure>
+<p>下面我简单介绍一下里面的参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">PSYoungGen      total 38400K, used 3686K [0x00000000d5f00000, 0x00000000d8980000, 0x0000000100000000)</span><br></pre></td></tr></table></figure>
+<p>第一行的PSYoungGen表示新生代；total 38400K表示总大小为38400K；used 3686K表示已经使用了3686K；[0x00000000d5f00000, 0x00000000d8980000, 0x0000000100000000)分别表示当前区域在内存中的位置，分别是低边界，当前边界和高边界,(0x00000000d8980000-0x00000000d5f00000)/1024/1024 = 42M,<br>33280K+5120K+5120K=42M(eden space+from space + to space)</p>
+<h5 id="文件输出GC-log"><a href="#文件输出GC-log" class="headerlink" title="文件输出GC log"></a>文件输出GC log</h5><p>有时候在运行环境下，需要查看错误信息，就需要将log文件保存在本地，应该使用下面的命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Xloggc:F:&#x2F;gc.log</span><br></pre></td></tr></table></figure>
+<p>这样在F盘就出现gc.log文件，打开信息为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">Java HotSpot(TM) 64-Bit Server VM (25.192-b12) for windows-amd64 JRE (1.8.0_192-b12), built on Oct  6 2018 17:12:23 by &quot;java_re&quot; with MS VC++ 10.0 (VS2010)</span><br><span class="line">Memory: 4k page, physical 8272984k(2132632k free), swap 16544068k(9949684k free)</span><br><span class="line">CommandLine flags: -XX:InitialHeapSize&#x3D;132367744 -XX:MaxHeapSize&#x3D;2117883904 -XX:+PrintGC -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelGC </span><br><span class="line">0.100: [GC (System.gc()) [PSYoungGen: 3020K-&gt;664K(38400K)] 3020K-&gt;672K(125952K), 0.0009640 secs] [Times: user&#x3D;0.00 sys&#x3D;0.00, real&#x3D;0.00 secs] </span><br><span class="line">0.101: [Full GC (System.gc()) [PSYoungGen: 664K-&gt;0K(38400K)] [ParOldGen: 8K-&gt;514K(87552K)] 672K-&gt;514K(125952K), [Metaspace: 2627K-&gt;2627K(1056768K)], 0.0054643 secs] [Times: user&#x3D;0.08 sys&#x3D;0.00, real&#x3D;0.01 secs] </span><br><span class="line">Heap</span><br><span class="line"> PSYoungGen      total 38400K, used 333K [0x00000000d5f00000, 0x00000000d8980000, 0x0000000100000000)</span><br><span class="line">  eden space 33280K, 1% used [0x00000000d5f00000,0x00000000d5f534a8,0x00000000d7f80000)</span><br><span class="line">  from space 5120K, 0% used [0x00000000d7f80000,0x00000000d7f80000,0x00000000d8480000)</span><br><span class="line">  to   space 5120K, 0% used [0x00000000d8480000,0x00000000d8480000,0x00000000d8980000)</span><br><span class="line"> ParOldGen       total 87552K, used 514K [0x0000000081c00000, 0x0000000087180000, 0x00000000d5f00000)</span><br><span class="line">  object space 87552K, 0% used [0x0000000081c00000,0x0000000081c80ba0,0x0000000087180000)</span><br><span class="line"> Metaspace       used 2633K, capacity 4486K, committed 4864K, reserved 1056768K</span><br><span class="line">  class space    used 280K, capacity 386K, committed 512K, reserved 1048576K</span><br></pre></td></tr></table></figure>
+<h5 id="监控加载了哪些类"><a href="#监控加载了哪些类" class="headerlink" title="监控加载了哪些类"></a>监控加载了哪些类</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:+TraceClassLoading</span><br></pre></td></tr></table></figure>
+<p>使用这个参数能获取到Java加载到的类。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">[Opened D:\myeclipse\binary\jdk1.8\jre\lib\rt.jar]</span><br><span class="line">[Loaded java.lang.Object from D:\myeclipse\binary\jdk1.8\jre\lib\rt.jar]</span><br><span class="line">[Loaded java.io.Serializable from D:\myeclipse\binary\jdk1.8\jre\lib\rt.jar]</span><br><span class="line">[Loaded java.lang.Comparable from D:\myeclipse\binary\jdk1.8\jre\lib\rt.jar]</span><br><span class="line">[Loaded java.lang.CharSequence from D:\myeclipse\binary\jdk1.8\jre\lib\rt.jar]</span><br><span class="line">[Loaded java.lang.String from D:\myeclipse\binary\jdk1.8\jre\lib\rt.jar]</span><br><span class="line">[Loaded java.lang.reflect.AnnotatedElement from D:\myeclipse\binary\jdk1.8\jre\lib\rt.jar]</span><br><span class="line">[Loaded java.lang.reflect.GenericDeclaration from D:\myeclipse\binary\jdk1.8\jre\lib\rt.jar]</span><br><span class="line">[Loaded java.lang.reflect.Type from D:\myeclipse\binary\jdk1.8\jre\lib\rt.jar]</span><br><span class="line">.......</span><br></pre></td></tr></table></figure>
+<h5 id="打印类的信息"><a href="#打印类的信息" class="headerlink" title="打印类的信息"></a>打印类的信息</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:+PrintClassHistogram</span><br></pre></td></tr></table></figure>
+<p>按下Ctrl+Break后，打印类的信息(四个参数分别是：序号、实例数量、总大小、类型<br>)：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"> num     #instances         #bytes  class name</span><br><span class="line">----------------------------------------------</span><br><span class="line">   1:        890617      470266000  [B</span><br><span class="line">   2:        890643       21375432  java.util.HashMap$Node</span><br><span class="line">   3:        890608       14249728  java.lang.Long</span><br><span class="line">   4:            13        8389712  [Ljava.util.HashMap$Node;</span><br><span class="line">   5:          2062         371680  [C</span><br><span class="line">   6:           463          41904  java.lang.Class</span><br></pre></td></tr></table></figure>
+<h4 id="堆的分配参数"><a href="#堆的分配参数" class="headerlink" title="堆的分配参数"></a>堆的分配参数</h4><h5 id="指定最大堆和最小堆"><a href="#指定最大堆和最小堆" class="headerlink" title="指定最大堆和最小堆"></a>指定最大堆和最小堆</h5><p>指定参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-Xmx</span><br><span class="line">-Xms</span><br><span class="line">&#x2F;&#x2F;下面表示最大堆为20m，最小堆是5m</span><br><span class="line">-Xmx20m</span><br><span class="line">-Xms5m</span><br></pre></td></tr></table></figure>
+<p>获取JVM最大堆数据：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">   &#x2F;&#x2F;获取最大堆大小</span><br><span class="line">System.out.print(&quot;Xmx&#x3D;&quot;);</span><br><span class="line">System.out.println(Runtime.getRuntime().maxMemory()&#x2F;1024.0&#x2F;1024+&quot;M&quot;);</span><br><span class="line">   &#x2F;&#x2F;获取空闲内存大小</span><br><span class="line">System.out.print(&quot;free mem&#x3D;&quot;);</span><br><span class="line">System.out.println(Runtime.getRuntime().freeMemory()&#x2F;1024.0&#x2F;1024+&quot;M&quot;);</span><br><span class="line">   &#x2F;&#x2F;获取总计内存大小</span><br><span class="line">System.out.print(&quot;total mem&#x3D;&quot;);</span><br><span class="line">System.out.println(Runtime.getRuntime().totalMemory()&#x2F;1024.0&#x2F;1024+&quot;M&quot;);</span><br></pre></td></tr></table></figure>
+<p>输出结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Xmx&#x3D;1796.0M  </span><br><span class="line">free mem&#x3D;121.04998016357422M  </span><br><span class="line">total mem&#x3D;123.0M  </span><br></pre></td></tr></table></figure>
+<p>也就是说，我的JVM设置最大堆是1796.0M ，总计123.0M  ，还有121.04998016357422M 可用。那么设置一下-Xmx20m -Xms5m参数，再看一下结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Xmx&#x3D;18.0M</span><br><span class="line">free mem&#x3D;4.761444091796875M</span><br><span class="line">total mem&#x3D;5.5M</span><br></pre></td></tr></table></figure>
+<p>如果分配1M的数组，再次执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">byte[] b &#x3D; new byte[1*1024*1024];</span><br></pre></td></tr></table></figure>
+<p>分配1M数组后，空闲空间变少：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Xmx&#x3D;18.0M</span><br><span class="line">free mem&#x3D;3.76141357421875M</span><br><span class="line">total mem&#x3D;5.5M</span><br></pre></td></tr></table></figure>
+<p>如果空闲空间全部使用完会怎么样呢？那我们创建一个5M的数组，看一下结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">byte[] b &#x3D; new byte[5*1024*1024];</span><br></pre></td></tr></table></figure>
+<p>输出的结果变成了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Xmx&#x3D;18.0M</span><br><span class="line">free mem&#x3D;5.26141357421875M</span><br><span class="line">total mem&#x3D;11.0M</span><br></pre></td></tr></table></figure>
+<p>这里的最大堆没变，还是18M，总的内存大小从5.5M变成了11M，也就是说如果空闲空间不能支撑对象所需容量，那么就会扩容。</p>
+<h5 id="堆的其他参数"><a href="#堆的其他参数" class="headerlink" title="堆的其他参数"></a>堆的其他参数</h5><p>设置新生代大小(绝对参数，设置多少就是多少):</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Xmn</span><br></pre></td></tr></table></figure>
+<p>新生代（eden+2*s）和老年代（不包含永久区）的比值:<br>4表示 新生代:老年代=1:4，即年轻代占堆的1/5</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:NewRatio</span><br></pre></td></tr></table></figure>
+<p>设置两个Survivor区和eden的比:<br>8表示 两个Survivor :eden=2:8，即一个Survivor占年轻代的1/10</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:SurvivorRatio</span><br></pre></td></tr></table></figure>
+<p>我们测试一下堆内空间的变化，创建一个10M的数组，数组是循环创建：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">byte[] b&#x3D;null;</span><br><span class="line">for(int i&#x3D;0;i&lt;10;i++)</span><br><span class="line">	b&#x3D;new byte[1*1024*1024];</span><br></pre></td></tr></table></figure>
+<p>先看一下新生代分配1M空间：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">配置参数：-Xmx20m -Xms20m -Xmn1m  -XX:+PrintGCDetails </span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 507K-&gt;504K(1024K)] 507K-&gt;504K(19968K), 0.0010025 secs] [Times: user&#x3D;0.05 sys&#x3D;0.02, real&#x3D;0.00 secs] </span><br><span class="line">Heap</span><br><span class="line"> PSYoungGen      total 1024K, used 721K [0x00000000ffe80000, 0x0000000100000000, 0x0000000100000000)</span><br><span class="line">  eden space 512K, 42% used [0x00000000ffe80000,0x00000000ffeb6790,0x00000000fff00000)</span><br><span class="line">  from space 512K, 98% used [0x00000000fff00000,0x00000000fff7e030,0x00000000fff80000)</span><br><span class="line">  to   space 512K, 0% used [0x00000000fff80000,0x00000000fff80000,0x0000000100000000)</span><br><span class="line"> ParOldGen       total 18944K, used 10240K [0x00000000fec00000, 0x00000000ffe80000, 0x00000000ffe80000)</span><br><span class="line">  object space 18944K, 54% used [0x00000000fec00000,0x00000000ff6000a0,0x00000000ffe80000)</span><br><span class="line"> Metaspace       used 2633K, capacity 4486K, committed 4864K, reserved 1056768K</span><br><span class="line">  class space    used 280K, capacity 386K, committed 512K, reserved 1048576K</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM warning: NewSize (1536k) is greater than the MaxNewSize (1024k). A new max generation size of 1536k will be used.</span><br></pre></td></tr></table></figure>
+<p>我用的JDK1.8，这里还报了Java HotSpot(TM) 64-Bit Server VM warning，主要是因为新生代的空间不足，不能分配。我们可以看到，新生代空间不足1M，因此新生代无法分配，就在老年代里面分配了10M空间。新生代发生了一次GC，回收了3K空间，可以忽略不计。那么继续增加新生代空间到15M：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">执行参数：-Xmx20m -Xms20m -Xmn15m  -XX:+PrintGCDetails</span><br><span class="line"></span><br><span class="line">Heap</span><br><span class="line"> PSYoungGen      total 13824K, used 11525K [0x00000000ff100000, 0x0000000100000000, 0x0000000100000000)</span><br><span class="line">  eden space 12288K, 93% used [0x00000000ff100000,0x00000000ffc41760,0x00000000ffd00000)</span><br><span class="line">  from space 1536K, 0% used [0x00000000ffe80000,0x00000000ffe80000,0x0000000100000000)</span><br><span class="line">  to   space 1536K, 0% used [0x00000000ffd00000,0x00000000ffd00000,0x00000000ffe80000)</span><br><span class="line"> ParOldGen       total 5120K, used 0K [0x00000000fec00000, 0x00000000ff100000, 0x00000000ff100000)</span><br><span class="line">  object space 5120K, 0% used [0x00000000fec00000,0x00000000fec00000,0x00000000ff100000)</span><br><span class="line"> Metaspace       used 2633K, capacity 4486K, committed 4864K, reserved 1056768K</span><br><span class="line">  class space    used 280K, capacity 386K, committed 512K, reserved 1048576K</span><br></pre></td></tr></table></figure>
+<p>这里没有发生GC，新生代使用了11525K空间，说明新生代空间足够分配，因此没有触发GC。那么将新生代空间调整到7M会发生什么呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">执行参数：-Xmx20m -Xms20m -Xmn7m  -XX:+PrintGCDetails</span><br><span class="line"></span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 6036K-&gt;480K(6656K)] 6036K-&gt;1648K(19968K), 0.0012152 secs] [Times: user&#x3D;0.00 sys&#x3D;0.00, real&#x3D;0.00 secs] </span><br><span class="line">Heap</span><br><span class="line"> PSYoungGen      total 6656K, used 5782K [0x00000000ff900000, 0x0000000100000000, 0x0000000100000000)</span><br><span class="line">  eden space 6144K, 86% used [0x00000000ff900000,0x00000000ffe2d900,0x00000000fff00000)</span><br><span class="line">  from space 512K, 93% used [0x00000000fff00000,0x00000000fff78020,0x00000000fff80000)</span><br><span class="line">  to   space 512K, 0% used [0x00000000fff80000,0x00000000fff80000,0x0000000100000000)</span><br><span class="line"> ParOldGen       total 13312K, used 1168K [0x00000000fec00000, 0x00000000ff900000, 0x00000000ff900000)</span><br><span class="line">  object space 13312K, 8% used [0x00000000fec00000,0x00000000fed24020,0x00000000ff900000)</span><br><span class="line"> Metaspace       used 2633K, capacity 4486K, committed 4864K, reserved 1056768K</span><br><span class="line">  class space    used 280K, capacity 386K, committed 512K, reserved 1048576K</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>这里发生了一次新生代GC，回收了6036K-1648k= 4388k空间，剩下的5782k在新生代。继续调整，这次调整一下新生代中eden和Survivor的比例，设置-XX:SurvivorRatio=2，增大了Survivor的大小。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">执行参数：-Xmx20m -Xms20m -Xmn7m   -XX:SurvivorRatio&#x3D;2 -XX:+PrintGCDetails</span><br><span class="line"></span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 3922K-&gt;1504K(5632K)] 3922K-&gt;1624K(18944K), 0.0025991 secs] [Times: user&#x3D;0.00 sys&#x3D;0.00, real&#x3D;0.00 secs] </span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 4656K-&gt;1504K(5632K)] 4776K-&gt;1624K(18944K), 0.0114028 secs] [Times: user&#x3D;0.08 sys&#x3D;0.00, real&#x3D;0.01 secs] </span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 4646K-&gt;1504K(5632K)] 4766K-&gt;1632K(18944K), 0.0024505 secs] [Times: user&#x3D;0.00 sys&#x3D;0.00, real&#x3D;0.00 secs] </span><br><span class="line">Heap</span><br><span class="line"> PSYoungGen      total 5632K, used 2610K [0x00000000ff900000, 0x0000000100000000, 0x0000000100000000)</span><br><span class="line">  eden space 4096K, 27% used [0x00000000ff900000,0x00000000ffa14930,0x00000000ffd00000)</span><br><span class="line">  from space 1536K, 97% used [0x00000000ffd00000,0x00000000ffe78030,0x00000000ffe80000)</span><br><span class="line">  to   space 1536K, 0% used [0x00000000ffe80000,0x00000000ffe80000,0x0000000100000000)</span><br><span class="line"> ParOldGen       total 13312K, used 128K [0x00000000fec00000, 0x00000000ff900000, 0x00000000ff900000)</span><br><span class="line">  object space 13312K, 0% used [0x00000000fec00000,0x00000000fec20010,0x00000000ff900000)</span><br><span class="line"> Metaspace       used 2633K, capacity 4486K, committed 4864K, reserved 1056768K</span><br><span class="line">  class space    used 280K, capacity 386K, committed 512K, reserved 1048576K</span><br></pre></td></tr></table></figure>
+<p>发生了3次新生代的GC，都是新生代的Minor GC，第一次GC回收了3922K-1624K=2298k，第二次GC回收了4776K-1624K=3152K，第三次GC回收了4766K-1632K=3134k，剩下的2610k在新生代中，还有一部分去了From Survivor中。再看一下，-XX:NewRatio=1的情况：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">执行参数：-Xmx20m -Xms20m -XX:NewRatio&#x3D;1    -XX:SurvivorRatio&#x3D;2 -XX:+PrintGCDetails</span><br><span class="line"></span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 4932K-&gt;1688K(7680K)] 4932K-&gt;1696K(17920K), 0.0011783 secs] [Times: user&#x3D;0.00 sys&#x3D;0.00, real&#x3D;0.00 secs] </span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 5884K-&gt;1592K(7680K)] 5892K-&gt;1600K(17920K), 0.0009533 secs] [Times: user&#x3D;0.00 sys&#x3D;0.00, real&#x3D;0.00 secs] </span><br><span class="line">Heap</span><br><span class="line"> PSYoungGen      total 7680K, used 3834K [0x00000000ff600000, 0x0000000100000000, 0x0000000100000000)</span><br><span class="line">  eden space 5120K, 43% used [0x00000000ff600000,0x00000000ff830ad8,0x00000000ffb00000)</span><br><span class="line">  from space 2560K, 62% used [0x00000000ffd80000,0x00000000fff0e040,0x0000000100000000)</span><br><span class="line">  to   space 2560K, 0% used [0x00000000ffb00000,0x00000000ffb00000,0x00000000ffd80000)</span><br><span class="line"> ParOldGen       total 10240K, used 8K [0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000)</span><br><span class="line">  object space 10240K, 0% used [0x00000000fec00000,0x00000000fec02000,0x00000000ff600000)</span><br><span class="line"> Metaspace       used 2633K, capacity 4486K, committed 4864K, reserved 1056768K</span><br><span class="line">  class space    used 280K, capacity 386K, committed 512K, reserved 1048576K</span><br></pre></td></tr></table></figure>
+<p>可以看到，提高新生代空间之后，发生了两次GC，因为新生代能分配更多的空间，避免GC，也没有是用老年代的空间。那么再增加eden空间会怎么样呢？</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">执行参数：-Xmx20m -Xms20m -XX:NewRatio&#x3D;1   -XX:SurvivorRatio&#x3D;3 -XX:+PrintGCDetails</span><br><span class="line"></span><br><span class="line">[GC (Allocation Failure) [PSYoungGen: 6036K-&gt;1720K(8192K)] 6036K-&gt;1728K(18432K), 0.0059791 secs] [Times: user&#x3D;0.00 sys&#x3D;0.00, real&#x3D;0.01 secs] </span><br><span class="line">Heap</span><br><span class="line"> PSYoungGen      total 8192K, used 7022K [0x00000000ff600000, 0x0000000100000000, 0x0000000100000000)</span><br><span class="line">  eden space 6144K, 86% used [0x00000000ff600000,0x00000000ffb2d900,0x00000000ffc00000)</span><br><span class="line">  from space 2048K, 83% used [0x00000000ffc00000,0x00000000ffdae040,0x00000000ffe00000)</span><br><span class="line">  to   space 2048K, 0% used [0x00000000ffe00000,0x00000000ffe00000,0x0000000100000000)</span><br><span class="line"> ParOldGen       total 10240K, used 8K [0x00000000fec00000, 0x00000000ff600000, 0x00000000ff600000)</span><br><span class="line">  object space 10240K, 0% used [0x00000000fec00000,0x00000000fec02000,0x00000000ff600000)</span><br><span class="line"> Metaspace       used 2633K, capacity 4486K, committed 4864K, reserved 1056768K</span><br><span class="line">  class space    used 280K, capacity 386K, committed 512K, reserved 1048576K</span><br></pre></td></tr></table></figure>
+<p>提高Eden空间之后，只发生了一次GC，GC越少，说明系统执行效率越高。</p>
+<h5 id="OOM内存溢出"><a href="#OOM内存溢出" class="headerlink" title="OOM内存溢出"></a>OOM内存溢出</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">-XX:+HeapDumpOnOutOfMemoryError</span><br><span class="line">OOM时导出堆到文件</span><br><span class="line">-XX:+HeapDumpPath</span><br><span class="line">导出OOM的路径</span><br><span class="line">-Xmx20m -Xms5m -XX:+HeapDumpOnOutOfMemoryError -XX:HeapDumpPath&#x3D;d:&#x2F;a.dump</span><br><span class="line">当发生OOM时，导出到文件a.dump</span><br><span class="line">-XX:OnOutOfMemoryError</span><br><span class="line">在OOM时，执行一个脚本</span><br><span class="line">&quot;-XX:OnOutOfMemoryError&#x3D;D:&#x2F;tools&#x2F;jdk1.7_40&#x2F;bin&#x2F;printstack.bat %p&quot;</span><br><span class="line">当程序OOM时，在D:&#x2F;a.txt中将会生成线程的dump</span><br><span class="line">可以在OOM时，发送邮件，甚至是重启程序</span><br></pre></td></tr></table></figure>
+<h5 id="默认配置"><a href="#默认配置" class="headerlink" title="默认配置"></a>默认配置</h5><p>新生代 ( Young ) 与老年代 ( Old ) 的比例的值为 1:2<br>Edem : from : to = 8 : 1 : 1 </p>
+<h4 id="永久区分配参数"><a href="#永久区分配参数" class="headerlink" title="永久区分配参数"></a>永久区分配参数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-XX:PermSize  -XX:MaxPermSize</span><br><span class="line">设置永久区的初始空间和最大空间</span><br></pre></td></tr></table></figure>
+<p>使用CGLIB等库的时候，可能会产生大量的类，这些类，有可能撑爆永久区导致OOM。</p>
+<h4 id="栈空间分配"><a href="#栈空间分配" class="headerlink" title="栈空间分配"></a>栈空间分配</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-Xss</span><br></pre></td></tr></table></figure>
+<p>通常只有几百K,决定了函数调用的深度;<br>每个线程都有独立的栈空间,局部变量、参数 分配在栈上.<br>因为每个线程都需要分配一个栈空间，因此如果想多跑一些线程，就需要将这个值调小，容纳更多线程。</p>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>1.<a target="_blank" rel="noopener" href="https://blog.csdn.net/huangxinyu_it/article/details/73992032">JAVA 方法区是在堆里面吗</a><br>2.<a target="_blank" rel="noopener" href="https://www.cnblogs.com/fangfuhai/p/7206944.html">Java虚拟机：JVM内存分代策略</a></p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/02/07/201902/Java源码分析String详解/" class="prev">上一篇：Java源码分析--String详解</a>
+    
+    
+    <a href="/2019/01/29/201901/Java基础之注解/" class="next">下一篇：Java基础之注解</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

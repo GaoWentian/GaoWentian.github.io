@@ -1,0 +1,361 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Kubernetes基础--Pod用法 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="Pod 是 Kubernetes 调度的最小单元。一个 Pod 可以包含一个或多个容器，因此它可以被看作是内部容器的逻辑宿主机。Pod 有控制器管理的 Pod 和自主式 Pod 两种用法，本文介绍的是自主式 Pod。自主式 Pod 也就是没有控制器参与的 Pod，删除后无法再次创建。首先下载镜像到本">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Kubernetes基础--Pod用法"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2020-04-21T15:51:24.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-04-21
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Kubernetes基础--Pod用法</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%B8%E7%94%A8%E5%91%BD%E4%BB%A4"><span class="toc-number">1.</span> <span class="toc-text">常用命令</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%87%E7%AD%BE"><span class="toc-number">2.</span> <span class="toc-text">标签</span></a></li></ol>
+    </div>
+    
+    <p>Pod 是 Kubernetes 调度的最小单元。一个 Pod 可以包含一个或多个容器，因此它可以被看作是内部容器的逻辑宿主机。Pod 有控制器管理的 Pod 和自主式 Pod 两种用法，本文介绍的是自主式 Pod。自主式 Pod 也就是没有控制器参与的 Pod，删除后无法再次创建。<br>首先下载镜像到本地 Docker 仓库，用来演示创建 Pod 的过程。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">docker pull tutum&#x2F;hello-world    </span><br><span class="line">docker images</span><br></pre></td></tr></table></figure>
+<p><a target="_blank" rel="noopener" href="https://hub.docker.com/r/tutum/hello-world">tutum/hello-world</a>是在 dockerHub 上找到的一个镜像，开放 80 端口。<br>编写生成 Pod 的 YAML</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ cat kubia-manual.yaml</span><br><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">    name: kubia-manual</span><br><span class="line">spec:</span><br><span class="line">    containers:</span><br><span class="line">    - image: tutum&#x2F;hello-world</span><br><span class="line">      name: hello</span><br><span class="line">      ports:</span><br><span class="line">      - containerPort: 80</span><br><span class="line">        protocol: TCP</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>参数名</th>
+<th>字段类型</th>
+<th>说明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>apiVersion</td>
+<td>String</td>
+<td>K8S API 的版本，目前是 v1</td>
+</tr>
+<tr>
+<td>kind</td>
+<td>String</td>
+<td>YAML 文件定义的资源类型和角色，比如：Pod</td>
+</tr>
+<tr>
+<td>metadata</td>
+<td>Object</td>
+<td>元数据对象，固定值写 metadata</td>
+</tr>
+<tr>
+<td>metadata name</td>
+<td>String</td>
+<td>元数据对象的名字，这里由我们编写，比如命名 Pod 的名字</td>
+</tr>
+<tr>
+<td>metadata namespace</td>
+<td>String</td>
+<td>元数据对象的命名空间，有我们自身定义</td>
+</tr>
+<tr>
+<td>spec</td>
+<td>Object</td>
+<td>详细定义对象，固定值写 Spec</td>
+</tr>
+<tr>
+<td>spec.containers[]</td>
+<td>list</td>
+<td>这里是 Spec 对象的容器列表定义，是一个列表</td>
+</tr>
+<tr>
+<td>spec.containers[].name</td>
+<td>String</td>
+<td>这里定义容器的名字</td>
+</tr>
+<tr>
+<td>spec.containers[].image</td>
+<td>String</td>
+<td>这里定义要用到的镜像名称</td>
+</tr>
+<tr>
+<td>spec.containers[].imagePullPolicy</td>
+<td>String</td>
+<td>定义镜像的拉取策略，有 Always、Never、IfNotPresent 三个值。Always：每次都尝试重新拉取镜像；Never 表示仅使用本地镜像；IfNotPresent：本地有镜像就使用本地镜像，默认为 Always</td>
+</tr>
+<tr>
+<td>spec.containers[].command[]</td>
+<td>List</td>
+<td>指定容器启动命令，因为是数据可以指定多个，不指定则使用镜像打包时使用的启动命令</td>
+</tr>
+<tr>
+<td>spec.containers[].args[]</td>
+<td>List</td>
+<td>指定容器启动命令参数</td>
+</tr>
+<tr>
+<td>spec.containers[].workingDir</td>
+<td>String</td>
+<td>指定容器的工作目录</td>
+</tr>
+<tr>
+<td>spec.containers[].volumeMounts[]</td>
+<td>List</td>
+<td>指定容器内部的存储卷配置</td>
+</tr>
+<tr>
+<td>spec.containers[].volumeMounts[].name</td>
+<td>String</td>
+<td>指定可以被容器挂载的存储卷的名称</td>
+</tr>
+<tr>
+<td>spec.containers[].volumeMounts[].mountPath</td>
+<td>String</td>
+<td>指定可以被容器挂载的存储卷的路径</td>
+</tr>
+<tr>
+<td>spec.containers[].volumeMounts[].readOnly</td>
+<td>String</td>
+<td>设置存储卷路径的读写模式，true 或者 false，默认为读写模式</td>
+</tr>
+<tr>
+<td>spec.containers[].ports[]</td>
+<td>List</td>
+<td>指定端口名称</td>
+</tr>
+<tr>
+<td>spec.containers[].ports[].name</td>
+<td>String</td>
+<td>指定端口名称</td>
+</tr>
+<tr>
+<td>spec.containers[].ports[].containerPort</td>
+<td>String</td>
+<td>指定容器需要监听的端口号</td>
+</tr>
+<tr>
+<td>spec.containers[].ports[].hostPort</td>
+<td>String</td>
+<td>指定容器所在主机需要监听的端口号，默认跟上面的 containerPort 相同，注意设置了 hostPort 同一台主机无法启动该容器的相同副本，因为端口号相同会冲突</td>
+</tr>
+<tr>
+<td>spec.containers[].ports[].protocol</td>
+<td>String</td>
+<td>指定端口协议，支持 TCP 和 UDP，默认为 TCP</td>
+</tr>
+<tr>
+<td>spec.containers[].env[]</td>
+<td>List</td>
+<td>指定容器运行前需设置的环境变量列表</td>
+</tr>
+<tr>
+<td>spec.containers[].env[].name</td>
+<td>String</td>
+<td>指定环境变量名称</td>
+</tr>
+<tr>
+<td>spec.containers[].env[].value</td>
+<td>String</td>
+<td>指定环境变量值</td>
+</tr>
+<tr>
+<td>spec.containers[].resource</td>
+<td>Object</td>
+<td>指定资源限制和资源请求的值</td>
+</tr>
+<tr>
+<td>spec.containers[].resource.limits</td>
+<td>Object</td>
+<td>指定设置容器运行时资源的运行上限</td>
+</tr>
+<tr>
+<td>spec.containers[].resource.limits.cpu</td>
+<td>String</td>
+<td>指定 CPU 的限制，单位为 core 数，将用于 docker run –cpu-shares 参数</td>
+</tr>
+<tr>
+<td>spec.containers[].resource.limits.memory</td>
+<td>String</td>
+<td>指定 MEM 内存的限制，单位为 MlB,GiB</td>
+</tr>
+<tr>
+<td>spec.containers[].resource.requests</td>
+<td>Object</td>
+<td>指定容器启动和调度时的限制设置</td>
+</tr>
+<tr>
+<td>spec.containers[].resource.requests.cpu</td>
+<td>String</td>
+<td>CPU 请求，单位为 core 数，容器启动时初始化可用数量</td>
+</tr>
+<tr>
+<td>spec.containers[].resource.requests.memory</td>
+<td>String</td>
+<td>内存请求，单位为 MlB,GiB，容器启动的初始化可用数量</td>
+</tr>
+<tr>
+<td>spec.restartPolicy</td>
+<td>String</td>
+<td>定义 Pod 的重启策略，可选值为 Always、OnFailure、Never，默认值为 Always。Always：Pod 一旦终止运行，kubelet 服务都会重启。OnFailure：只有 Pod 以非零退出吗终止时，kubelet 才会重启该容器。如果容器正常结束（退出码为 0），则不会重启。Never：Pod 终止后，kubelet 将退出码报告给 Master，不会重启该 Pod</td>
+</tr>
+<tr>
+<td>spec.nodeSelector</td>
+<td>Object</td>
+<td>定义 Node 的 Label 过滤标签，以 name:value 格式指定</td>
+</tr>
+<tr>
+<td>spec.imagePullSecrets</td>
+<td>Object</td>
+<td>定义 pull 镜像时使用 secret 名称，以 name：secretkey 格式指定</td>
+</tr>
+<tr>
+<td>spec.hostNetWork</td>
+<td>Boolean</td>
+<td>定义是否使用主机网络模式，默认值为 false。设置 true 表示使用宿主机网络，不使用 docker 网桥，同时设置了 true 将无法在同一台宿主机上启动第二个副本</td>
+</tr>
+</tbody></table>
+<h4 id="常用命令"><a href="#常用命令" class="headerlink" title="常用命令"></a>常用命令</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line"># 根据yaml文件创建pod</span><br><span class="line">kubectl create -f kubia-manual.yaml</span><br><span class="line"># 查看kubia-manual的详细yaml</span><br><span class="line">kubectl get po kubia-manual -o yaml</span><br><span class="line"># 查看k8s中所有pod</span><br><span class="line">kubectl get pods</span><br><span class="line"># 删除pod</span><br><span class="line">kubectl delete pod kubia-manual</span><br><span class="line"># 查看Pod日志</span><br><span class="line">kubectl logs kubia-manual</span><br><span class="line"># 查看Pod中的hello容器的日志，这里的容器名称为spec.containers[].name定义的名字</span><br><span class="line">kubectl logs kubia-manual -c hello</span><br></pre></td></tr></table></figure>
+<p>正常需要通过 Service 和 Pod 通信，也可以直接将配置端口转发到 pod，可以使用 kubectl port-forward 命令转发，下面的指令将本地端口的 8888 转发到 pod 的 80 端口。然后使用 curl 命令即可查看容器返回的消息。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">kubectl port-forward kubia-manual 8888:80</span><br><span class="line">curl localhost:8888</span><br></pre></td></tr></table></figure>
+<h4 id="标签"><a href="#标签" class="headerlink" title="标签"></a>标签</h4><p>修改 YAML 文件，将 labels 信息加入，此时 pod 多了两个标签。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: Pod</span><br><span class="line">metadata:</span><br><span class="line">    name: kubia-manual-v1</span><br><span class="line">    labels:</span><br><span class="line">        creation_method: manual</span><br><span class="line">        env: prod</span><br><span class="line">spec:</span><br><span class="line">    containers:</span><br><span class="line">    - image: tutum&#x2F;hello-world</span><br><span class="line">      name: hello</span><br><span class="line">      ports:</span><br><span class="line">      - containerPort: 80</span><br><span class="line">        protocol: TCP</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line"># 使用 --show-labels参数，可以看到pod中的标签。</span><br><span class="line">kubectl get po --show-labels</span><br><span class="line"></span><br><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get po --show-labels</span><br><span class="line">NAME              READY   STATUS    RESTARTS   AGE   LABELS</span><br><span class="line">kubia-manual      1&#x2F;1     Running   0          14m   &lt;none&gt;</span><br><span class="line">kubia-manual-v1   1&#x2F;1     Running   0          49s   creation_method&#x3D;manual,env&#x3D;prod</span><br><span class="line"></span><br><span class="line"># -L命令可以分别查看标签的两列</span><br><span class="line">kubectl get po -L creation_method,env</span><br><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get po -L creation_method,env</span><br><span class="line">NAME              READY   STATUS    RESTARTS   AGE    CREATION_METHOD   ENV</span><br><span class="line">kubia-manual      1&#x2F;1     Running   0          17m</span><br><span class="line">kubia-manual-v1   1&#x2F;1     Running   0          4m1s   manual            prod</span><br><span class="line"></span><br><span class="line"># kubectl label参数可以修改标签</span><br><span class="line">master@master:~$ kubectl label po kubia-manual env&#x3D;dev</span><br><span class="line">pod&#x2F;kubia-manual labeled</span><br><span class="line">master@master:~$ kubectl get po -L creation_method,env</span><br><span class="line">NAME              READY   STATUS    RESTARTS   AGE     CREATION_METHOD   ENV</span><br><span class="line">kubia-manual      1&#x2F;1     Running   0          23m                       dev</span><br><span class="line">kubia-manual-v1   1&#x2F;1     Running   0          9m16s   manual            prod</span><br><span class="line"></span><br><span class="line"># 使用-l命令筛选env&#x3D;dev的标签</span><br><span class="line">master@master:~$ kubectl get po -l env&#x3D;dev</span><br><span class="line">NAME           READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-manual   1&#x2F;1     Running   0          34m</span><br><span class="line"></span><br><span class="line"># 使用-l命令筛选存在env的标签，不管值多少</span><br><span class="line">master@master:~$ kubectl get po -l env</span><br><span class="line">NAME              READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-manual      1&#x2F;1     Running   0          36m</span><br><span class="line">kubia-manual-v1   1&#x2F;1     Running   0          22m</span><br><span class="line"></span><br><span class="line"># 列出不包含creation_method标签的pod</span><br><span class="line">master@master:~$ kubectl get po -l &#39;!creation_method&#39;</span><br><span class="line">NAME           READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-manual   1&#x2F;1     Running   0          37m</span><br><span class="line"></span><br><span class="line"># 按标签删除Pod</span><br><span class="line">master@master:~$ kubectl delete po -l creation_method&#x3D;manual</span><br><span class="line">pod &quot;kubia-manual-v1&quot; deleted</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2020/04/25/202004/Kubernetes基础Pod控制器/" class="prev">上一篇：Kubernetes基础--Pod控制器</a>
+    
+    
+    <a href="/2020/03/21/202003/Zookeeper基础简单用法/" class="next">下一篇：Zookeeper基础--简单用法</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

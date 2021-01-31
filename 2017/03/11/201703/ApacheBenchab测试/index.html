@@ -1,0 +1,160 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>ApacheBench（ab）测试 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="12345678910111213141516171819202122232425262728293031323334353637383940414243444546474849505152535455565758E:\xampp\apache\bin&amp;gt;ab -n 1000 -c 10 htt">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="ApacheBench（ab）测试"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-03-10T22:35:20.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-03-11
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">ApacheBench（ab）测试</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">E:\xampp\apache\bin&gt;ab -n 1000 -c 10 http:&#x2F;&#x2F;localhost&#x2F;index.php</span><br><span class="line">&#x2F;&#x2F;-n 1000 表示发起1000个请求   -c 10 表示并发用户数为10     最后是请求的url，我测的本地</span><br><span class="line">This is ApacheBench, Version 2.3 &lt;$Revision: 1706008 $&gt;</span><br><span class="line">Copyright 1996 Adam Twiss, Zeus Technology Ltd, http:&#x2F;&#x2F;www.zeustech.net&#x2F;</span><br><span class="line">Licensed to The Apache Software Foundation, http:&#x2F;&#x2F;www.apache.org&#x2F;</span><br><span class="line"></span><br><span class="line">Benchmarking localhost (be patient)</span><br><span class="line">Completed 100 requests</span><br><span class="line">Completed 200 requests</span><br><span class="line">Completed 300 requests</span><br><span class="line">Completed 400 requests</span><br><span class="line">Completed 500 requests</span><br><span class="line">Completed 600 requests</span><br><span class="line">Completed 700 requests</span><br><span class="line">Completed 800 requests</span><br><span class="line">Completed 900 requests</span><br><span class="line">Completed 1000 requests</span><br><span class="line">Finished 1000 requests</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">Server Software:        Apache&#x2F;2.4.17    &#x2F;&#x2F;被测试web服务器软件的名称。我用的apache</span><br><span class="line">Server Hostname:        localhost         &#x2F;&#x2F;被测url的 主机名称</span><br><span class="line">Server Port:            80                 &#x2F;&#x2F;被测web服务器监听的端口</span><br><span class="line"></span><br><span class="line">Document Path:          &#x2F;index.php       &#x2F;&#x2F;被测请求的绝对地址</span><br><span class="line">Document Length:        0 bytes          &#x2F;&#x2F;http响应数据的正文长度</span><br><span class="line"></span><br><span class="line">Concurrency Level:      10              &#x2F;&#x2F;表示并发数</span><br><span class="line">Time taken for tests:   0.585 seconds   &#x2F;&#x2F;表示所有请求处理完成花费的总时间</span><br><span class="line">Complete requests:      1000             &#x2F;&#x2F;表示请求数</span><br><span class="line">Failed requests:        0               &#x2F;&#x2F;表示失败的请求数</span><br><span class="line">Non-2xx responses:      1000         &#x2F;&#x2F;如果接收到的HTTP响应数据的头信息中含有2XX以外的状态码，则会在测试结果中显示另一个名为“Non-2xx responses”的统计项，用于统计这部分请求数，这些请求并不算在失败的请求中。</span><br><span class="line">Total transferred:      259000 bytes     &#x2F;&#x2F;表示请求响应数据长度总和，包括http响应数据头文件和正文数据。</span><br><span class="line">HTML transferred:       0 bytes          &#x2F;&#x2F;表示请求中响应数据中正文数据总和</span><br><span class="line">Requests per second:    1709.31 [#&#x2F;sec] (mean)    &#x2F;&#x2F;吞吐率</span><br><span class="line">Time per request:       5.850 [ms] (mean)                &#x2F;&#x2F;用户平均 请求等待时间</span><br><span class="line">Time per request:       0.585 [ms] (mean, across all concurrent requests) &#x2F;&#x2F;服务器平均请求处理时间，等于吞吐率的倒数</span><br><span class="line">Transfer rate:          432.33 [Kbytes&#x2F;sec] received   &#x2F;&#x2F;表示请求单位时间内从服务器获取数据长度</span><br><span class="line"></span><br><span class="line">Connection Times (ms)</span><br><span class="line">              min  mean[+&#x2F;-sd] median   max</span><br><span class="line">Connect:        0    0   0.4      0       2</span><br><span class="line">Processing:     2    5   5.6      5     100</span><br><span class="line">Waiting:        1    5   5.7      4      99</span><br><span class="line">Total:          2    6   5.6      5     100</span><br><span class="line"></span><br><span class="line">Percentage of the requests served within a certain time (ms)  </span><br><span class="line">&#x2F;&#x2F;描述每个请求处理时间的分布情况。表示99%的用户不超过20ms，90%的用户不超过7ms</span><br><span class="line">  50%      5</span><br><span class="line">  66%      5</span><br><span class="line">  75%      5</span><br><span class="line">  80%      6</span><br><span class="line">  90%      7</span><br><span class="line">  95%      9</span><br><span class="line">  98%     11</span><br><span class="line">  99%     20</span><br><span class="line"> 100%    100 (longest request)</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-4bb1fcd111d8b845.png" alt="Alt text"></p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/04/23/201704/设计模式简单工厂模式/" class="prev">上一篇：设计模式-简单工厂模式</a>
+    
+    
+    <a href="/2017/02/27/201702/BruteForce算法和KMP算法笔记/" class="next">下一篇：Brute-Force算法和KMP算法笔记</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

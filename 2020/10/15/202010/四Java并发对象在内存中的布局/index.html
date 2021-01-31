@@ -1,0 +1,229 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>（四）Java并发-对象在内存中的布局 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="对象在内存中的布局Object对象内存布局查看对象在内存中的结构，需要借助Java Object Layout工具，在Maven中引入依赖：
+1234567&amp;lt;dependencies&amp;gt;  &amp;lt;dependency&amp;gt;    &amp;lt;groupId&amp;gt;org.openjdk.j">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="（四）Java并发-对象在内存中的布局"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2020-10-14T16:22:25.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-10-15
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">（四）Java并发-对象在内存中的布局</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%9C%A8%E5%86%85%E5%AD%98%E4%B8%AD%E7%9A%84%E5%B8%83%E5%B1%80"><span class="toc-number">1.</span> <span class="toc-text">对象在内存中的布局</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#Object%E5%AF%B9%E8%B1%A1%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80"><span class="toc-number">1.1.</span> <span class="toc-text">Object对象内存布局</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Object-Header"><span class="toc-number">1.2.</span> <span class="toc-text">Object Header</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Mark-Word"><span class="toc-number">1.2.1.</span> <span class="toc-text">Mark Word</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Class-pointer"><span class="toc-number">1.2.2.</span> <span class="toc-text">Class pointer</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#array-length"><span class="toc-number">1.2.3.</span> <span class="toc-text">array length</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B%E6%95%B0%E6%8D%AE"><span class="toc-number">1.3.</span> <span class="toc-text">实例数据</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E6%9C%AC%E6%95%B0%E6%8D%AE%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.3.1.</span> <span class="toc-text">基本数据类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1"><span class="toc-number">1.3.2.</span> <span class="toc-text">对象</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E9%BD%90%E5%A1%AB%E5%85%85%E5%AD%97%E8%8A%82"><span class="toc-number">1.4.</span> <span class="toc-text">对齐填充字节</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%89%A9%E5%B1%95"><span class="toc-number">2.</span> <span class="toc-text">扩展</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E6%8C%87%E9%92%88%E5%8E%8B%E7%BC%A9"><span class="toc-number">2.1.</span> <span class="toc-text">对象指针压缩</span></a></li></ol></li></ol>
+    </div>
+    
+    <h2 id="对象在内存中的布局"><a href="#对象在内存中的布局" class="headerlink" title="对象在内存中的布局"></a>对象在内存中的布局</h2><h3 id="Object对象内存布局"><a href="#Object对象内存布局" class="headerlink" title="Object对象内存布局"></a>Object对象内存布局</h3><p>查看对象在内存中的结构，需要借助Java Object Layout工具，在Maven中引入依赖：</p>
+<figure class="highlight xml"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="tag">&lt;<span class="name">dependencies</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;<span class="name">dependency</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">groupId</span>&gt;</span>org.openjdk.jol<span class="tag">&lt;/<span class="name">groupId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">artifactId</span>&gt;</span>jol-core<span class="tag">&lt;/<span class="name">artifactId</span>&gt;</span></span><br><span class="line">    <span class="tag">&lt;<span class="name">version</span>&gt;</span>0.9<span class="tag">&lt;/<span class="name">version</span>&gt;</span></span><br><span class="line">  <span class="tag">&lt;/<span class="name">dependency</span>&gt;</span></span><br><span class="line"><span class="tag">&lt;/<span class="name">dependencies</span>&gt;</span></span><br></pre></td></tr></table></figure>
+<p>创建Object对象和数组对象，并输出内存结构：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> </span>&#123;</span><br><span class="line">    Object o = <span class="keyword">new</span> Object();</span><br><span class="line">    System.out.println(ClassLayout.parseInstance(o).toPrintable());</span><br><span class="line">    <span class="keyword">int</span>[] a = <span class="keyword">new</span> <span class="keyword">int</span>[<span class="number">0</span>];</span><br><span class="line">    System.out.println(ClassLayout.parseInstance(a).toPrintable());</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">learn20201010.User object internals:</span><br><span class="line"> OFFSET  SIZE   TYPE DESCRIPTION                               VALUE</span><br><span class="line">      <span class="number">0</span>     <span class="number">4</span>        (object header)                           <span class="number">01</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> (<span class="number">00000001</span> <span class="number">00000000</span> <span class="number">00000000</span> <span class="number">00000000</span>) (<span class="number">1</span>)</span><br><span class="line">      <span class="number">4</span>     <span class="number">4</span>        (object header)                           <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> (<span class="number">00000000</span> <span class="number">00000000</span> <span class="number">00000000</span> <span class="number">00000000</span>) (<span class="number">0</span>)</span><br><span class="line">      <span class="number">8</span>     <span class="number">4</span>        (object header)                           <span class="number">43</span> c1 <span class="number">00</span> <span class="number">20</span> (<span class="number">01000011</span> <span class="number">11000001</span> <span class="number">00000000</span> <span class="number">00100000</span>) (<span class="number">536920387</span>)</span><br><span class="line">     <span class="number">12</span>     <span class="number">4</span>        (loss due to the next object alignment)</span><br><span class="line">Instance size: <span class="number">16</span> bytes</span><br><span class="line">Space losses: <span class="number">0</span> bytes internal + <span class="number">4</span> bytes external = <span class="number">4</span> bytes total</span><br><span class="line"></span><br><span class="line">[I object internals:</span><br><span class="line"> OFFSET  SIZE   TYPE DESCRIPTION                               VALUE</span><br><span class="line">      <span class="number">0</span>     <span class="number">4</span>        (object header)                           <span class="number">01</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> (<span class="number">00000001</span> <span class="number">00000000</span> <span class="number">00000000</span> <span class="number">00000000</span>) (<span class="number">1</span>)</span><br><span class="line">      <span class="number">4</span>     <span class="number">4</span>        (object header)                           <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> (<span class="number">00000000</span> <span class="number">00000000</span> <span class="number">00000000</span> <span class="number">00000000</span>) (<span class="number">0</span>)</span><br><span class="line">      <span class="number">8</span>     <span class="number">4</span>        (object header)                           <span class="number">6d</span> <span class="number">01</span> <span class="number">00</span> <span class="number">20</span> (<span class="number">01101101</span> <span class="number">00000001</span> <span class="number">00000000</span> <span class="number">00100000</span>) (<span class="number">536871277</span>)</span><br><span class="line">     <span class="number">12</span>     <span class="number">4</span>        (object header)                           <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> <span class="number">00</span> (<span class="number">00000000</span> <span class="number">00000000</span> <span class="number">00000000</span> <span class="number">00000000</span>) (<span class="number">0</span>)</span><br><span class="line">     <span class="number">16</span>     <span class="number">0</span>    <span class="keyword">int</span> [I.&lt;elements&gt;                             N/A</span><br><span class="line">Instance size: <span class="number">16</span> bytes</span><br><span class="line">Space losses: <span class="number">0</span> bytes internal + <span class="number">0</span> bytes external = <span class="number">0</span> bytes total</span><br></pre></td></tr></table></figure>
+<p>根据上面的输出，重点介绍一下对象内存结构。Java对象在内存中分为三部分：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1、 object header（对象头）</span><br><span class="line">2、 instance data （实例数据）</span><br><span class="line">3、 padding （对齐填充字节）</span><br></pre></td></tr></table></figure>
+<p>上面的Object对象里面没有变量（方法不占空间）因此没有实例数据，只有对象头和对齐填充字段，数组对象也相同。下面来说一下对象这三部分。</p>
+<h3 id="Object-Header"><a href="#Object-Header" class="headerlink" title="Object Header"></a>Object Header</h3><p>对象头由一下三部分组成：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">1、Mark Word</span><br><span class="line">2、Class pointer </span><br><span class="line">3、array length（数组长度）</span><br></pre></td></tr></table></figure>
+<h4 id="Mark-Word"><a href="#Mark-Word" class="headerlink" title="Mark Word"></a>Mark Word</h4><p>Mark Word记录对象和锁的信息，在32位JVM中长度是32bit（4字节），64位JVM中长度是64bit（8字节）。</p>
+<h4 id="Class-pointer"><a href="#Class-pointer" class="headerlink" title="Class pointer"></a>Class pointer</h4><p>Class pointer指向该对象的Class对象（方法区）。在32位JVM中长度是32bit（4字节），64位JVM中长度是64bit（8字节，可以开启-XX:+UseCompressedClassPointers参数和-XX:+UseCompressedOops参数压缩为4字节）。</p>
+<h4 id="array-length"><a href="#array-length" class="headerlink" title="array length"></a>array length</h4><p>array length只有在对象是数组时才出现，占4个字节，对比上面的Object对象和数组对象，数组对象Object header最后多出来的4个字节就是用于保存数组长度。</p>
+<h3 id="实例数据"><a href="#实例数据" class="headerlink" title="实例数据"></a>实例数据</h3><p>实例数据不包括方法、静态变量和静态常量。</p>
+<h4 id="基本数据类型"><a href="#基本数据类型" class="headerlink" title="基本数据类型"></a>基本数据类型</h4><table>
+<thead>
+<tr>
+<th>类型</th>
+<th>占用空间（字节）</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>int</td>
+<td>4字节</td>
+</tr>
+<tr>
+<td>long</td>
+<td>8字节</td>
+</tr>
+<tr>
+<td>byte</td>
+<td>1字节</td>
+</tr>
+<tr>
+<td>short</td>
+<td>2字节</td>
+</tr>
+<tr>
+<td>float</td>
+<td>4字节</td>
+</tr>
+<tr>
+<td>double</td>
+<td>8字节</td>
+</tr>
+<tr>
+<td>char</td>
+<td>2字节</td>
+</tr>
+<tr>
+<td>boolean</td>
+<td>1字节</td>
+</tr>
+</tbody></table>
+<h4 id="对象"><a href="#对象" class="headerlink" title="对象"></a>对象</h4><p>对象指针在32位JVM中占4字节；在64位JVM中占8字节，开启指针压缩后占4字节（默认开启，-XX:+UseCompressedOops参数）</p>
+<h3 id="对齐填充字节"><a href="#对齐填充字节" class="headerlink" title="对齐填充字节"></a>对齐填充字节</h3><p>JVM要求Java对象占用内存的大小为8bit的倍数，12字节不是8的倍数，因此补齐4个字节到16字节，这4个字节被称为对齐填充字节。</p>
+<h2 id="扩展"><a href="#扩展" class="headerlink" title="扩展"></a>扩展</h2><h3 id="对象指针压缩"><a href="#对象指针压缩" class="headerlink" title="对象指针压缩"></a>对象指针压缩</h3><p>在JVM启动后，-XX:+PrintFlagsFinal参数可以输出所有的JVM参数。其中-XX:+UseCompressedClassPointers参数和-XX:+UseCompressedOops默认开启，这两个参数在64位JVM环境中，可以将对象指针由8字节压缩到4字节。</p>
+<ul>
+<li>-XX:+UseCompressedClassPointers 压缩对象头中的Class Pointer</li>
+<li>-XX:+UseCompressedOops 即压缩对象头中的Class Pointer 也压缩普通对象中的对象引用指针。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">C:\Users\gavin&gt;java -XX:+PrintCommandLineFlags -version</span><br><span class="line">-XX:InitialHeapSize&#x3D;132500864 -XX:MaxHeapSize&#x3D;2120013824 -XX:+PrintCommandLineFlags -XX:+UseCompressedClassPointers -XX:+UseCompressedOops -XX:-UseLargePagesIndividualAllocation -XX:+UseParallelGC</span><br><span class="line">java version &quot;1.8.0_211&quot;</span><br><span class="line">Java(TM) SE Runtime Environment (build 1.8.0_211-b12)</span><br><span class="line">Java HotSpot(TM) 64-Bit Server VM (build 25.211-b12, mixed mode)</span><br></pre></td></tr></table></figure></li>
+<li>XX:+UseCompressedClassPointers在64位JVM环境中可以压缩Class对象指针，将指针由8字节压缩为4字节。<br>使用：-XX:+UseCompressedClassPointers压缩后，ClassPointers仅占4字节。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">java.lang.Object object internals:</span><br><span class="line"> OFFSET  SIZE   TYPE DESCRIPTION                               VALUE</span><br><span class="line">      0     4        (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)</span><br><span class="line">      4     4        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)</span><br><span class="line">      8     4        (object header)                           e5 01 00 20 (11100101 00000001 00000000 00100000) (536871397)</span><br><span class="line">     12     4        (loss due to the next object alignment)</span><br><span class="line">Instance size: 16 bytes</span><br><span class="line">Space losses: 0 bytes internal + 4 bytes external &#x3D; 4 bytes total</span><br></pre></td></tr></table></figure>
+使用-XX:-UseCompressedClassPointers参数，关闭压缩，可以看到Object Header增加了4个字节变为16字节，对象占用内存是8bit的倍数，因此不需要对齐填充字节。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">java.lang.Object object internals:</span><br><span class="line"> OFFSET  SIZE   TYPE DESCRIPTION                               VALUE</span><br><span class="line">      0     4        (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)</span><br><span class="line">      4     4        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)</span><br><span class="line">      8     4        (object header)                           00 1c 4f 17 (00000000 00011100 01001111 00010111) (391060480)</span><br><span class="line">     12     4        (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)</span><br><span class="line">Instance size: 16 bytes</span><br><span class="line">Space losses: 0 bytes internal + 0 bytes external &#x3D; 0 bytes total</span><br></pre></td></tr></table></figure></li>
+<li>XX:+UseCompressedClassPointers参数只压缩Class对象指针，-XX:+UseCompressedOops既可以压缩Class对象指针，也可以压缩普通对象的指针。<br>编写以下代码，User对象中保存了Object对象的指针，使用-XX:+UseCompressedOops参数，并查看User对象的内存结构。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class ObjectLayout &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        User o &#x3D; new User();</span><br><span class="line">        System.out.println(ClassLayout.parseInstance(o).toPrintable());</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class User &#123;</span><br><span class="line">    Object o &#x3D; new Object();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+此时可以看到User对象中保存的Object对象引用的大小仅4个字节。User对象的大小达到了8bit的倍数，这里不需要对其填充字段。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">java20201009.User object internals:</span><br><span class="line"> OFFSET  SIZE               TYPE DESCRIPTION                               VALUE</span><br><span class="line">      0     4                    (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)</span><br><span class="line">      4     4                    (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)</span><br><span class="line">      8     4                    (object header)                           43 c1 00 f8 (01000011 11000001 00000000 11111000) (-134168253)</span><br><span class="line">     12     4   java.lang.Object User.o                                    (object)</span><br><span class="line">Instance size: 16 bytes</span><br><span class="line">Space losses: 0 bytes internal + 0 bytes external &#x3D; 0 bytes total</span><br></pre></td></tr></table></figure>
+使用-XX:-UseCompressedOops参数，关掉对象指针压缩，可以看到Class对象指针和引用的Object指针的大小都变成了8字节。<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">java20201009.User object internals:</span><br><span class="line"> OFFSET  SIZE               TYPE DESCRIPTION                               VALUE</span><br><span class="line">      0     4                    (object header)                           01 00 00 00 (00000001 00000000 00000000 00000000) (1)</span><br><span class="line">      4     4                    (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)</span><br><span class="line">      8     4                    (object header)                           50 35 33 1c (01010000 00110101 00110011 00011100) (473118032)</span><br><span class="line">     12     4                    (object header)                           00 00 00 00 (00000000 00000000 00000000 00000000) (0)</span><br><span class="line">     16     8   java.lang.Object User.o                                    (object)</span><br><span class="line">Instance size: 24 bytes</span><br><span class="line">Space losses: 0 bytes internal + 0 bytes external &#x3D; 0 bytes total</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2020/10/22/202010/一Java并发多线程基础/" class="prev">上一篇：（一）Java并发-多线程基础</a>
+    
+    
+    <a href="/2020/10/15/202010/二Java并发可见性原子性和有序性/" class="next">下一篇：（二）Java并发-可见性、原子性和有序性</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,244 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>深入理解Java虚拟机--Java内存模型 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介Java虚拟机管理的内存包括下面五个运行时数据区域：
+
+程序计数器
+Java虚拟机栈
+本地方法栈
+堆
+方法区
+
+程序计数器程序计数器（Program Counter Register）是一块较小的内存空间，可以看做当前所执行的字节码的行号指示器。字节码解释器工作时就是通过改变这个计数器的值来选取">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="深入理解Java虚拟机--Java内存模型"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2018-12-28T23:26:18.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2018-12-29
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">深入理解Java虚拟机--Java内存模型</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%A8%8B%E5%BA%8F%E8%AE%A1%E6%95%B0%E5%99%A8"><span class="toc-number">2.</span> <span class="toc-text">程序计数器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Java%E8%99%9A%E6%8B%9F%E6%9C%BA%E6%A0%88"><span class="toc-number">3.</span> <span class="toc-text">Java虚拟机栈</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%AC%E5%9C%B0%E6%96%B9%E6%B3%95%E6%A0%88"><span class="toc-number">4.</span> <span class="toc-text">本地方法栈</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Java%E5%A0%86"><span class="toc-number">5.</span> <span class="toc-text">Java堆</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%96%B9%E6%B3%95%E5%8C%BA"><span class="toc-number">6.</span> <span class="toc-text">方法区</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%BF%90%E8%A1%8C%E6%97%B6%E5%B8%B8%E9%87%8F%E6%B1%A0"><span class="toc-number">6.1.</span> <span class="toc-text">运行时常量池</span></a></li></ol></li></ol>
+    </div>
+    
+    <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>Java虚拟机管理的内存包括下面五个运行时数据区域：<br><img src="/img/blog/QQ%E5%9B%BE%E7%89%8720181228201203.png" alt="Alt text"></p>
+<ul>
+<li>程序计数器</li>
+<li>Java虚拟机栈</li>
+<li>本地方法栈</li>
+<li>堆</li>
+<li>方法区</li>
+</ul>
+<h4 id="程序计数器"><a href="#程序计数器" class="headerlink" title="程序计数器"></a>程序计数器</h4><p>程序计数器（Program Counter Register）是一块较小的内存空间，可以看做当前所执行的字节码的行号指示器。字节码解释器工作时就是通过改变这个计数器的值来选取下一条需要执行的字节码指令，也就是下一条字节码指令的地址。</p>
+<ul>
+<li>线程私有（多线程并发执行时每个线程必须有自己的程序计数器，用来记录自己执行字节码的位置，方便CPU时间片轮询切换后继续执行）。</li>
+<li>如果执行的是Native方法（指本地方法：一般使用C/C++在另外文件中编写）,这个计数器值记为空。</li>
+<li>此区域是唯一一个在Java虚拟机规范中没有规定任何OutOfMemoryError情况的区域（程序计数器存放当前线程下一条指令所在的位置，可以预见其大小，所以不会内存溢出）。</li>
+</ul>
+<h4 id="Java虚拟机栈"><a href="#Java虚拟机栈" class="headerlink" title="Java虚拟机栈"></a>Java虚拟机栈</h4><p>Java虚拟机栈是线程私有，生命周期与线程相同。</p>
+<ul>
+<li><p>栈描述的是方法执行的内存模型。每个方法被调用都会创建一个栈帧(存储局部变量表、操作数栈、动态链接、方法出口等)</p>
+</li>
+<li><p>JVM为每个线程创建一个栈，用于存放该线程执行方法的信息(实际参数、局部变量等)</p>
+</li>
+<li><p>栈属于线程私有，不能实现线程间的共享!</p>
+</li>
+<li><p>栈的存储特性是“先进后出，后进先出”（每一个方法从调用直到执行完成的过程，就对应一个栈帧在虚拟机栈中入栈到出栈的过程。）</p>
+</li>
+<li><p>局部变量表的创建是在方法被执行的时候，随着栈帧的创建而创建。而且，局部变量表的大小在编译时期就确定下来了，在创建的时候只需分配事先规定好的大小即可。此外，在方法运行的过程中局部变量表的大小是不会发生改变的。</p>
+</li>
+<li><p>Java虚拟机栈会出现两种异常：StackOverFlowError和OutOfMemoryError。</p>
+<ul>
+<li>StackOverFlowError：若Java虚拟机栈的内存大小不允许动态扩展，那么当线程请求栈的深度超过当前Java虚拟机栈的最大深度的时候，就抛出StackOverFlowError异常。 </li>
+<li>OutOfMemoryError：若Java虚拟机栈的内存大小允许动态扩展，且当线程请求栈时内存用完了，无法再动态扩展了，此时抛出OutOfMemoryError异常。</li>
+</ul>
+<h4 id="本地方法栈"><a href="#本地方法栈" class="headerlink" title="本地方法栈"></a>本地方法栈</h4></li>
+<li><p>本地方法栈和Java虚拟机栈实现的功能类似，只不过本地方法区是本地方法运行的内存模型。</p>
+</li>
+<li><p>本地方法被执行的时候，在本地方法栈也会创建一个栈帧，用于存放该本地方法的局部变量表、操作数栈、动态链接、出口信息。</p>
+</li>
+<li><p>方法执行完毕后相应的栈帧也会出栈并释放内存空间。</p>
+</li>
+<li><p>也会抛出StackOverFlowError和OutOfMemoryError异常。</p>
+<h4 id="Java堆"><a href="#Java堆" class="headerlink" title="Java堆"></a>Java堆</h4></li>
+<li><p>堆用于存储创建好的对象和数组(数组也是对象)</p>
+</li>
+<li><p>JVM只有一个堆，所有的线程都访问同一个堆。而程序计数器、Java虚拟机栈、本地方法栈都是一个线程对应一个的。</p>
+</li>
+<li><p>所有的线程都访问同一个堆，进行对象内存的分配均需要进行加锁，所以new对象操作开销比较大</p>
+</li>
+<li><p>在虚拟机启动时创建</p>
+</li>
+<li><p>垃圾回收的主要场所。</p>
+</li>
+<li><p>可以进一步细分为：新生代、老年代。 </p>
+</li>
+<li><p>新生代又可被分为：Eden、From Survior、To Survior。 </p>
+</li>
+<li><p>不同的区域存放具有不同生命周期的对象。这样可以根据不同的区域使用不同的垃圾回收算法，从而更具有针对性，从而更高效。</p>
+</li>
+<li><p>堆的大小既可以固定也可以扩展，但主流的虚拟机堆的大小是可扩展的，因此当线程请求分配内存，但堆已满，且内存已满无法再扩展时，就抛出OutOfMemoryError。<br><img src="https://www.gwt.fun/upload/f9696000f5204de2b4de39b87c809280_QQ20190129231959.jpg" alt="QQ20190129231959jpg"> </p>
+</li>
+</ul>
+<h4 id="方法区"><a href="#方法区" class="headerlink" title="方法区"></a>方法区</h4><ul>
+<li>JVM只有一个方法区，被所有线程共享!</li>
+<li>方法区实际也是堆（堆的一个逻辑部分），只是用于存储类、常量相关的信息!</li>
+<li>用来存放程序中永远是不变或唯一的内容。(类信息【Class对象】、静态变量、字符串常量等)<br>线程共享 </li>
+<li>永久代 方法区中的信息一般需要长期存在，而且它又是堆的逻辑分区，因此用堆的划分方法，我们把方法区称为老年代。</li>
+<li>内存回收效率低 方法区中的信息一般需要长期存在，回收一遍内存之后可能只有少量信息无效。 </li>
+<li>对方法区的内存回收的主要目标是：对常量池的回收 和 对类型的卸载。</li>
+<li>Java虚拟机规范对方法区的要求比较宽松。<br>和堆一样，允许固定大小，也允许可扩展的大小，还允许不实现垃圾回收。 <h5 id="运行时常量池"><a href="#运行时常量池" class="headerlink" title="运行时常量池"></a>运行时常量池</h5></li>
+<li>运行时常量池是方法区的一部分</li>
+<li>方法区中存放三种数据：类信息、常量、静态变量、即时编译器编译后的代码。其中常量存储在运行时常量池中。</li>
+<li>我们一般在一个类中通过public static final来声明一个常量。这个类被编译后便生成Class文件，这个类的所有信息都存储在这个class文件中。</li>
+<li>当这个类被Java虚拟机加载后，class文件中的常量就存放在方法区的运行时常量池中。而且在运行期间，可以向常量池中添加新的常量。如：String类的intern()方法就能在运行期间向常量池中添加字符串常量。</li>
+<li>当运行时常量池中的某些常量没有被对象引用，同时也没有被变量引用，那么就需要垃圾收集器回收。</li>
+</ul>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2018/12/30/201812/MySQL学习慢查询/" class="prev">上一篇：MySQL学习--慢查询</a>
+    
+    
+    <a href="/2018/12/29/201812/MySQL学习MySQL优化思路与三范式/" class="next">下一篇：MySQL学习--MySQL优化思路与三范式</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

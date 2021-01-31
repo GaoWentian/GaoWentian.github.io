@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java并发学习--Copy-On-Write容器 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="介绍　　JDK1.5开始Java并发包提供了两个基于Copy-On-Write实现的并发容器，CopyOnWriteArrayList和CopyOnWriteArraySet。　　“写入时复制（Copy-On-Write）”容器线程安全性在于，只要正确地发布一个事实不可变的对象，那么在访问该对象时就">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java并发学习--Copy-On-Write容器"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-11-29T21:43:31.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-30
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java并发学习--Copy-On-Write容器</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CopyOnWriteArrayList"><span class="toc-number">2.</span> <span class="toc-text">CopyOnWriteArrayList</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#add"><span class="toc-number">2.1.</span> <span class="toc-text">add</span></a></li></ol></li></ol>
+    </div>
+    
+    <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>　　JDK1.5开始Java并发包提供了两个基于Copy-On-Write实现的并发容器，CopyOnWriteArrayList和CopyOnWriteArraySet。<br>　　“写入时复制（Copy-On-Write）”容器线程安全性在于，只要正确地发布一个事实不可变的对象，那么在访问该对象时就不再需要进一步同步。每次修改时，都会创建并重新发布一个新的容器副本，从而实现可变性。每次修改容器都会复制底层数组，这需要一定的开销，特别是当容器规模较大时。因此，仅当迭代操作远远多于修改操作时，才应该使用Copy-On-Write容器。</p>
+<h3 id="CopyOnWriteArrayList"><a href="#CopyOnWriteArrayList" class="headerlink" title="CopyOnWriteArrayList"></a>CopyOnWriteArrayList</h3><h4 id="add"><a href="#add" class="headerlink" title="add"></a>add</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line"> * Appends the specified element to the end of this list.</span><br><span class="line"> *</span><br><span class="line"> * @param e element to be appended to this list</span><br><span class="line"> * @return &#123;@code true&#125; (as specified by &#123;@link Collection#add&#125;)</span><br><span class="line"> *&#x2F;</span><br><span class="line">public boolean add(E e) &#123;</span><br><span class="line">    final ReentrantLock lock &#x3D; this.lock;</span><br><span class="line">    lock.lock();</span><br><span class="line">    try &#123;</span><br><span class="line">        Object[] elements &#x3D; getArray();   &#x2F;&#x2F;得到数组</span><br><span class="line">        int len &#x3D; elements.length;  </span><br><span class="line">        Object[] newElements &#x3D; Arrays.copyOf(elements, len + 1);  &#x2F;&#x2F;复制数组</span><br><span class="line">        newElements[len] &#x3D; e;   &#x2F;&#x2F;添加新值</span><br><span class="line">        setArray(newElements); &#x2F;&#x2F;将这个数组替换</span><br><span class="line">        return true;</span><br><span class="line">    &#125; finally &#123;</span><br><span class="line">        lock.unlock();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;**</span><br><span class="line"> * Gets the array.  Non-private so as to also be accessible</span><br><span class="line"> * from CopyOnWriteArraySet class.</span><br><span class="line"> *&#x2F;</span><br><span class="line">final Object[] getArray() &#123;</span><br><span class="line">    return array;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;**</span><br><span class="line"> * Sets the array.</span><br><span class="line"> *&#x2F;</span><br><span class="line">final void setArray(Object[] a) &#123;</span><br><span class="line">    array &#x3D; a;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>学习资料：<br>[1] BrianGoetz, 戈茨, 童云兰. Java并发编程实战[M]. 机械工业出版社, 2012.<br>[2] <a target="_blank" rel="noopener" href="http://ifeve.com/java-copy-on-write/">聊聊并发-Java中的Copy-On-Write容器</a></p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2018/03/19/201803/Redis设计与实现简单动态字符串/" class="prev">上一篇：《Redis设计与实现》：简单动态字符串</a>
+    
+    
+    <a href="/2017/11/28/201711/Java并发学习线程间数据交换Exchanger/" class="next">下一篇：Java并发学习--线程间数据交换Exchanger</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

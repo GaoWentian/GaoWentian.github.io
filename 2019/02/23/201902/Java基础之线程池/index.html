@@ -1,0 +1,214 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java基础之线程池 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介线程池可以重用存在的线程，减少对象创建、消亡的开销，性能好。并且可以控制最大并发线程数，提高系统资源利用率，同时避免过多资源竞争，避免阻塞。
+java.uitl.concurrent.ThreadPoolExecutorThreadPoolExecutor提供了四个构造函数：
+123456789">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java基础之线程池"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-02-23T13:08:34.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-02-23
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java基础之线程池</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#java-uitl-concurrent-ThreadPoolExecutor"><span class="toc-number">2.</span> <span class="toc-text">java.uitl.concurrent.ThreadPoolExecutor</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%A0%B8%E5%BF%83%E5%8F%82%E6%95%B0"><span class="toc-number">2.1.</span> <span class="toc-text">核心参数</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E5%8E%9F%E7%90%86"><span class="toc-number">3.</span> <span class="toc-text">线程池原理</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%8A%B6%E6%80%81"><span class="toc-number">3.1.</span> <span class="toc-text">线程池状态</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BA%BF%E7%A8%8B%E6%B1%A0%E7%A7%8D%E7%B1%BB"><span class="toc-number">4.</span> <span class="toc-text">线程池种类</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#newCachedThreadPool"><span class="toc-number">4.1.</span> <span class="toc-text">newCachedThreadPool</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#newFixedThreadPool"><span class="toc-number">4.2.</span> <span class="toc-text">newFixedThreadPool</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#newSingleThreadExecutor"><span class="toc-number">4.3.</span> <span class="toc-text">newSingleThreadExecutor</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#newScheduleThreadPool"><span class="toc-number">4.4.</span> <span class="toc-text">newScheduleThreadPool</span></a></li></ol></li></ol>
+    </div>
+    
+    <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>线程池可以重用存在的线程，减少对象创建、消亡的开销，性能好。并且可以控制最大并发线程数，提高系统资源利用率，同时避免过多资源竞争，避免阻塞。</p>
+<h4 id="java-uitl-concurrent-ThreadPoolExecutor"><a href="#java-uitl-concurrent-ThreadPoolExecutor" class="headerlink" title="java.uitl.concurrent.ThreadPoolExecutor"></a>java.uitl.concurrent.ThreadPoolExecutor</h4><p>ThreadPoolExecutor提供了四个构造函数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br></pre></td><td class="code"><pre><span class="line">public ThreadPoolExecutor(int corePoolSize,</span><br><span class="line">                             int maximumPoolSize,</span><br><span class="line">                             long keepAliveTime,</span><br><span class="line">                             TimeUnit unit,</span><br><span class="line">                             BlockingQueue&lt;Runnable&gt; workQueue) &#123;</span><br><span class="line">       this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,</span><br><span class="line">            Executors.defaultThreadFactory(), defaultHandler);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   public ThreadPoolExecutor(int corePoolSize,</span><br><span class="line">                             int maximumPoolSize,</span><br><span class="line">                             long keepAliveTime,</span><br><span class="line">                             TimeUnit unit,</span><br><span class="line">                             BlockingQueue&lt;Runnable&gt; workQueue,</span><br><span class="line">                             ThreadFactory threadFactory) &#123;</span><br><span class="line">       this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,</span><br><span class="line">            threadFactory, defaultHandler);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line">   public ThreadPoolExecutor(int corePoolSize,</span><br><span class="line">                             int maximumPoolSize,</span><br><span class="line">                             long keepAliveTime,</span><br><span class="line">                             TimeUnit unit,</span><br><span class="line">                             BlockingQueue&lt;Runnable&gt; workQueue,</span><br><span class="line">                             RejectedExecutionHandler handler) &#123;</span><br><span class="line">       this(corePoolSize, maximumPoolSize, keepAliveTime, unit, workQueue,</span><br><span class="line">            Executors.defaultThreadFactory(), handler);</span><br><span class="line">   &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">   public ThreadPoolExecutor(int corePoolSize,</span><br><span class="line">                             int maximumPoolSize,</span><br><span class="line">                             long keepAliveTime,</span><br><span class="line">                             TimeUnit unit,</span><br><span class="line">                             BlockingQueue&lt;Runnable&gt; workQueue,</span><br><span class="line">                             ThreadFactory threadFactory,</span><br><span class="line">                             RejectedExecutionHandler handler) &#123;</span><br><span class="line">       if (corePoolSize &lt; 0 ||</span><br><span class="line">           maximumPoolSize &lt;&#x3D; 0 ||</span><br><span class="line">           maximumPoolSize &lt; corePoolSize ||</span><br><span class="line">           keepAliveTime &lt; 0)</span><br><span class="line">           throw new IllegalArgumentException();</span><br><span class="line">       if (workQueue &#x3D;&#x3D; null || threadFactory &#x3D;&#x3D; null || handler &#x3D;&#x3D; null)</span><br><span class="line">           throw new NullPointerException();</span><br><span class="line">       this.acc &#x3D; System.getSecurityManager() &#x3D;&#x3D; null ?</span><br><span class="line">               null :</span><br><span class="line">               AccessController.getContext();</span><br><span class="line">       this.corePoolSize &#x3D; corePoolSize;</span><br><span class="line">       this.maximumPoolSize &#x3D; maximumPoolSize;</span><br><span class="line">       this.workQueue &#x3D; workQueue;</span><br><span class="line">       this.keepAliveTime &#x3D; unit.toNanos(keepAliveTime);</span><br><span class="line">       this.threadFactory &#x3D; threadFactory;</span><br><span class="line">       this.handler &#x3D; handler;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>corePoolSize  //核心线程数量；只有任务来到才会创建线程。</li>
+<li>maximumPoolSize //线程最大线程数量</li>
+<li>workQueue //阻塞队列，存储等待执行的任务  </li>
+<li>keepAliveTime //线程中没有任务时，线程最多保持多久就销毁</li>
+<li>unit //的时间单位</li>
+<li>threadFactory //线程工厂，用来创建线程</li>
+<li>rejectHandler //如果阻塞队列满了，并且没有空闲线程，根据这个参数执行拒绝处理任务的策略</li>
+</ul>
+<p>1、如果系统中线程数量小于corePoolSize，直接创建新的线程来执行任务（不管是否存在空闲线程）；如果线程数量大于corePoolSize，但是小于maximumPoolSize，只有workQueue满了才会创建新的线程；如果系统中线程数量等于maximumPoolSize,maximumPoolSize和corePoolSize相同，workQueue不满，则线程进入workQueue，否则指定策略执行任务。    </p>
+<p>2、workQueue 是阻塞队列（BlockingQueue）</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">ArrayBlockingQueue   &#x2F;&#x2F;可以限定队列长度</span><br><span class="line">DelayQueue          &#x2F;&#x2F;队内元素必须实现Delayed接口，队列中有元素入队时，只有到达指定延时时间，才会执行任务。</span><br><span class="line">LinkedBlockingQueue  &#x2F;&#x2F;阻塞的线程进入队列中，但这个队列没有最大值，因此设置maximumPoolSize会失效。</span><br><span class="line">PriorityBlockingQueue  &#x2F;&#x2F;优先级阻塞队列</span><br><span class="line">SynchronousQueue  &#x2F;&#x2F;SynchronousQueue是没有缓存的阻塞队列，接收到任务会直接提交给线程处理，如果没有空闲线程，将创建一个，一般使用时将maximumPoolSize设置为Integer.MAX_VALUE</span><br></pre></td></tr></table></figure>
+<h5 id="核心参数"><a href="#核心参数" class="headerlink" title="核心参数"></a>核心参数</h5><ul>
+<li>execute()  //提交任务，交给线程池使用</li>
+<li>submit()  //提交任务，能够返回执行结果 execute + Future</li>
+<li>shutdown()  // 关闭线程池，等所有任务都执行完</li>
+<li>shutdownNow()  //关闭线程池，不等待任务执行完</li>
+<li>getTaskCount()  //线程池已执行和未执行的任务总数</li>
+<li>getCompletedTaskCount()  //已完成任务数量</li>
+<li>getPoolSize()  //线程池当前线程数量</li>
+<li>getActiveCount()  //当前线程池中正在执行任务的线程数量</li>
+</ul>
+<h4 id="线程池原理"><a href="#线程池原理" class="headerlink" title="线程池原理"></a>线程池原理</h4><h5 id="线程池状态"><a href="#线程池状态" class="headerlink" title="线程池状态"></a>线程池状态</h5><p><img src="https://www.gwt.fun/upload/d6cbefe6fed74590bfb041bd1396fd05_image.png" alt="imagepng"> </p>
+<ul>
+<li>RUNNING 运行状态，能接受新提交的任务，也能处理阻塞队列中的任务 </li>
+<li>SHUTDOWN 关闭状态，不能接受新提交的任务，但是可以处理阻塞队列中的任务</li>
+<li>STOP 不能接受新的任务，也不能处理阻塞队列中的任务</li>
+<li>TIDYING 工作线程为0时进入这个状态</li>
+</ul>
+<h4 id="线程池种类"><a href="#线程池种类" class="headerlink" title="线程池种类"></a>线程池种类</h4><ul>
+<li>Executors.newCachedThreadPool</li>
+<li>Executors.newFixedThreadPool</li>
+<li>Executors.newSingleThreadExecutor</li>
+<li>Executors.newScheduleThreadPool</li>
+</ul>
+<h5 id="newCachedThreadPool"><a href="#newCachedThreadPool" class="headerlink" title="newCachedThreadPool"></a>newCachedThreadPool</h5><p>创建一个可缓存的线程池，任务增加时则创建线程执行任务，线程空闲60秒则回收线程。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static ExecutorService newCachedThreadPool() &#123;</span><br><span class="line">    return new ThreadPoolExecutor(0, Integer.MAX_VALUE,</span><br><span class="line">                                  60L, TimeUnit.SECONDS,</span><br><span class="line">                                  new SynchronousQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到最大线程数量是Integer.MAX_VALUE，使用的是SynchronousQueue，因此有任务时不会存在阻塞队列中，会直接创建线程执行。</p>
+<h5 id="newFixedThreadPool"><a href="#newFixedThreadPool" class="headerlink" title="newFixedThreadPool"></a>newFixedThreadPool</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static ExecutorService newFixedThreadPool(int nThreads) &#123;</span><br><span class="line">    return new ThreadPoolExecutor(nThreads, nThreads,</span><br><span class="line">                                  0L, TimeUnit.MILLISECONDS,</span><br><span class="line">                                  new LinkedBlockingQueue&lt;Runnable&gt;());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>定长线程池，使用的是LinkedBlockingQueue阻塞队列，有任务则创建线程，如果达到固定的数量，则存放到阻塞队列中。</p>
+<h5 id="newSingleThreadExecutor"><a href="#newSingleThreadExecutor" class="headerlink" title="newSingleThreadExecutor"></a>newSingleThreadExecutor</h5><p>创建一个单线程线程池，可以保证线程池中永远有一个线程在工作，保证了任务的顺序性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public static ExecutorService newSingleThreadExecutor() &#123;</span><br><span class="line">    return new FinalizableDelegatedExecutorService</span><br><span class="line">        (new ThreadPoolExecutor(1, 1,</span><br><span class="line">                                0L, TimeUnit.MILLISECONDS,</span><br><span class="line">                                new LinkedBlockingQueue&lt;Runnable&gt;()));</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>可以看到，调用了ThreadPoolExecutor，只允许一个线程运行。使用方法:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">ExecutorService mSingleThreadPool &#x3D; Executors.newSingleThreadPool();</span><br></pre></td></tr></table></figure>
+<h5 id="newScheduleThreadPool"><a href="#newScheduleThreadPool" class="headerlink" title="newScheduleThreadPool"></a>newScheduleThreadPool</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public static ScheduledExecutorService newScheduledThreadPool(int corePoolSize) &#123;</span><br><span class="line">    return new ScheduledThreadPoolExecutor(corePoolSize);</span><br><span class="line">&#125;</span><br><span class="line">public ScheduledThreadPoolExecutor(int corePoolSize) &#123;</span><br><span class="line">    super(corePoolSize, Integer.MAX_VALUE, 0, NANOSECONDS,</span><br><span class="line">          new DelayedWorkQueue());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>创建一个大小无限，可以定时执行的线程池。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/11/30/201911/Servlet总结/" class="prev">上一篇：Servlet总结</a>
+    
+    
+    <a href="/2019/02/15/201902/动态规划/" class="next">下一篇：动态规划</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,276 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Redis数据类型 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="一、基础操作1.创建键值：
+1redis&amp;gt; SET bar 1       &amp;#x2F;&amp;#x2F;创建键值bar  值为1
+2.显示key
+1redis&amp;gt; keys *
+3.判断key是否存在
+1redis&amp;gt; exists bar
+如果存在显示整数1，否则显示整数04.删除key">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Redis数据类型"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2016-10-11T11:13:40.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2016-10-11
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Redis数据类型</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%80%E3%80%81%E5%9F%BA%E7%A1%80%E6%93%8D%E4%BD%9C"><span class="toc-number">1.</span> <span class="toc-text">一、基础操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E5%AD%97%E7%AC%A6%E4%B8%B2%E7%B1%BB%E5%9E%8B"><span class="toc-number">2.</span> <span class="toc-text">二、字符串类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E6%95%A3%E5%88%97%E7%B1%BB%E5%9E%8B"><span class="toc-number">3.</span> <span class="toc-text">三、散列类型</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E5%88%97%E8%A1%A8"><span class="toc-number">4.</span> <span class="toc-text">四、列表</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BA%94-%E3%80%81%E9%9B%86%E5%90%88"><span class="toc-number">5.</span> <span class="toc-text">五 、集合</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E6%9C%89%E5%BA%8F%E9%9B%86%E5%90%88%E7%B1%BB%E5%9E%8B"><span class="toc-number">6.</span> <span class="toc-text">六、有序集合类型</span></a></li></ol>
+    </div>
+    
+    <h4 id="一、基础操作"><a href="#一、基础操作" class="headerlink" title="一、基础操作"></a>一、基础操作</h4><p>1.创建键值：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; SET bar 1       &#x2F;&#x2F;创建键值bar  值为1</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-1a906f4ac1e26652.png" alt="Alt text"><br>2.显示key</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; keys *</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-016d1784e9b8b95b.png" alt="Alt text"><br>3.判断key是否存在</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; exists bar</span><br></pre></td></tr></table></figure>
+<p>如果存在显示整数1，否则显示整数0<br><img src="/img/blog/2350612-401f1855bf063492.png" alt="Alt text"><br>4.删除key</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; del line</span><br></pre></td></tr></table></figure>
+<p>成功返回整数1，失败返回整数0</p>
+<p><img src="/img/blog/2350612-a4f9d4b54a4f31cd.png" alt="Alt text"><br>5.获取数据类型</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; type bar</span><br></pre></td></tr></table></figure>
+<p>数据类型有string（字符串类型），hash（散列类型），list（列表类型），set（集合类型），zset（有序集合类型）</p>
+<p><img src="/img/blog/2350612-72b1aad122c77733.png" alt="Alt text"></p>
+<h4 id="二、字符串类型"><a href="#二、字符串类型" class="headerlink" title="二、字符串类型"></a>二、字符串类型</h4><p>字符串是redis中最基本的数据类型，可以用字符串存储json数据或者是图片等数据。一个字符串类型的键允许存储的最大容量是512M.<br>1.得到key的value</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; get bar</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-f5114f6d0a4b443f.png" alt="Alt text"><br>2.递增<br>当字符串为整数形式时，可以使用incr，让键值递增，并返回 递增后的值。如果这个value不存在，则默认为0；</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; incr line</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-ecb7c9d743d3ade9.png" alt="Alt text"><br>3.增加指定的整数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; incrby line 2</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-45b6679b029b72d8.png" alt="Alt text"><br>4.减少指定的整数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; decr line</span><br><span class="line">redis&gt; decrby line 2</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-89ae2837dc0899ff.png" alt="Alt text"><br>5.增加指定浮点数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; incrbyfloat line 2.7</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-024bef4dd6efc0ca.png" alt="Alt text"><br>6.向尾部追加值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; append bar &quot; nihao&quot;</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-276cd314dd348ace.png" alt="Alt text"></p>
+<p>7.获取字符串长度</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; strlen bar</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-af7db5c331ea43db.png" alt="Alt text"><br>8.同时设置/获得多个键值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; mset bar 2 line 2 </span><br><span class="line">redis&gt; mget bar line</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-9a6341276857e696.png" alt="Alt text"></p>
+<h4 id="三、散列类型"><a href="#三、散列类型" class="headerlink" title="三、散列类型"></a>三、散列类型</h4><p>redis中的数据类型不支持其他数据类型的嵌套。<br>1.赋值和取值 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; hset car price 500</span><br><span class="line">redis&gt;hget car price </span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-0e49836f03e55dfb.png" alt="Alt text"><br>2.设置/读取多个值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; hmset student id &quot;2014&quot; sex man</span><br><span class="line">redis&gt; hmget student id sex</span><br><span class="line">redis&gt; hgetall student</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-415a9d90a3866d62.png" alt="Alt text"><br>3.判断字段是否存在</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; hexists student sex</span><br></pre></td></tr></table></figure>
+<p>存在返回数字1.不存在返回数字0<br><img src="/img/blog/2350612-50d2ceb20d618643.png" alt="Alt text"><br>4.增加数字</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; hincrby student score 100</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-672697a810c6cb39.png" alt="Alt text"><br>5.删除字段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; hdel student sex</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-5abc008c0d3ba877.png" alt="Alt text"><br>6.只获取字段名或者字段值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; hkeys student</span><br><span class="line">redis&gt; hvals student</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-f97f6aff397804f3.png" alt="Alt text"><br>7.获得字段数量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; hlen student </span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-02e11517e64e009b.png" alt="Alt text"></p>
+<h4 id="四、列表"><a href="#四、列表" class="headerlink" title="四、列表"></a>四、列表</h4><p>1.向列表两端添加元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; lpush arr 12 13 14 15</span><br><span class="line">redis&gt; rpush arr 16 17 18</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-34056cec989ac279.png" alt="Alt text"><br>2.获取列表片段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; lrange arr 0 7</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-a57e869fbaba4b9c.png" alt="Alt text"><br>3.从列表两端弹出元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; lpop</span><br><span class="line">redis&gt; rpop</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-d92d2632be660479.png" alt="Alt text"><br>4.获取列表中元素的 个数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; llen arr</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-173c5de01a1cba5f.png" alt="Alt text"><br>5.删除列表中指定元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; lrem arr 1 12 </span><br></pre></td></tr></table></figure>
+<p>删除列表中前1个12<br><img src="/img/blog/2350612-86dcef767e6f1bbc.png" alt="Alt text"><br>6.获得/设置指定索引的元素值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; lindex arr 0</span><br><span class="line">redis&gt; lset arr 2 19</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-224fa82602c5591e.png" alt="Alt text"><br>7.只保留列表指定片段</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; ltrim arr 1 2</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-07f677459e363a42.png" alt="Alt text"><br>8.向列表中插入元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; linsert arr after 13 12</span><br><span class="line">redis&gt; linsert arr before 19  14</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-393181229b359f0c.png" alt="Alt text"></p>
+<h4 id="五-、集合"><a href="#五-、集合" class="headerlink" title="五 、集合"></a>五 、集合</h4><p>1.增加 /删除元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; sadd obj 12 13 14 15 16 17</span><br><span class="line">redis&gt; srem obj 12</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-197a371fa7f58fde.png" alt="Alt text"><br>2.获得元素中的所有元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; smembers obj </span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-197a371fa7f58fde.png" alt="Alt text"><br>3.判断元素是否在集合中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; sismembers 13</span><br><span class="line">redis&gt; sismembers 11</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-4cc12951265dc0a7.png" alt="Alt text"><br>4.集合间运算</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; sdiff obj obj1        &#x2F;&#x2F;差集</span><br><span class="line">redis&gt; sinter obj obj1    &#x2F;&#x2F;交集</span><br><span class="line">redis&gt; sunion obj obj1      &#x2F;&#x2F;并集</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-cace8150a27b882d.png" alt="Alt text"><br>5.获得集合中元素个数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; scard obj</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-e70111fbf97b44cc.png" alt="Alt text"><br>6.进行集合运算并将结果存储</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; sdiffstore  obj_sum obj obj1        </span><br><span class="line">redis&gt; sinterstore obj_sum obj obj1   </span><br><span class="line">redis&gt; sunionstore obj_sum obj obj1      </span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-e84228fd5d5ae00d.png" alt="Alt text"><br>7.随机获得集合中的元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; srandmember obj  [count]</span><br></pre></td></tr></table></figure>
+<p>count 可不写，用来确认随机返回多少个值<br><img src="/img/blog/2350612-537c669a03cac1a4.png" alt="Alt text"><br>8.从集合中弹出一个元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; spop obj [count]</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-db88222d212b0164.png" alt="Alt text"></p>
+<h4 id="六、有序集合类型"><a href="#六、有序集合类型" class="headerlink" title="六、有序集合类型"></a>六、有序集合类型</h4><p>1.增加元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt;&gt; zadd scoreboard 89 gavin 66 haha</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-736a51a849fe95ee.png" alt="Alt text"><br>2.获得元素分数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; zscore scoreboard gavin</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-040a4e428cb4d846.png" alt="Alt text"></p>
+<p>3.获得排名在某个范围的元素列表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt;zrange scoreboard 0 1</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-85fc2b325758ea7e.png" alt="Alt text"><br>4.获得指定分数范围的元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; zrangebyscore scoreboard 50 70</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-30947985bc818dc1.png" alt="Alt text"><br>5.增加某个元素的分数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; zincrby scoreboard 4 haha</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-24569d22e2026d64.png" alt="Alt text"><br>6.获得集合中 元素的数量</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; zcard scoreboard</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-53ceb8582e21763a.png" alt="Alt text"><br>7.获得指定分数范围内的元素个数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; zcount scoreboard 60 71</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-cfdec675baad23cc.png" alt="Alt text"><br>8.删除一个或多个元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; zrem scoreboard haha</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-0a413b9a2dae47a8.png" alt="Alt text"></p>
+<p>9.按照排名范围删除元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; zremrangebyrank scoreboard 0 1</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-25bfa628f77e1cbe.png" alt="Alt text"></p>
+<p>10.按照分数范围删除元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; zremrangebyscore scoreboard 10 30</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-b91b8ba4c8041e1a.png" alt="Alt text"></p>
+<p>11.获得元素的排名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">redis&gt; zrank scoreboard c #元素最小的是0</span><br><span class="line">redis&gt;  zrevrank scoreboard gavin # 元素最大的是0</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-fa0fd51f32efd5e1.png" alt="Alt text"></p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2016/10/25/201610/Redis高级应用数据持久化/" class="prev">上一篇：Redis高级应用--数据持久化</a>
+    
+    
+    <a href="/2016/07/21/201607/Linux文件和用户权限以及SSH操作/" class="next">下一篇：Linux文件和用户权限以及SSH操作</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

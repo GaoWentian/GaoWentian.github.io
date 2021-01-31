@@ -1,0 +1,487 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>page | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <div class="article-list-wrap">
+  
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/06/22/201706/算法导论学习笔记二叉搜索树/" itemprop="url">算法导论学习笔记--二叉搜索树</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      二叉搜索树上的基本操作所花费的时间与这颗树的高度成正比。对于有n个结点的一棵完全二叉树来说，这些操作最坏运行时间是O（lgn）。如果这棵树是一条n个结点组成的线性链，那么同样的操作就要花费O（n）的最坏运行时间。在树中查找是否存在value==x的node的代价是O(h),h是树的深度。
+什么是二叉搜索树二叉搜索树，又称为二叉查找树或二叉排序树。一棵二叉搜索树是以一棵二叉树来组织。这样一棵树可以 ...
+      <a href="/2017/06/22/201706/算法导论学习笔记二叉搜索树/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-06-21T21:28:54.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-06-22
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/06/21/201706/Nginx中优化性能的配置项/" itemprop="url">Nginx中优化性能的配置项</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      （1） Nginx worker 进程数量语法： worker_processes  number;默认：worker_processes  1;在master/worker 方式运行下，定义worker进程个数。具体配置个数跟实际业务有关。&gt;&gt;&gt;线程数究竟设多少合理&lt;&lt;&lt;（2）绑定Nginx worker 进程到指定的CPU内核语法： worker_cpu_ ...
+      <a href="/2017/06/21/201706/Nginx中优化性能的配置项/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-06-20T22:43:09.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-06-21
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/06/17/201706/算法导论学习笔记散列表/" itemprop="url">算法导论学习笔记--散列表</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      散列表　　许多应用都要用到一种动态集合结构，它至少要支持 INSERT ， SEARCH 和 DELETE 字典操作。散列表（hash table）就是实现字典的一种有效的数据结构。在最坏情况下，从散列表中查找一个元素的时间与在链表中查找一个元素的时间相同，都是Ｏ( n )，但在实际应用中，散列技术的效率是很高的。在一些合理的假设下，从散列表中查找一个元素的期望时间是 O(1)。散列表是普通数组 ...
+      <a href="/2017/06/17/201706/算法导论学习笔记散列表/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-06-16T22:03:37.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-06-17
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/05/23/201705/Nginx初识/" itemprop="url">Nginx 初识</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      nginx下载在http://nginx.org/ 网站，直接选择nginx-1.12.0稳定版本
+1wget http:&#x2F;&#x2F;nginx.org&#x2F;download&#x2F;nginx-1.12.0.tar.gz   &#x2F;&#x2F;下载nginx
+
+nginx安装123tar zxvf nginx-1.12.0.tar.gz   &#x2F;&#x2F;直 ...
+      <a href="/2017/05/23/201705/Nginx初识/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-05-22T22:14:03.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-05-23
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/05/18/201705/算法导论学习笔记基本数据结构/" itemprop="url">算法导论学习笔记--基本数据结构</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      栈的几种操作:S.top=0时，表示栈中不包含任何元素，即栈是空的。
+12345678&#x2F;&#x2F;判断栈是不是空的STACK-EMPTY(S)&#123;	if(S.top &#x3D;&#x3D; 0)&#123;		return TRUE;	&#125;else&#123;		return FALSE;	&#125;&#125;
+压入栈操作：
+12345PUSH(S,x)&#12 ...
+      <a href="/2017/05/18/201705/算法导论学习笔记基本数据结构/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-05-17T20:21:52.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-05-18
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/05/12/201705/算法导论学习笔记中位数和顺序统计量/" itemprop="url">算法导论学习笔记--中位数和顺序统计量</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      在一个由n个元素组成的集合中，第i个顺序统计量(order statistic)是该集合中第i小的元素。中位数是指所属集合的“中点元素”。当n为奇数时，中位数唯一；当n为偶数时，有两个中位数，这里只讨论出现在i = [(n+1)/2]处的（下中位数）。我们讨论从一个由n个互异的元素构成的集合中选择第i个顺序统计量的问题。将这一问题形式化定义为如下问题：
+12输入：一个包含 n个互异的数的集合A和 ...
+      <a href="/2017/05/12/201705/算法导论学习笔记中位数和顺序统计量/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-05-11T22:54:56.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-05-12
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/05/10/201705/算法导论学习笔记快速排序/" itemprop="url">算法导论学习笔记--快速排序</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      对于n个数的输入数组，快速排序最坏时间复杂度是O（n^2）,虽然最坏情况下的时间复杂度很差，但是快速排序通常是实际排序应用中最好的选择，因为它平均性能最好，期望时间复杂度是O（nlgn）。
+快速排序的描述快速排序分成三步：
+分解数组A[p..r],被划分为两个子数组A[p..q-1]和A[q+1..r],使得A[p..q-1]中的每一个元素都小于或等于A[q],而A[q]也小于A[q+1..r] ...
+      <a href="/2017/05/10/201705/算法导论学习笔记快速排序/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-05-10T12:49:36.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-05-10
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/05/10/201705/算法导论学习笔记优先队列/" itemprop="url">算法导论学习笔记--优先队列</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      优先队列和是一种用来维护由一组元素构成的集合S的数据结构，其中的每一个元素都有一个相关的值，称为关键字。和堆一样，优先队列也有两种形式，最大优先队列和最小优先队列。以最大优先队列为例：
+1234INSERT(S,X): 把元素x插入集合S中。MAXIMUM(S): 返回S中具有最大键字的元素。EXTRACT-MAX(S): 去掉并返回S中的具有最大键字的元素。INCREASE-KEY(S,x,k ...
+      <a href="/2017/05/10/201705/算法导论学习笔记优先队列/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-05-09T20:51:59.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-05-10
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/05/09/201705/算法导论学习笔记堆里面的两个性质/" itemprop="url">算法导论学习笔记--堆里面的两个性质</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      每个孩子的子树的大小至多为2n/3(最坏情况发生在树的最底层恰好为半满的时候)规定总大小为n。当左子树为最大时，最底层恰好为半满。也就是最底层只有左子树有结点，右子树没有结点。设底层半满时节点数为y，则再加y个节点，就是满树，并且根据满二叉树的特–若底层元素个数为x,则元素总数为2x-1.所以n+y = 2y -1 +2y = 满树，所以n = 3y - 1即左子树结点数= （满树-1）/2 = ...
+      <a href="/2017/05/09/201705/算法导论学习笔记堆里面的两个性质/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-05-08T22:42:29.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-05-09
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/05/08/201705/算法导论学习笔记堆排序/" itemprop="url">算法导论学习笔记--堆排序</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      堆什么是堆？（二叉）堆是一个数组，可以被看成是完全二叉树，树上的每一个结点对应数组中的元素。除了底层，该树是完全充满的，并且是从左到右填充。表示堆的数组A包括两个属性：A.length通常表示数组元素的个数，A.heap-size表示有多少个堆元素存储在该数组中。0&lt;= A.heap-size&lt;=A.length。
+123假设根节点是A[1]PARENT(i)     &#x2F;& ...
+      <a href="/2017/05/08/201705/算法导论学习笔记堆排序/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-05-07T18:01:15.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-05-08
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+</div>
+
+<nav id="pagenavi">
+  
+  <a href="/page/7/" class="prev">上一页</a>
+  
+  
+  <a href="/page/9/" class="next">下一页</a>
+  
+</nav>
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

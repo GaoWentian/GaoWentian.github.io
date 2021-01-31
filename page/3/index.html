@@ -1,0 +1,495 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>page | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <div class="article-list-wrap">
+  
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2019/02/14/201902/从线程安全角度看单例模式/" itemprop="url">从线程安全角度看单例模式</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      单例模式是一次只创建一个实例，不允许多个存在。所以让类自身保存它的唯一实例。这个类保证没有其他实例可以被创建，并提供一个其他类访问的方法。先前在设计模式-单例模式中简单了介绍一下，现在开始填这个坑，比较几种单例模式的线程安全问题。
+懒汉模式懒汉模式就是在对象第一次使用时创建对象，下面这种方式，是非线程安全的，因为当多个线程同时判断成功instance == null，就会创建多个对象。
+1234 ...
+      <a href="/2019/02/14/201902/从线程安全角度看单例模式/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2019-02-14T13:06:20.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-02-14
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2019/02/14/201902/Java基础之序列化与反序列化/" itemprop="url">Java基础之序列化与反序列化</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      简介在Java运行过程中创建的对象，随着JVM的的停止，对象也会消失。为了将对象保存在本地硬盘或者是进行网络传输，需要将对象序列化，在需要的时候重新获取对象状态。Java为对象序列化和反序列化提供了两个接口：
+12java.io.Serializablejava.io.Externalizable
+下面通过例子来演示两个接口的作用和区别。
+Serializable实现对象的序列化，必须实现Ser ...
+      <a href="/2019/02/14/201902/Java基础之序列化与反序列化/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2019-02-13T16:08:19.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-02-14
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2019/02/12/201902/深入理解Java虚拟机垃圾收集器与GC参数/" itemprop="url">深入理解Java虚拟机--垃圾收集器与GC参数</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      简介程序计数器、虚拟机栈和本地方法栈的生存周期就是线程的生存周期，因此不需要考虑垃圾回收。Java中，GC的对象是堆空间和永久区。
+怎么判断一个对象是否需要回收？引用计数法引用计数法就是给对象中添加一个引用计数器，当有对象引用时，计数器数值加1，引用失效时，计数器数值减1，当计数器数值为0，就通知GC回收对象。图片中的B对象引用了D对象，如果B对象不再引用D对象，D对象的计数器数值就置为0，这样 ...
+      <a href="/2019/02/12/201902/深入理解Java虚拟机垃圾收集器与GC参数/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2019-02-12T11:41:50.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-02-12
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2019/02/10/201902/Java基础之自动拆箱装箱/" itemprop="url">Java基础之自动拆箱装箱</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      介绍Java为每种基本数据类型提供了对应的包装类型，比如int对应的包装类型是Integer，创建一个Integer对象需要使用new关键字，在JDK5之后提供了自动装箱拆箱，可以自动将基本数据类型直接转换为包装类型，也可以直接将包装类型自动转成基本数据类型，这就叫做自动装箱拆箱。
+12Integer i = 100;    //自动装箱int j = i;          //自动拆箱
+In ...
+      <a href="/2019/02/10/201902/Java基础之自动拆箱装箱/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2019-02-10T15:09:19.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-02-10
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2019/02/07/201902/Java源码分析String详解/" itemprop="url">Java源码分析--String详解</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      介绍String类是final修饰，说明不可以被继承，String一旦被创建就不能改变，对String修改就会创建一个新的字符串，因此禁止使用循环修改字符串。
+Sring在内存中的位置12345678910111213String str1 &#x3D; new String(&quot;hello&quot;);String str2 &#x3D; new String(&quot;hello ...
+      <a href="/2019/02/07/201902/Java源码分析String详解/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2019-02-07T04:30:42.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-02-07
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2019/01/30/201901/深入理解Java虚拟机内存分代策略及常用参数配置/" itemprop="url">深入理解Java虚拟机--内存分代策略及常用参数配置</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      内存分代策略简介HotSpot中为了提高内存对象内存分配和垃圾回收的效率，将内存分为了新生代（Eden+From Survivor+To Survivor）、老年代（OldGen）和永久代（PermGen）。新创建的对象分配在新生代，多次回收还存活的对象放在老年代，类信息、静态变量和字符串常量等存放在永久代中。新生代中需要频繁执行垃圾回收，老年代中不需要频繁垃圾回收，永久代一般来说不实现垃圾回收 ...
+      <a href="/2019/01/30/201901/深入理解Java虚拟机内存分代策略及常用参数配置/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2019-01-30T15:08:13.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-01-30
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2019/01/29/201901/Java基础之注解/" itemprop="url">Java基础之注解</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      注解什么是注解注解也叫Annotation，从JDK5.0开始引入。
+
+Annotation不是程序，但是可以对程序作出解释
+可以被其他程序读取
+
+内置注解@Override定义在java.lang.Override中，此注释只适用于修辞方法，表示一个方法声明打算重写超类中的另一个方法声明。
+1234   @Overridepublic String toString ()&#123;	retu ...
+      <a href="/2019/01/29/201901/Java基础之注解/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2019-01-28T16:25:56.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-01-29
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2019/01/28/201901/Java源码分析Object详解/" itemprop="url">Java源码分析--Object详解</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      简介Object类在java.lang包中，是所有类的父类，所有类都间接或者直接继承Object类。Object类中主要有registerNatives()、getClass()、hashCode()、equals()、clone()、toString()、notify()、notifyAll()、wait()和finalize()等方法。其中getClass()、notify()、notify ...
+      <a href="/2019/01/28/201901/Java源码分析Object详解/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2019-01-28T11:30:43.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-01-28
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2019/01/26/201901/Java源码分析全面解析HashMap/" itemprop="url">Java源码分析--全面解析HashMap</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      介绍HashMap是基于哈希表的Map接口的实现，并允许使用 null 值和 null 键。HashMap在JDK1.8之前使用的是哈希表+链表的方式存储数据。在JDK1.8之后，如果链表过长则将链表转成红黑树。 
+源码分析继承123public class HashMap&lt;K,V&gt; extends AbstractMap&lt;K,V&gt;    implements Map&l ...
+      <a href="/2019/01/26/201901/Java源码分析全面解析HashMap/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2019-01-26T15:00:56.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-01-26
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2019/01/18/201901/Java源码分析Stack/" itemprop="url">Java源码分析--Stack</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      介绍Stack是一种先进后出的数据结构，继承于Vector，所以Stack是通过数组实现。
+源码分析继承12publicclass Stack&lt;E&gt; extends Vector&lt;E&gt; &#123;&#125;
+构造函数Stack只有一个默认的构造函数，创建一个空的栈。
+12public Stack() &#123;&#125;
+所有API12345            ...
+      <a href="/2019/01/18/201901/Java源码分析Stack/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2019-01-17T20:24:51.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-01-18
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+</div>
+
+<nav id="pagenavi">
+  
+  <a href="/page/2/" class="prev">上一页</a>
+  
+  
+  <a href="/page/4/" class="next">下一页</a>
+  
+</nav>
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

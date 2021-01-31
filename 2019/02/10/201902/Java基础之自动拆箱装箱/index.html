@@ -1,0 +1,207 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java基础之自动拆箱装箱 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="介绍Java为每种基本数据类型提供了对应的包装类型，比如int对应的包装类型是Integer，创建一个Integer对象需要使用new关键字，在JDK5之后提供了自动装箱拆箱，可以自动将基本数据类型直接转换为包装类型，也可以直接将包装类型自动转成基本数据类型，这就叫做自动装箱拆箱。
+12Intege">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java基础之自动拆箱装箱"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-02-10T15:09:19.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-02-10
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java基础之自动拆箱装箱</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Integer%E4%B8%AD%E7%9A%84%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">Integer中的实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#valueOf-NaN"><span class="toc-number">2.1.</span> <span class="toc-text">valueOf()</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#intValue"><span class="toc-number">2.2.</span> <span class="toc-text">intValue()</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96%E5%8C%85%E8%A3%85%E7%B1%BB"><span class="toc-number">3.</span> <span class="toc-text">其他包装类</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Long"><span class="toc-number">3.1.</span> <span class="toc-text">Long</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Double"><span class="toc-number">3.2.</span> <span class="toc-text">Double</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Short"><span class="toc-number">3.3.</span> <span class="toc-text">Short</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Byte"><span class="toc-number">3.4.</span> <span class="toc-text">Byte</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Character"><span class="toc-number">3.5.</span> <span class="toc-text">Character</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Boolean"><span class="toc-number">3.6.</span> <span class="toc-text">Boolean</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%90%8E"><span class="toc-number">4.</span> <span class="toc-text">最后</span></a></li></ol>
+    </div>
+    
+    <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>Java为每种基本数据类型提供了对应的包装类型，比如int对应的包装类型是Integer，创建一个Integer对象需要使用new关键字，在JDK5之后提供了自动装箱拆箱，可以自动将基本数据类型直接转换为包装类型，也可以直接将包装类型自动转成基本数据类型，这就叫做自动装箱拆箱。</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Integer i = <span class="number">100</span>;    <span class="comment">//自动装箱</span></span><br><span class="line"><span class="keyword">int</span> j = i;          <span class="comment">//自动拆箱</span></span><br></pre></td></tr></table></figure>
+<h3 id="Integer中的实现"><a href="#Integer中的实现" class="headerlink" title="Integer中的实现"></a>Integer中的实现</h3><p>Integer自动装箱拆箱是基于valueOf()和intValue方法实现。当我们执行</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Integer i &#x3D; 100; </span><br></pre></td></tr></table></figure>
+<p>其实就是执行了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Integer i &#x3D; Integer.valueOf(100);</span><br></pre></td></tr></table></figure>
+<p>当执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int j &#x3D; i;  </span><br></pre></td></tr></table></figure>
+<p>就是执行了：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int j &#x3D; i.intValue();</span><br></pre></td></tr></table></figure>
+<h4 id="valueOf-NaN"><a href="#valueOf-NaN" class="headerlink" title="valueOf()"></a>valueOf()</h4><p>这是valueOf的实现代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static Integer valueOf(int i) &#123;</span><br><span class="line">    if (i &gt;&#x3D; IntegerCache.low &amp;&amp; i &lt;&#x3D; IntegerCache.high)</span><br><span class="line">        return IntegerCache.cache[i + (-IntegerCache.low)];</span><br><span class="line">    return new Integer(i);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>当获取到值i后，首先判断i是否存在IntegerCache中，这里IntegerCache是Integer的缓存，如果i在缓存中，直接返回缓存中的数据。注意只有在自动装箱中才用到缓存，使用new Integer中不会用到。看一下IntegerCache的源码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">private static class IntegerCache &#123;</span><br><span class="line">    static final int low &#x3D; -128;  &#x2F;&#x2F;默认缓存最小值是-128</span><br><span class="line">    static final int high;  &#x2F;&#x2F;最大值不是固定的，可以修改</span><br><span class="line">    static final Integer cache[]; &#x2F;&#x2F;存放缓存的数组</span><br><span class="line"></span><br><span class="line">    static &#123;</span><br><span class="line">        &#x2F;&#x2F; high value may be configured by property</span><br><span class="line">        int h &#x3D; 127; &#x2F;&#x2F;默认最大值是127</span><br><span class="line">        String integerCacheHighPropValue &#x3D;</span><br><span class="line">            sun.misc.VM.getSavedProperty(&quot;java.lang.Integer.IntegerCache.high&quot;); &#x2F;&#x2F;使用JVM参数设置最大值</span><br><span class="line">        if (integerCacheHighPropValue !&#x3D; null) &#123;</span><br><span class="line">            try &#123;</span><br><span class="line">                int i &#x3D; parseInt(integerCacheHighPropValue);</span><br><span class="line">                i &#x3D; Math.max(i, 127); &#x2F;&#x2F;如果设置的最大值小于默认最大值127，就使用127</span><br><span class="line">                &#x2F;&#x2F; Maximum array size is Integer.MAX_VALUE</span><br><span class="line">                h &#x3D; Math.min(i, Integer.MAX_VALUE - (-low) -1);&#x2F;&#x2F;最大值的范围</span><br><span class="line">            &#125; catch( NumberFormatException nfe) &#123;</span><br><span class="line">                &#x2F;&#x2F; If the property cannot be parsed into an int, ignore it.</span><br><span class="line">            &#125;</span><br><span class="line">        &#125;</span><br><span class="line">        high &#x3D; h;</span><br><span class="line"></span><br><span class="line">        cache &#x3D; new Integer[(high - low) + 1];</span><br><span class="line">        int j &#x3D; low;</span><br><span class="line">        for(int k &#x3D; 0; k &lt; cache.length; k++)</span><br><span class="line">            cache[k] &#x3D; new Integer(j++);</span><br><span class="line"></span><br><span class="line">        &#x2F;&#x2F; range [-128, 127] must be interned (JLS7 5.1.7)</span><br><span class="line">        assert IntegerCache.high &gt;&#x3D; 127;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    private IntegerCache() &#123;&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>总结一下，IntegerCache缓存的最小值是-128，最大值默认是127，可以通过 JVM 的启动参数 -XX:AutoBoxCacheMax=size 修改，最大值的范围是127到Integer.MAX_VALUE - (-low) -1。cache数组中下标0存的是-128，下标1存-127，依次类推，因此i的缓存是i + (-IntegerCache.low)<br>举个例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Integer a &#x3D; 127;</span><br><span class="line">Integer b &#x3D; 127;</span><br><span class="line">Integer c &#x3D; 128;</span><br><span class="line">Integer d &#x3D; 128;</span><br><span class="line">System.out.println(a&#x3D;&#x3D;b); &#x2F;&#x2F;true</span><br><span class="line">System.out.println(c&#x3D;&#x3D;d);&#x2F;&#x2F;false</span><br><span class="line">System.out.println(c.equals(d));&#x2F;&#x2F;true</span><br></pre></td></tr></table></figure>
+<p>上面的代码中，a和b使用的是缓存，所以a和b的地址都相同，而c和d是新建的对象，所以地址不相同。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public boolean equals(Object obj) &#123;</span><br><span class="line">    if (obj instanceof Integer) &#123;</span><br><span class="line">        return value &#x3D;&#x3D; ((Integer)obj).intValue();</span><br><span class="line">    &#125;</span><br><span class="line">    return false;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Integer中重写的equals方法是直接对比value的值，不是对比的对象地址，所以c.equals(d)为true。</p>
+<h4 id="intValue"><a href="#intValue" class="headerlink" title="intValue()"></a>intValue()</h4><p>intValue中直接返回value的值。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public int intValue() &#123;</span><br><span class="line">    return value;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="其他包装类"><a href="#其他包装类" class="headerlink" title="其他包装类"></a>其他包装类</h3><p>Java中提供了八种包装类Integer（int）、Long（long）、Double（double）、Short（short）、Float（float）、Byte(byte)、Character（char）、Boolean(boolean)<br>八种包装类中，xxxValue基本一样，都是返回value值，我们重点看一下valueOf方法：</p>
+<h4 id="Long"><a href="#Long" class="headerlink" title="Long"></a>Long</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public static Long valueOf(long l) &#123;</span><br><span class="line">    final int offset &#x3D; 128;</span><br><span class="line">    if (l &gt;&#x3D; -128 &amp;&amp; l &lt;&#x3D; 127) &#123; &#x2F;&#x2F; will cache</span><br><span class="line">        return LongCache.cache[(int)l + offset];</span><br><span class="line">    &#125;</span><br><span class="line">    return new Long(l);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Long并没有提供可以更改的缓存最大值，直接默认为127，并且不能更改。</p>
+<h4 id="Double"><a href="#Double" class="headerlink" title="Double"></a>Double</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static Double valueOf(double d) &#123;</span><br><span class="line">    return new Double(d);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Double的valueOf()方法没有使用缓存，道理很简单，以为小数位没法缓存，同理，Float一样。</p>
+<h4 id="Short"><a href="#Short" class="headerlink" title="Short"></a>Short</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public static Short valueOf(short s) &#123;</span><br><span class="line">    final int offset &#x3D; 128;</span><br><span class="line">    int sAsInt &#x3D; s;</span><br><span class="line">    if (sAsInt &gt;&#x3D; -128 &amp;&amp; sAsInt &lt;&#x3D; 127) &#123; &#x2F;&#x2F; must cache</span><br><span class="line">        return ShortCache.cache[sAsInt + offset];</span><br><span class="line">    &#125;</span><br><span class="line">    return new Short(s);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>Short包装类也是直接缓存-128到127。</p>
+<h4 id="Byte"><a href="#Byte" class="headerlink" title="Byte"></a>Byte</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public static Byte valueOf(byte b) &#123;</span><br><span class="line">    final int offset &#x3D; 128;</span><br><span class="line">    return ByteCache.cache[(int)b + offset];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>byte的取值范围是-128~127，因此byte不用判断上下界</p>
+<h4 id="Character"><a href="#Character" class="headerlink" title="Character"></a>Character</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public static Character valueOf(char c) &#123;</span><br><span class="line">    if (c &lt;&#x3D; 127) &#123; &#x2F;&#x2F; must cache</span><br><span class="line">        return CharacterCache.cache[(int)c];</span><br><span class="line">    &#125;</span><br><span class="line">    return new Character(c);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>char的最小值是0，所以没有判断最小值，缓存的最大值设置为127.</p>
+<h4 id="Boolean"><a href="#Boolean" class="headerlink" title="Boolean"></a>Boolean</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public static Boolean valueOf(boolean b) &#123;</span><br><span class="line">    return (b ? TRUE : FALSE);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>注意这里如果用“==”对比Boolean的包装类，都会返回true，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">  Boolean a &#x3D; true;</span><br><span class="line">Boolean b &#x3D; true;</span><br><span class="line">Boolean c &#x3D; false;</span><br><span class="line">Boolean d &#x3D; false;</span><br><span class="line">System.out.println(a&#x3D;&#x3D;b); 	&#x2F;&#x2F;true</span><br><span class="line">System.out.println(c&#x3D;&#x3D;d);	&#x2F;&#x2F;true</span><br></pre></td></tr></table></figure>
+<h3 id="最后"><a href="#最后" class="headerlink" title="最后"></a>最后</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">Integer a &#x3D; 1;</span><br><span class="line">Integer b &#x3D; 2;</span><br><span class="line">Integer c &#x3D; 3;</span><br><span class="line">Long d &#x3D; 2L;</span><br><span class="line">Long e &#x3D; 3L;</span><br><span class="line">System.out.println(c&#x3D;&#x3D;(a+b)); 	   &#x2F;&#x2F;true</span><br><span class="line">System.out.println(c.equals(a+b));	&#x2F;&#x2F;true</span><br><span class="line">System.out.println(e&#x3D;&#x3D;(a+b));		&#x2F;&#x2F;true</span><br><span class="line">System.out.println(e.equals(a+b));	&#x2F;&#x2F;false</span><br><span class="line">System.out.println(e.equals(a+d));	&#x2F;&#x2F;true</span><br></pre></td></tr></table></figure>
+<ul>
+<li>c==(a+b) 中，a+b会触发自动拆箱和装箱，再和c比较，所以是true</li>
+<li>c.equals(a+b)，a+b触发自动拆箱和装箱，对比结果也是true</li>
+<li>e==(a+b)，a+b自动拆箱装箱变为3，e也自动拆箱变成3，所以返回true</li>
+<li>e.equals(a+b)，a+b自动拆箱装箱变成Integer类型的3，而e是Long类型，equals方法会先判断obj instanceof Long，如果传入的不是Long类型，会返回false</li>
+<li>e.equals(a+d) ，a和d自动拆箱后，因为d是Long类型，会自动转换成Long类型，再触发装箱变成Long类型，对比后为true。</li>
+</ul>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/02/12/201902/深入理解Java虚拟机垃圾收集器与GC参数/" class="prev">上一篇：深入理解Java虚拟机--垃圾收集器与GC参数</a>
+    
+    
+    <a href="/2019/02/07/201902/Java源码分析String详解/" class="next">下一篇：Java源码分析--String详解</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,181 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>（二）Java并发-可见性、原子性和有序性 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="缓存问题造成的可见性单核CPU的情况下，多个线程使用同一个CPU,线程1读取共享变量A到CPU缓存，修改后对线程2是可见的，不存在一致性问题。一个线程对共享变量的修改对另一个线程可见称为可见性。多核CPU的情况下，线程1和线程2分别操作不同CPU的缓存，线程1对共享变量A的操作对线程2不可见，出现一">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="（二）Java并发-可见性、原子性和有序性"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2020-10-14T16:10:14.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-10-15
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">（二）Java并发-可见性、原子性和有序性</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E9%97%AE%E9%A2%98%E9%80%A0%E6%88%90%E7%9A%84%E5%8F%AF%E8%A7%81%E6%80%A7"><span class="toc-number">1.</span> <span class="toc-text">缓存问题造成的可见性</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7"><span class="toc-number">2.</span> <span class="toc-text">原子性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8E%9F%E5%AD%90%E6%80%A7%E5%AE%9E%E7%8E%B0%E5%8E%9F%E7%90%86"><span class="toc-number">2.1.</span> <span class="toc-text">原子性实现原理</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%BB%E7%BA%BF%E9%94%81%E5%AE%9A"><span class="toc-number">2.1.1.</span> <span class="toc-text">总线锁定</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BC%93%E5%AD%98%E9%94%81%E5%AE%9A"><span class="toc-number">2.1.2.</span> <span class="toc-text">缓存锁定</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9C%89%E5%BA%8F%E6%80%A7"><span class="toc-number">3.</span> <span class="toc-text">有序性</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E4%BC%9A%E6%9C%89%E9%87%8D%E6%8E%92%E5%BA%8F"><span class="toc-number">3.1.</span> <span class="toc-text">为什么会有重排序</span></a></li></ol></li></ol>
+    </div>
+    
+    <h2 id="缓存问题造成的可见性"><a href="#缓存问题造成的可见性" class="headerlink" title="缓存问题造成的可见性"></a>缓存问题造成的可见性</h2><p>单核CPU的情况下，多个线程使用同一个CPU,线程1读取共享变量A到CPU缓存，修改后对线程2是可见的，不存在一致性问题。一个线程对共享变量的修改对另一个线程可见称为可见性。<br><img src="https://www.gwt.fun/img/blog/java-%E5%B9%B6%E5%8F%91-%E5%8D%95%E6%A0%B8CPU.png" alt="image"><br>多核CPU的情况下，线程1和线程2分别操作不同CPU的缓存，线程1对共享变量A的操作对线程2不可见，出现一致性问题。<br><img src="https://www.gwt.fun/img/blog/java-%E5%B9%B6%E5%8F%91-%E5%A4%9A%E6%A0%B8CPU.png" alt="image"><br>下面这段代码，使用两个线程对num分别加10000次，启动两个线程，结果应该是20000。但是结果是4537。当线程1读取到num是0，线程2读到的值也是0，线程1修改num为2，保存到内存。此时线程2也修改num为2，保存到内存中。线程1和线程2分别对num做加1操作，但是最终结果是2。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">private static int num &#x3D; 0;</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">    new Thread(()-&gt;&#123;</span><br><span class="line">        for (int i &#x3D; 0; i &lt; 10000; i++) &#123;</span><br><span class="line">            num++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">    new Thread(()-&gt;&#123;</span><br><span class="line">        for (int i &#x3D; 0; i &lt; 10000; i++) &#123;</span><br><span class="line">            num++;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;).start();</span><br><span class="line">    System.out.println(num);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h2 id="原子性"><a href="#原子性" class="headerlink" title="原子性"></a>原子性</h2><p>原子性就是把事务看成是一个整体，要么完整执行，要么完全不执行，这就是原子性。一般一条语句需要多个CPU指令执行，例如：num++</p>
+<ul>
+<li>将num变量从内存加载到CPU寄存器</li>
+<li>在寄存器中将num执行+1操作</li>
+<li>将结果保存到内存中（缓存机制可能造成num保存到CPU缓存而不是内存中）<br>上面步骤中，如果有其他线程操作num，就会造成数据不一致。因此i++ 是非原子性的操作。要保证原子性，Java中可以使用Synchronized或者Lock对i++加锁。</li>
+</ul>
+<h3 id="原子性实现原理"><a href="#原子性实现原理" class="headerlink" title="原子性实现原理"></a>原子性实现原理</h3><p>处理器使用总线锁定和缓存锁定两个机制保存个复杂内存操作的原子性。</p>
+<h4 id="总线锁定"><a href="#总线锁定" class="headerlink" title="总线锁定"></a>总线锁定</h4><p>总线锁定就是使用处理器提供的LOCK # 信号，当一个处理器在总线上输出信号时，其他处理器的请求将被阻塞，该处理器可以独占共享内存。</p>
+<h4 id="缓存锁定"><a href="#缓存锁定" class="headerlink" title="缓存锁定"></a>缓存锁定</h4><p>总线锁定期间，其他处理器也无法和内存通信，开销比较大。缓存锁定会锁定共享变量内存区域的缓存并写回到内存，使用缓存一致性机制保证修改的原子性。同时处理器使用嗅探技术保证它的内部缓存、系统内存和其他处理器的缓存中的数据在总线上保持一致。缓存锁定仅能锁定一个缓存行，对于夸缓存行的数据，需要使用总线锁定。</p>
+<h2 id="有序性"><a href="#有序性" class="headerlink" title="有序性"></a>有序性</h2><p>有序性就是指代码执行的顺序，编译器为了优化性能，会改变语句的先后顺序。重排序可以分为三种：</p>
+<ul>
+<li>编译器优化重排序</li>
+<li>指令级并行的重排序</li>
+<li>内存系统的重排序<br>Java中可以用Synchronized和volatile保证有序性。</li>
+</ul>
+<h3 id="为什么会有重排序"><a href="#为什么会有重排序" class="headerlink" title="为什么会有重排序"></a>为什么会有重排序</h3><p>CPU执行指令的速度远超内存访问速度，CPU为了避免内存访问延迟，将指令管道化，尽量重拍管道内指令达到最大化利用CPU。并且CPU内部包含多个执行单元，可以组合进行算数运算，逻辑条件判断和内存操作。每个单元是并行执行的，指令也是并行执行，执行命令的顺序也增加了不确定性。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2020/10/15/202010/四Java并发对象在内存中的布局/" class="prev">上一篇：（四）Java并发-对象在内存中的布局</a>
+    
+    
+    <a href="/2020/04/25/202004/Kubernetes基础Pod控制器/" class="next">下一篇：Kubernetes基础--Pod控制器</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

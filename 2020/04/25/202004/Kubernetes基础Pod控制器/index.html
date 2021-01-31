@@ -1,0 +1,194 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Kubernetes基础--Pod控制器 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="ReplicationControllerReplicationController 可以保证它的 Pod 始终保持在运行状态。ReplicationController 的工作是确保 Pod 的数量始终与其标签选择器匹配，如果不匹配，ReplicationController 会采取适当的操作来协">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Kubernetes基础--Pod控制器"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2020-04-25T07:15:50.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-04-25
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Kubernetes基础--Pod控制器</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#ReplicationController"><span class="toc-number">1.</span> <span class="toc-text">ReplicationController</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ReplicationController-%E6%93%8D%E4%BD%9C"><span class="toc-number">1.1.</span> <span class="toc-text">ReplicationController 操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ReplicationController-%E5%92%8C-Pod-%E7%9A%84%E5%85%B3%E7%B3%BB"><span class="toc-number">1.2.</span> <span class="toc-text">ReplicationController 和 Pod 的关系</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ReplicationController-%E7%9A%84%E5%88%A0%E9%99%A4"><span class="toc-number">1.3.</span> <span class="toc-text">ReplicationController 的删除</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ReplicaSet"><span class="toc-number">2.</span> <span class="toc-text">ReplicaSet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#ReplicaSet-%E6%93%8D%E4%BD%9C"><span class="toc-number">2.1.</span> <span class="toc-text">ReplicaSet 操作</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#DaemonSet"><span class="toc-number">3.</span> <span class="toc-text">DaemonSet</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#DaemonSet-%E6%93%8D%E4%BD%9C"><span class="toc-number">3.1.</span> <span class="toc-text">DaemonSet 操作</span></a></li></ol></li></ol>
+    </div>
+    
+    <h3 id="ReplicationController"><a href="#ReplicationController" class="headerlink" title="ReplicationController"></a>ReplicationController</h3><p>ReplicationController 可以保证它的 Pod 始终保持在运行状态。ReplicationController 的工作是确保 Pod 的数量始终与其标签选择器匹配，如果不匹配，ReplicationController 会采取适当的操作来协调 Pod 的数量。一个 ReplicationController 有三部分：</p>
+<ul>
+<li>label selector（标签选择器），用于确定 ReplicationController 作用域有哪些 Pod</li>
+<li>replica count(副本个数)，指定应运行的 pod 数量</li>
+<li>pod template（pod 模板）。用于创建新的 pod 副本<br>ReplicationController 的副本个数、标签选择器，甚至是 pod 模板都能随时修改，但只有副本数量变更才会影响现有 pod。</li>
+</ul>
+<h4 id="ReplicationController-操作"><a href="#ReplicationController-操作" class="headerlink" title="ReplicationController 操作"></a>ReplicationController 操作</h4><p>首先创建 YAML 文件，replicas 表示创建 2 个 pod，selector 表示标签选择器选择的标签。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: v1</span><br><span class="line">kind: ReplicationController</span><br><span class="line">metadata:</span><br><span class="line">    name: kubia</span><br><span class="line">spec:</span><br><span class="line">    replicas: 2</span><br><span class="line">    selector:</span><br><span class="line">        app: kubia</span><br><span class="line">    template:</span><br><span class="line">        metadata:</span><br><span class="line">            labels:</span><br><span class="line">                app: kubia</span><br><span class="line">        spec:</span><br><span class="line">            containers:</span><br><span class="line">            - name: kubia</span><br><span class="line">              image: tutum&#x2F;hello-world</span><br><span class="line">              ports:</span><br><span class="line">              - containerPort: 80</span><br></pre></td></tr></table></figure>
+<p>然后使用已有命令创建 rc</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl create -f kubia-rc.yaml</span><br></pre></td></tr></table></figure>
+<p>查看 Pod，发现已经存在两个 Pod,此时删除一个 Pod，RC 会创建一个新的 Pod。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get pods</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-98g42   1&#x2F;1     Running   0          3m5s</span><br><span class="line">kubia-9ppzm   1&#x2F;1     Running   0          3m5s</span><br><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl delete po kubia-98g42</span><br><span class="line">pod &quot;kubia-98g42&quot; deleted</span><br><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get pods</span><br><span class="line">NAME          READY   STATUS              RESTARTS   AGE</span><br><span class="line">kubia-9ppzm   1&#x2F;1     Running             0          6m44s</span><br><span class="line">kubia-xvhqd   0&#x2F;1     ContainerCreating   0          5s</span><br></pre></td></tr></table></figure>
+<p>查看 k8s 中所有 rc</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get rc</span><br><span class="line">NAME    DESIRED   CURRENT   READY   AGE</span><br><span class="line">kubia   2         2         2       8m2s</span><br></pre></td></tr></table></figure>
+<h4 id="ReplicationController-和-Pod-的关系"><a href="#ReplicationController-和-Pod-的关系" class="headerlink" title="ReplicationController 和 Pod 的关系"></a>ReplicationController 和 Pod 的关系</h4><p>Pod 并没有绑定到 ReplicationController，ReplicationController 只管理与标签选择器匹配的 Pod。通过修改 Pod 的标签，可以将 Pod 从 ReplicationController 作用域中添加或删除。如果更改了一个 Pod 的标签，不在与 ReplicationController 的标签选择器匹配，那该 Pod 和其他手动创建的 Pod 相同，如果该 Pod 终止，也不会重新调度。ReplicationController 发现 Pod 丢失后，会启动新的 Pod 替代它。<br>还可以使用一下命令修改当前 ReplicationController 的配置。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">kubectl edit rc kubia</span><br></pre></td></tr></table></figure>
+<p>该命令会在默认文本编辑器中打开 ReplicationController 的 YAML 配置文件，修改保存后，会自动更新。</p>
+<h4 id="ReplicationController-的删除"><a href="#ReplicationController-的删除" class="headerlink" title="ReplicationController 的删除"></a>ReplicationController 的删除</h4><p>使用 kubectl delete 命令会删除 ReplicationController 和管理的 Pod，可以通过添加–cascade=false 参数避免删除 Pod</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl delete rc kubia --cascade&#x3D;false</span><br><span class="line">replicationcontroller &quot;kubia&quot; deleted</span><br><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get pods</span><br><span class="line">NAME          READY   STATUS    RESTARTS   AGE</span><br><span class="line">kubia-9ppzm   1&#x2F;1     Running   0          21m</span><br><span class="line">kubia-xvhqd   1&#x2F;1     Running   0          15m</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="ReplicaSet"><a href="#ReplicaSet" class="headerlink" title="ReplicaSet"></a>ReplicaSet</h3><p>ReplicaSet 是替换 ReplicationController 的调度组件。ReplicaSet 和 ReplicationController 完全相同，但是 ReplicaSet 的 Pod 选择器表达能力更强，ReplicaSet 允许匹配缺少某个标签的 Pod，包含特定标签名的 Pod。</p>
+<h4 id="ReplicaSet-操作"><a href="#ReplicaSet-操作" class="headerlink" title="ReplicaSet 操作"></a>ReplicaSet 操作</h4><p>新建 ReplicaSet 的 YAML 文件</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: apps&#x2F;v1</span><br><span class="line">kind: ReplicaSet</span><br><span class="line">metadata:</span><br><span class="line">    name: kubia</span><br><span class="line">spec:</span><br><span class="line">    replicas: 2</span><br><span class="line">    selector:</span><br><span class="line">        matchLabels:</span><br><span class="line">            app: kubia</span><br><span class="line">    template:</span><br><span class="line">        metadata:</span><br><span class="line">            labels:</span><br><span class="line">                app: kubia</span><br><span class="line">        spec:</span><br><span class="line">            containers:</span><br><span class="line">            - name: kubia</span><br><span class="line">              image: tutum&#x2F;hello-world</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h3 id="DaemonSet"><a href="#DaemonSet" class="headerlink" title="DaemonSet"></a>DaemonSet</h3><p>一个 DaemonSet 对象能确保其创建的 Pod 在集群中的每一台（或指定）Node 上都运行一个副本。如果集群中动态加入了新的 Node，DaemonSet 中的 Pod 也会被添加在新加入 Node 上运行。删除一个 DaemonSet 也会级联删除所有其创建的 Pod。</p>
+<h4 id="DaemonSet-操作"><a href="#DaemonSet-操作" class="headerlink" title="DaemonSet 操作"></a>DaemonSet 操作</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">apiVersion: apps&#x2F;v1</span><br><span class="line">kind: DaemonSet</span><br><span class="line">metadata:</span><br><span class="line">    name: ssd-monitor</span><br><span class="line">spec:</span><br><span class="line">    selector:</span><br><span class="line">        matchLabels:</span><br><span class="line">            app: ssd-monitor</span><br><span class="line">    template:</span><br><span class="line">        metadata:</span><br><span class="line">            labels:</span><br><span class="line">                app: ssd-monitor</span><br><span class="line">        spec:</span><br><span class="line">            nodeSelector:</span><br><span class="line">                disk: ssd</span><br><span class="line">            containers:</span><br><span class="line">            - name: main</span><br><span class="line">              image: tutum&#x2F;hello-world</span><br></pre></td></tr></table></figure>
+<p>创建 DaemonSet</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl create -f daemonset.yaml</span><br><span class="line">daemonset.apps&#x2F;ssd-monitor created</span><br></pre></td></tr></table></figure>
+<p>此时查看 DaemonSet，会发现创建了 0 个 Pod，此时查看 Pod 的数量也是 0。因为 DaemonSet 会检测所有的节点，如果节点的标签是 ssd，那就会把 Pod 部署上去。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get ds</span><br><span class="line">NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE</span><br><span class="line">ssd-monitor   0         0         0       0            0           disk&#x3D;ssd        15s</span><br><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get pods</span><br><span class="line">No resources found in default namespace.</span><br></pre></td></tr></table></figure>
+<p>向节点上添加标签：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get node</span><br><span class="line">NAME       STATUS   ROLES    AGE     VERSION</span><br><span class="line">minikube   Ready    master   5d13h   v1.18.0</span><br><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl label node minikube disk&#x3D;ssd</span><br><span class="line">node&#x2F;minikube labeled</span><br><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get pods</span><br><span class="line">NAME                READY   STATUS    RESTARTS   AGE</span><br><span class="line">ssd-monitor-m59rf   1&#x2F;1     Running   0          11s</span><br><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get ds</span><br><span class="line">NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE</span><br><span class="line">ssd-monitor   1         1         1       1            1           disk&#x3D;ssd        12m</span><br></pre></td></tr></table></figure>
+<p>从节点上删除/修改标签，DaemonSet 也会删除该节点上的 Pod</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl label node minikube disk&#x3D;hdd --overwrite</span><br><span class="line">node&#x2F;minikube labeled</span><br><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get pods</span><br><span class="line">No resources found in default namespace.</span><br><span class="line">master@master:&#x2F;data&#x2F;k8s&#x2F;conf$ kubectl get ds</span><br><span class="line">NAME          DESIRED   CURRENT   READY   UP-TO-DATE   AVAILABLE   NODE SELECTOR   AGE</span><br><span class="line">ssd-monitor   0         0         0       0            0           disk&#x3D;ssd        14m</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2020/10/15/202010/二Java并发可见性原子性和有序性/" class="prev">上一篇：（二）Java并发-可见性、原子性和有序性</a>
+    
+    
+    <a href="/2020/04/21/202004/Kubernetes基础Pod用法/" class="next">下一篇：Kubernetes基础--Pod用法</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

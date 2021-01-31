@@ -1,0 +1,170 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>算法导论学习笔记--中位数和顺序统计量 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="在一个由n个元素组成的集合中，第i个顺序统计量(order statistic)是该集合中第i小的元素。中位数是指所属集合的“中点元素”。当n为奇数时，中位数唯一；当n为偶数时，有两个中位数，这里只讨论出现在i = [(n+1)/2]处的（下中位数）。我们讨论从一个由n个互异的元素构成的集合中选择第">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="算法导论学习笔记--中位数和顺序统计量"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-05-11T22:54:56.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-05-12
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">算法导论学习笔记--中位数和顺序统计量</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%B0%8F%E5%80%BC%E5%92%8C%E6%9C%80%E5%A4%A7%E5%80%BC"><span class="toc-number">1.</span> <span class="toc-text">最小值和最大值</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%9F%E6%9C%9B%E4%B8%BA%E7%BA%BF%E6%80%A7%E6%97%B6%E9%97%B4%E7%9A%84%E9%80%89%E6%8B%A9%E7%AE%97%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">期望为线性时间的选择算法</span></a></li></ol>
+    </div>
+    
+    <p>在一个由n个元素组成的集合中，第i个<strong>顺序统计量</strong>(order statistic)是该集合中第i小的元素。中位数是指所属集合的“中点元素”。当n为奇数时，中位数唯一；当n为偶数时，有两个中位数，这里只讨论出现在i = [(n+1)/2]处的（下中位数）。<br>我们讨论从一个由n个互异的元素构成的集合中选择第i个顺序统计量的问题。将这一问题形式化定义为如下问题：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">输入：一个包含 n个互异的数的集合A和一个整数i，1&lt;&#x3D;i&lt;&#x3D;n;</span><br><span class="line">输出：元素x属于A，且A中恰好有i-1个其他元素小于它。</span><br></pre></td></tr></table></figure>
+<h3 id="最小值和最大值"><a href="#最小值和最大值" class="headerlink" title="最小值和最大值"></a>最小值和最大值</h3><p>确定最小值</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">MINIMUM(A)&#123;</span><br><span class="line">    min &#x3D; A[1];</span><br><span class="line">    for(i&#x3D;2;i&lt;&#x3D;A.length;i++)&#123;</span><br><span class="line">        if(min &gt; A[i])&#123;</span><br><span class="line">            min &#x3D; A[i];</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return min;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="期望为线性时间的选择算法"><a href="#期望为线性时间的选择算法" class="headerlink" title="期望为线性时间的选择算法"></a>期望为线性时间的选择算法</h3><p>一般选择问题看起来要比找最小值的简单选择问题更难，但两种问题的渐近运行时间却是相同的：都是 O ( n )。这里介绍一种解决选择问题的分治算法，即 RANDOMIZED-SELECT算法。该算法利用了之前介绍的RANDOMIZED-PARTITION过程,它返回数组A[p..r]中第i小的元素。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">RANDOMIZED-SELECT(A,p,r,i)&#123;</span><br><span class="line">    if(p &#x3D;&#x3D; r)&#123;</span><br><span class="line">        return A[p];</span><br><span class="line">    &#125;</span><br><span class="line">    q &#x3D; RANDOMIZED-PARTITION(A,p,r);</span><br><span class="line">    k &#x3D; q - p + 1;</span><br><span class="line">    if(i &#x3D;&#x3D; k)&#123;</span><br><span class="line">        return A[q];</span><br><span class="line">    &#125;else if(i &lt; k)&#123;</span><br><span class="line">        return RANDOMIZED-SELECT(A,p,q-1,i)</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        return RANDOMIZED-SELECT(A,q+1,r,i-k)</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">RANDOMIZED-PARTITION(A,p,r)&#123;</span><br><span class="line">	i &#x3D; RANDOM(p,r);</span><br><span class="line">	swap(A[r],A[i]);</span><br><span class="line">	return PARTITION(A,p,r);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">PARTITION(A,p,r)&#123;</span><br><span class="line">	x &#x3D; A[r];</span><br><span class="line">	i &#x3D; p - 1;</span><br><span class="line">	for(j &#x3D; p;j &lt;&#x3D; r-1;j++)&#123;</span><br><span class="line">		if(A[j] &lt;&#x3D; x)&#123;</span><br><span class="line">			i &#x3D; i + 1;</span><br><span class="line">			swap(A[i],A[j]);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	swap(A[i+1],A[r]);</span><br><span class="line">	return i+1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/05/18/201705/算法导论学习笔记基本数据结构/" class="prev">上一篇：算法导论学习笔记--基本数据结构</a>
+    
+    
+    <a href="/2017/05/10/201705/算法导论学习笔记快速排序/" class="next">下一篇：算法导论学习笔记--快速排序</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

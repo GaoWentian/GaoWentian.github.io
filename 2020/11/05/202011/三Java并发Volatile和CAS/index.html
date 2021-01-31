@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>（三）Java并发-Volatile和CAS | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="volatile一旦一个共享变量（类的成员变量、类的静态成员变量）被 volatile 修饰之后，两个含义：
+
+1.volatile 保证了共享变量的可见性；
+2.禁止进行指令重排序。
+
+123456789101112public class ThreadSafeInteger &amp;#123;    ">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="（三）Java并发-Volatile和CAS"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2020-11-05T15:16:56.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-11-05
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">（三）Java并发-Volatile和CAS</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#volatile"><span class="toc-number">1.</span> <span class="toc-text">volatile</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#LOCK-%E6%8C%87%E4%BB%A4"><span class="toc-number">1.0.1.</span> <span class="toc-text">LOCK 指令</span></a></li></ol></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#CAS"><span class="toc-number">2.</span> <span class="toc-text">CAS</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%82%B2%E8%A7%82%E9%94%81%E5%92%8C%E4%B9%90%E8%A7%82%E9%94%81"><span class="toc-number">2.1.</span> <span class="toc-text">悲观锁和乐观锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CAS-%E8%BF%87%E7%A8%8B"><span class="toc-number">2.2.</span> <span class="toc-text">CAS 过程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#ABA-%E9%97%AE%E9%A2%98"><span class="toc-number">2.3.</span> <span class="toc-text">ABA 问题</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#CAS-%E5%8E%9F%E7%90%86"><span class="toc-number">2.4.</span> <span class="toc-text">CAS 原理</span></a></li></ol></li></ol>
+    </div>
+    
+    <h2 id="volatile"><a href="#volatile" class="headerlink" title="volatile"></a>volatile</h2><p>一旦一个共享变量（类的成员变量、类的静态成员变量）被 volatile 修饰之后，两个含义：</p>
+<ul>
+<li>1.volatile 保证了共享变量的可见性；</li>
+<li>2.禁止进行指令重排序。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class ThreadSafeInteger &#123;</span><br><span class="line"></span><br><span class="line">      private int value;</span><br><span class="line"></span><br><span class="line">      public synchronized int get() &#123;</span><br><span class="line">          return value;</span><br><span class="line">      &#125;</span><br><span class="line"></span><br><span class="line">      public synchronized  void set(int value) &#123;</span><br><span class="line">          this.value &#x3D; value;</span><br><span class="line">      &#125;</span><br><span class="line">  &#125;</span><br></pre></td></tr></table></figure>
+<p>上面的同步和下面的 volatile 修饰变量是等价的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class ThreadSafeInteger &#123;</span><br><span class="line"></span><br><span class="line">       private volatile int value;</span><br><span class="line"></span><br><span class="line">       public int get() &#123;</span><br><span class="line">           return value;</span><br><span class="line">       &#125;</span><br><span class="line"></span><br><span class="line">       public void set(int value) &#123;</span><br><span class="line">           this.value &#x3D; value;</span><br><span class="line">       &#125;</span><br><span class="line">   &#125;</span><br></pre></td></tr></table></figure>
+<p>volatile 变量具有 synchronized 的可见性特性，但是不具备原子特性。volatile 关键字不会引起线程上下文切换和线程调度，使用 volatile 还能解决重排序问题。</p>
+<h4 id="LOCK-指令"><a href="#LOCK-指令" class="headerlink" title="LOCK 指令"></a>LOCK 指令</h4><p>用 volatile 关键字修饰的共享变量，编译成字节码后增有 Lock 前缀指令。<br>Lock 前缀的指令在多核处理器下：</p>
+<ul>
+<li>将当前处理器的缓存航的数据写回到系统内存</li>
+<li>写回内存的操作会使其他 CPU 里缓存了该内存地址的数据无效。</li>
+<li>处理器使用嗅探技术保证内部缓存、系统缓存和其他处理器的数据在总线上保持一致。</li>
+</ul>
+<h2 id="CAS"><a href="#CAS" class="headerlink" title="CAS"></a>CAS</h2><p>volatile 修饰变量，对共享变量做读取或者赋值操作时，具有原子性；但一个变量赋值给另一个变量是非原子性的。因此 volatile 和 CAS 结合实现原子操作。</p>
+<h3 id="悲观锁和乐观锁"><a href="#悲观锁和乐观锁" class="headerlink" title="悲观锁和乐观锁"></a>悲观锁和乐观锁</h3><p>悲观锁(Pessimistic Lock)，顾名思义，它指的是对数据被外界（包括本系统当前的其他事务，以及来自外部系统的事务处理）修改持悲观态度。线程每次修改数据之前，都会认为别的线程会修改，所以拿数据之前会先上锁，别的线程要想使用这个数据必须等待线程释放掉锁。synchronized 就是悲观锁的一种，也被成为独占锁。<br>乐观锁(Optimistic Lock)，顾名思义，它认为数据一般情况下不会造成冲突，所以在数据提交更新的时候，会对数据是否冲突进行检测，如果发现冲突则失败并重试，直到成功为止，可以称为自旋。</p>
+<h3 id="CAS-过程"><a href="#CAS-过程" class="headerlink" title="CAS 过程"></a>CAS 过程</h3><p>乐观锁用到的主要机制就是 CAS。CAS 即(Compare and swap)，也就是比较并替换，CAS 有三个操作数分别为：内存值 V，旧的预期值 A，新的值 B。处理过程为：</p>
+<ul>
+<li>1、首先获取内存中的值 A</li>
+<li>2、A 经过自增或其他计算后变为 B</li>
+<li>3、对比当前内存中的 V 和 A 是否相同，相同则 B 替换 A<br>AtomicLong 的自增就是使用这种方式实现：</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public final long incrementAndGet() &#123;</span><br><span class="line">    for (;;) &#123;</span><br><span class="line">        long current &#x3D; get();（1）</span><br><span class="line">        long next &#x3D; current + 1;（2）</span><br><span class="line">        if (compareAndSet(current, next))（3）</span><br><span class="line">            return next;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public final boolean compareAndSet(long expect, long update) &#123;</span><br><span class="line">    return unsafe.compareAndSwapLong(this, valueOffset, expect, update);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>假如当前值为 1，那么线程 A 和检查 B 同时执行到了（3）时候各自的 next 都是 2，current=1，假如线程 A 先执行了 3，那么这个是原子性操作，会把档期值更新为 2 并且返回 1，if 判断 true 所以 incrementAndGet 返回 2.这时候线程 B 执行 3，因为 current=1 而当前变量实际值为 2,所以 if 判断为 false，继续循环，如果没有其他线程去自增变量的话，这次线程 B 就会更新变量为 3 然后退出。<br>这里使用了无限循环使用 CAS 进行轮询检查，虽然一定程度浪费了 CPU 资源，但是相比锁来说避免的线程上下文切换和调度。</p>
+<h3 id="ABA-问题"><a href="#ABA-问题" class="headerlink" title="ABA 问题"></a>ABA 问题</h3><p>线程 1 获取当前内存值为：A，其他线程讲内存的值改为 B，后又改为 A。此时内存中的 A 已经不是线程 1 获取的 A，这个问题叫做 ABA 问题。</p>
+<ul>
+<li>1、ABA 问题无影响的可以不做处理</li>
+<li>2、有影响的可以加版本号，每次修改数据都修改版本号，对比值时也对比版本号即可。</li>
+</ul>
+<h3 id="CAS-原理"><a href="#CAS-原理" class="headerlink" title="CAS 原理"></a>CAS 原理</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lock cmpxchg</span><br></pre></td></tr></table></figure>
+<p>CAS 主要是通过 lock cmpxchg 指令实现，单核 CPU 只需要 cmpxchg 指令，多核 CPU 使用 lock 前缀指令。</p>
+<p>学习资料：<br>[1] BrianGoetz, 戈茨， 童云兰。 Java 并发编程实战[M]. 机械工业出版社， 2012.<br>[2] <a target="_blank" rel="noopener" href="http://ifeve.com/%E9%AB%98%E5%B9%B6%E5%8F%91%E7%BC%96%E7%A8%8B%E5%BF%85%E5%A4%87%E5%9F%BA%E7%A1%80/">并发编程网 – ifeve.com  – 高并发编程必备基础</a></p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    
+    <a href="/2020/11/05/202011/五Java并发Synchronized/" class="next">下一篇：（五）Java并发-Synchronized</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

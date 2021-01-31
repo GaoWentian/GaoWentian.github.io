@@ -1,0 +1,206 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java基础之注解 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="注解什么是注解注解也叫Annotation，从JDK5.0开始引入。
+
+Annotation不是程序，但是可以对程序作出解释
+可以被其他程序读取
+
+内置注解@Override定义在java.lang.Override中，此注释只适用于修辞方法，表示一个方法声明打算重写超类中的另一个方法声明。
+123">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java基础之注解"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-01-28T16:25:56.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-01-29
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java基础之注解</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3"><span class="toc-number">1.</span> <span class="toc-text">注解</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E6%B3%A8%E8%A7%A3"><span class="toc-number">1.1.</span> <span class="toc-text">什么是注解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%85%E7%BD%AE%E6%B3%A8%E8%A7%A3"><span class="toc-number">1.2.</span> <span class="toc-text">内置注解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%AE%9A%E4%B9%89%E6%B3%A8%E8%A7%A3"><span class="toc-number">1.3.</span> <span class="toc-text">自定义注解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3%E5%AE%9E%E6%88%98ORM"><span class="toc-number">1.4.</span> <span class="toc-text">注解实战ORM</span></a></li></ol></li></ol>
+    </div>
+    
+    <h3 id="注解"><a href="#注解" class="headerlink" title="注解"></a>注解</h3><h4 id="什么是注解"><a href="#什么是注解" class="headerlink" title="什么是注解"></a>什么是注解</h4><p>注解也叫Annotation，从JDK5.0开始引入。</p>
+<ul>
+<li>Annotation不是程序，但是可以对程序作出解释</li>
+<li>可以被其他程序读取</li>
+</ul>
+<h4 id="内置注解"><a href="#内置注解" class="headerlink" title="内置注解"></a>内置注解</h4><p>@Override<br>定义在java.lang.Override中，此注释只适用于修辞方法，表示一个方法声明打算重写超类中的另一个方法声明。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">   @Override</span><br><span class="line">public String toString ()&#123;</span><br><span class="line">	return &quot;&quot;;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>在阿里巴巴Java开发手册中强制要求所有重写方法必须加@Override，防止重写方法名称写错。<br>@Deprecated<br>定义在java.lang.Deprecated中，此注释可用于修辞方法、属性、类，表示不建议使用这样的元素，通常被遗弃。<br>@SuppressWarnings<br>定义在java.lang.SuppressWarnings中，用来抑制编译时的警告信息。  </p>
+<h4 id="自定义注解"><a href="#自定义注解" class="headerlink" title="自定义注解"></a>自定义注解</h4><p>先了解一下元注解：<br>元注解的作用就是负责注解其他注解。 Java定义了4个标准的meta-annotation类型，它们被用来提供对其它 annotation类型作说明。这些类型和它们所支持的类在java.lang.annotation包中可以找到  </p>
+<ul>
+<li>@Target 用于描述注解的使用范围</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">@Documented</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">@Target(ElementType.ANNOTATION_TYPE)</span><br><span class="line">public @interface Target &#123;</span><br><span class="line">    ElementType[] value();</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;其中ElementType是枚举</span><br><span class="line"></span><br><span class="line">package java.lang.annotation;</span><br><span class="line">public enum ElementType &#123;</span><br><span class="line">    TYPE,  &#x2F;&#x2F;修饰：类、接口、枚举、Annotation类型</span><br><span class="line">    FIELD, &#x2F;&#x2F;用于描述域</span><br><span class="line">    METHOD, &#x2F;&#x2F;用于描述方法</span><br><span class="line">    PARAMETER,  &#x2F;&#x2F;用于描述参数</span><br><span class="line">    CONSTRUCTOR,    &#x2F;&#x2F;用于描述构造器</span><br><span class="line">    LOCAL_VARIABLE, &#x2F;&#x2F;用于描述局部参数</span><br><span class="line">    ANNOTATION_TYPE,    &#x2F;&#x2F;注解A对注解B进行声明，@Target就是用的这个</span><br><span class="line">    PACKAGE,    &#x2F;&#x2F;package包</span><br><span class="line">    &#x2F;&#x2F;java8新增两个注解</span><br><span class="line">    TYPE_PARAMETER,</span><br><span class="line">    TYPE_USE</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<ul>
+<li><p>@Retention 表示需要在什么级别保存该注释信息，用于描述注解的生命周期</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">package java.lang.annotation;</span><br><span class="line"></span><br><span class="line">@Documented</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">@Target(ElementType.ANNOTATION_TYPE)</span><br><span class="line">public @interface Retention &#123;</span><br><span class="line"></span><br><span class="line">    RetentionPolicy value();</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;RetentionPolicy也是枚举</span><br><span class="line">package java.lang.annotation;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public enum RetentionPolicy &#123;</span><br><span class="line">    SOURCE, &#x2F;&#x2F;在源文件中有效（用于编译器和加载器）</span><br><span class="line">    CLASS, &#x2F;&#x2F;在class文件中有效（用于编译器和加载器）</span><br><span class="line">    </span><br><span class="line">    RUNTIME &#x2F;&#x2F;在运行时有效。为Runtime可以被反射机制读取</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>下面的两个不常用：  </p>
+</li>
+<li><p>@Documented 给类方法添加注释</p>
+</li>
+<li><p>@Inherited  修饰某个被标注的类型是被继承的</p>
+<p>1、首先创建一个Annotation,使用@interface自定义注解时，自动继承了java.lang.annotation.Annotation接口</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">package fun.gwt;</span><br><span class="line"></span><br><span class="line">import java.lang.annotation.ElementType;</span><br><span class="line">import java.lang.annotation.Retention;</span><br><span class="line">import java.lang.annotation.RetentionPolicy;</span><br><span class="line">import java.lang.annotation.Target;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"></span><br><span class="line">@Target(value&#x3D;&#123;ElementType.METHOD,ElementType.TYPE&#125;)</span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">public @interface MyAnnotation &#123;</span><br><span class="line">	String value() default &quot;&quot;;</span><br><span class="line">	int id() default 0;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure></li>
+<li><p>注解元素必须要有值。我们定义注解元素时，经常使用空字符串、0作为默认值。也经常使用负数(比如：-1)表示不存在的含义</p>
+</li>
+<li><p>如果只有一个参数成员，一般参数名为value</p>
+</li>
+</ul>
+<h4 id="注解实战ORM"><a href="#注解实战ORM" class="headerlink" title="注解实战ORM"></a>注解实战ORM</h4><p>对象关系映射（英语：(Object Relational Mapping，简称ORM，或O/RM，或O/Rmapping），是一种程序技术，用于实现面向对象编程语言里不同类型系统的数据之间的转换。这里使用注解和反射技术，来实现ORM，将对象转换成SQL语句<br>1、首先创建一个Student对象，如下代码所示，我们需要创建两个注解，第一个注解将Student类转换成sql的表名，第二个注解将属性赋值上长度，类型和名称等属性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">package fun.gwt.annotation;</span><br><span class="line"></span><br><span class="line">class Student &#123;</span><br><span class="line">	int id;</span><br><span class="line">	int age;</span><br><span class="line">	String sName;</span><br><span class="line">	public int getId() &#123;</span><br><span class="line">		return id;</span><br><span class="line">	&#125;</span><br><span class="line">	public void setId(int id) &#123;</span><br><span class="line">		this.id &#x3D; id;</span><br><span class="line">	&#125;</span><br><span class="line">	public int getAge() &#123;</span><br><span class="line">		return age;</span><br><span class="line">	&#125;</span><br><span class="line">	public void setAge(int age) &#123;</span><br><span class="line">		this.age &#x3D; age;</span><br><span class="line">	&#125;</span><br><span class="line">	public String getsName() &#123;</span><br><span class="line">		return sName;</span><br><span class="line">	&#125;</span><br><span class="line">	public void setsName(String sName) &#123;</span><br><span class="line">		this.sName &#x3D; sName;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>2、为对象名注解表名</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">package fun.gwt.annotation;</span><br><span class="line"></span><br><span class="line">import java.lang.annotation.ElementType;</span><br><span class="line">import java.lang.annotation.Retention;</span><br><span class="line">import java.lang.annotation.RetentionPolicy;</span><br><span class="line">import java.lang.annotation.Target;</span><br><span class="line"></span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">@Target(value&#x3D;&#123;ElementType.TYPE&#125;)</span><br><span class="line">public @interface Table &#123;</span><br><span class="line">	&#x2F;&#x2F;如果只有一个参数成员，一般参数名为value</span><br><span class="line">	String value();</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>3、给属性赋值上长度，类型和名称等属性</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">package fun.gwt.annotation;</span><br><span class="line"></span><br><span class="line">import java.lang.annotation.ElementType;</span><br><span class="line">import java.lang.annotation.Retention;</span><br><span class="line">import java.lang.annotation.RetentionPolicy;</span><br><span class="line">import java.lang.annotation.Target;</span><br><span class="line"></span><br><span class="line">@Retention(RetentionPolicy.RUNTIME)</span><br><span class="line">@Target(value&#x3D;&#123;ElementType.FIELD&#125;)</span><br><span class="line">public @interface Field &#123;</span><br><span class="line">	String columnName();</span><br><span class="line">	String type();</span><br><span class="line">	int length();</span><br><span class="line">		</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>4、接下来需要重新修改Student类，将类名和属性名加上注解</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line">package fun.gwt.annotation;</span><br><span class="line"></span><br><span class="line">@Table(&quot;db_student&quot;)</span><br><span class="line">class Student &#123;</span><br><span class="line">	@Field(columnName&#x3D;&quot;id&quot;,type&#x3D;&quot;int&quot;,length&#x3D;10)</span><br><span class="line">	int id;</span><br><span class="line">	@Field(columnName&#x3D;&quot;id&quot;,type&#x3D;&quot;int&quot;,length&#x3D;3)</span><br><span class="line">	int age;</span><br><span class="line">	@Field(columnName&#x3D;&quot;sname&quot;,type&#x3D;&quot;varchar&quot;,length&#x3D;10)</span><br><span class="line">	String sName;</span><br><span class="line">	public int getId() &#123;</span><br><span class="line">		return id;</span><br><span class="line">	&#125;</span><br><span class="line">	public void setId(int id) &#123;</span><br><span class="line">		this.id &#x3D; id;</span><br><span class="line">	&#125;</span><br><span class="line">	public int getAge() &#123;</span><br><span class="line">		return age;</span><br><span class="line">	&#125;</span><br><span class="line">	public void setAge(int age) &#123;</span><br><span class="line">		this.age &#x3D; age;</span><br><span class="line">	&#125;</span><br><span class="line">	public String getsName() &#123;</span><br><span class="line">		return sName;</span><br><span class="line">	&#125;</span><br><span class="line">	public void setsName(String sName) &#123;</span><br><span class="line">		this.sName &#x3D; sName;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>5、使用反射来获取信息</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">package fun.gwt.annotation;</span><br><span class="line"></span><br><span class="line">import java.lang.annotation.Annotation;</span><br><span class="line">import java.lang.reflect.Field;</span><br><span class="line"></span><br><span class="line">public class Test &#123;</span><br><span class="line">	public static void main(String[] args) throws ClassNotFoundException, NoSuchFieldException, SecurityException &#123;</span><br><span class="line">		Class cla &#x3D; Class.forName(&quot;fun.gwt.annotation.Student&quot;);</span><br><span class="line">		&#x2F;&#x2F;获取类的所有有效注解</span><br><span class="line">		Annotation[] annotations &#x3D; cla.getAnnotations();</span><br><span class="line">		for (Annotation a : annotations) &#123;</span><br><span class="line">			System.out.println(a);&#x2F;&#x2F;@fun.gwt.annotation.Table(value&#x3D;db_student)</span><br><span class="line">		&#125;</span><br><span class="line">		&#x2F;&#x2F;获取类的指定注解</span><br><span class="line">		Table t &#x3D; (Table)cla.getAnnotation(Table.class);</span><br><span class="line">		System.out.println(t.value()); &#x2F;&#x2F;db_student</span><br><span class="line">		&#x2F;&#x2F;获取类的属性注解</span><br><span class="line">		Field f &#x3D; cla.getDeclaredField(&quot;sName&quot;);</span><br><span class="line">		GwtField gwtField &#x3D; f.getAnnotation(GwtField.class);</span><br><span class="line">		System.out.println(gwtField.columnName()+&quot;--&quot;+gwtField.type()+&quot;--&quot;+gwtField.length());&#x2F;&#x2F;sname--varchar--10</span><br><span class="line">		&#x2F;&#x2F;接下来就是拼接sql语句</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/01/30/201901/深入理解Java虚拟机内存分代策略及常用参数配置/" class="prev">上一篇：深入理解Java虚拟机--内存分代策略及常用参数配置</a>
+    
+    
+    <a href="/2019/01/28/201901/Java源码分析Object详解/" class="next">下一篇：Java源码分析--Object详解</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

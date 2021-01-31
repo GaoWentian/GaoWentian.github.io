@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java网络编程笔记之多种建立网络连接的方式（三） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="通过构造方法可以通过6个重载构造函数以不同方式连接服务器。并且可以分为两类。
+自动选择IP当本机有多块网卡，或者一个网卡上绑定了多个IP地址，Socket会自动为我们选择一个可用的IP地址。
+public Socket(String host,int port)一个字符串类型的IP或域名以及一个整形">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java网络编程笔记之多种建立网络连接的方式（三）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-08-04T23:53:26.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-08-05
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java网络编程笔记之多种建立网络连接的方式（三）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%BF%87%E6%9E%84%E9%80%A0%E6%96%B9%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">通过构造方法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E9%80%89%E6%8B%A9IP"><span class="toc-number">1.1.</span> <span class="toc-text">自动选择IP</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#public-Socket-String-host-int-port"><span class="toc-number">1.1.1.</span> <span class="toc-text">public Socket(String host,int port)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#public-Socket-InetAddress-inetaddress-int-port"><span class="toc-number">1.1.2.</span> <span class="toc-text">public Socket(InetAddress inetaddress,int port)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#public-Socket-String-inetaddress-int-port-boolean-stream"><span class="toc-number">1.1.3.</span> <span class="toc-text">public Socket(String inetaddress,int port,boolean stream)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#public-Socket-InetAddress-inetaddress-int-port-boolean-flag"><span class="toc-number">1.1.4.</span> <span class="toc-text">public Socket(InetAddress inetaddress,int port, boolean flag)</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E7%BB%91%E5%AE%9AIP"><span class="toc-number">1.2.</span> <span class="toc-text">手动绑定IP</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#public-Socket-String-host-int-port-InetAddress-inetaddress-int-localPort"><span class="toc-number">1.2.1.</span> <span class="toc-text">public Socket(String host ,int port, InetAddress inetaddress,int localPort)</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#public-Socket-InetAddress-inetaddress-int-port-InetAddress-inetaddress1-int-localPort"><span class="toc-number">1.2.2.</span> <span class="toc-text">public Socket(InetAddress  inetaddress,int port, InetAddress inetaddress1,int localPort)</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%BF%87connect%E6%96%B9%E6%B3%95%E8%BF%9E%E6%8E%A5%E6%9C%8D%E5%8A%A1%E5%99%A8"><span class="toc-number">2.</span> <span class="toc-text">通过connect方法连接服务器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#public-void-connect-InetSocketAddress-endpoint-throws-IOException"><span class="toc-number">2.1.</span> <span class="toc-text">public void connect(InetSocketAddress endpoint) throws IOException</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#public-void-connect-InetSocketAddress-endpoint-int-timeout-throws-IOException"><span class="toc-number">2.2.</span> <span class="toc-text">public void connect(InetSocketAddress endpoint,int timeout) throws IOException</span></a></li></ol></li></ol>
+    </div>
+    
+    <h3 id="通过构造方法"><a href="#通过构造方法" class="headerlink" title="通过构造方法"></a>通过构造方法</h3><p>可以通过6个重载构造函数以不同方式连接服务器。并且可以分为两类。</p>
+<h4 id="自动选择IP"><a href="#自动选择IP" class="headerlink" title="自动选择IP"></a>自动选择IP</h4><p>当本机有多块网卡，或者一个网卡上绑定了多个IP地址，Socket会自动为我们选择一个可用的IP地址。</p>
+<h5 id="public-Socket-String-host-int-port"><a href="#public-Socket-String-host-int-port" class="headerlink" title="public Socket(String host,int port)"></a>public Socket(String host,int port)</h5><p>一个字符串类型的IP或域名以及一个整形的端口号。</p>
+<h5 id="public-Socket-InetAddress-inetaddress-int-port"><a href="#public-Socket-InetAddress-inetaddress-int-port" class="headerlink" title="public Socket(InetAddress inetaddress,int port)"></a>public Socket(InetAddress inetaddress,int port)</h5><p>和第一种类似，将字符串类型的host改为InetAddress对象类型。使用InetAddress主要是考虑在程序中可能需要使用Socket类多次连接同一个IP或域名，这样使用InetAddress的效率比较高。</p>
+<h5 id="public-Socket-String-inetaddress-int-port-boolean-stream"><a href="#public-Socket-String-inetaddress-int-port-boolean-stream" class="headerlink" title="public Socket(String inetaddress,int port,boolean stream)"></a>public Socket(String inetaddress,int port,boolean stream)</h5><p>这个方法和第一个差不多，多了一个boolean类型的stream参数。如果这个stream参数为true，那这个构造方法和第一种构造方法完全一样。如果stream为false，则使用UDP协议建议一个UDP连接。后来在JDK中加入了DatagramSocket类，所以说这个类很少用。</p>
+<h5 id="public-Socket-InetAddress-inetaddress-int-port-boolean-flag"><a href="#public-Socket-InetAddress-inetaddress-int-port-boolean-flag" class="headerlink" title="public Socket(InetAddress inetaddress,int port, boolean flag)"></a>public Socket(InetAddress inetaddress,int port, boolean flag)</h5><p>这个构造方法和第三种构造方法的的flag标记的含义一样，不建议使用</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.InetAddress;</span><br><span class="line">import java.net.Socket;</span><br><span class="line">import java.net.UnknownHostException;</span><br><span class="line"></span><br><span class="line">public class createSocket &#123;</span><br><span class="line">	private static void closeSocket(Socket socket)&#123;</span><br><span class="line">		if(socket !&#x3D; null)&#123;</span><br><span class="line">			try &#123;</span><br><span class="line">				socket.close();</span><br><span class="line">			&#125; catch (IOException e) &#123;</span><br><span class="line">				&#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">				e.printStackTrace();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	public static void main(String[] args) throws UnknownHostException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		Socket socket1 &#x3D; null,socket2 &#x3D; null,socket3 &#x3D; null,socket4 &#x3D; null;</span><br><span class="line">		</span><br><span class="line">		try &#123;</span><br><span class="line">			socket1 &#x3D; new Socket(&quot;www.xxxx.com&quot;, 80);</span><br><span class="line">			System.out.println(&quot;socket1 连接成功！&quot;);</span><br><span class="line">			</span><br><span class="line">			</span><br><span class="line">			socket2 &#x3D; new Socket(InetAddress.getByName(&quot;www.xxxx.com&quot;), 80);</span><br><span class="line">			System.out.println(&quot;socket2 连接成功！&quot;);</span><br><span class="line">			</span><br><span class="line">			socket3 &#x3D; new Socket(&quot;www.xxxx.com&quot;, 80,false);</span><br><span class="line">			System.out.println(&quot;socket3 连接成功！&quot;);</span><br><span class="line">			</span><br><span class="line">			socket4 &#x3D; new Socket(InetAddress.getByName(&quot;www.xxxx.com&quot;), 80,false);</span><br><span class="line">			System.out.println(&quot;socket4 连接成功！&quot;);</span><br><span class="line">			</span><br><span class="line">		&#125; catch (IOException e) &#123;</span><br><span class="line">			&#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;finally&#123;</span><br><span class="line">			closeSocket(socket1);</span><br><span class="line">			closeSocket(socket2);</span><br><span class="line">			closeSocket(socket3);</span><br><span class="line">			closeSocket(socket4);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="手动绑定IP"><a href="#手动绑定IP" class="headerlink" title="手动绑定IP"></a>手动绑定IP</h4><p>当本机有多个IP时，在连接服务器时需要由客户端确定需要使用哪个IP。</p>
+<h5 id="public-Socket-String-host-int-port-InetAddress-inetaddress-int-localPort"><a href="#public-Socket-String-host-int-port-InetAddress-inetaddress-int-localPort" class="headerlink" title="public Socket(String host ,int port, InetAddress inetaddress,int localPort)"></a>public Socket(String host ,int port, InetAddress inetaddress,int localPort)</h5><p>这个构造方法参数分为两部分，第一部分分为前两个参数：host和port，分别表示要连接的服务器的IP和端口号。第二部分分为后两个参数：inetaddress和localPort，其中inetaddress表示要使用的本机IP地址，而localPort表示要绑定本地端口号。localPort可以设置为本机任何未被绑定的端口号，如果localPort设置为0，java将在1024到65536<br>之间随机一个未被绑定的端口号。</p>
+<h5 id="public-Socket-InetAddress-inetaddress-int-port-InetAddress-inetaddress1-int-localPort"><a href="#public-Socket-InetAddress-inetaddress-int-port-InetAddress-inetaddress1-int-localPort" class="headerlink" title="public Socket(InetAddress  inetaddress,int port, InetAddress inetaddress1,int localPort)"></a>public Socket(InetAddress  inetaddress,int port, InetAddress inetaddress1,int localPort)</h5><p>这个构造方法和第一个基本相同，只不过第一个参数换成了inetaddress。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">我电脑只有一个ip，我就不写代码了。。。</span><br></pre></td></tr></table></figure>
+<h3 id="通过connect方法连接服务器"><a href="#通过connect方法连接服务器" class="headerlink" title="通过connect方法连接服务器"></a>通过connect方法连接服务器</h3><p>Socket不仅可以通过构造方法直接连接服务器，还能建立Socket对象，通过connect方法连接服务器。Socket类的connect方法有两个重载方式：</p>
+<h4 id="public-void-connect-InetSocketAddress-endpoint-throws-IOException"><a href="#public-void-connect-InetSocketAddress-endpoint-throws-IOException" class="headerlink" title="public void connect(InetSocketAddress endpoint) throws IOException"></a>public void connect(InetSocketAddress endpoint) throws IOException</h4><p>Socket类的connect方法与其构造方法描述服务器信息有一些差异。connect直接将IP和端口封装在了SocketAddress类的子类InetSocketAddress中</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">Socket socket &#x3D; new Socket();</span><br><span class="line">socket.connect(new InetSocketAddress(host , port));</span><br></pre></td></tr></table></figure>
+<h4 id="public-void-connect-InetSocketAddress-endpoint-int-timeout-throws-IOException"><a href="#public-void-connect-InetSocketAddress-endpoint-int-timeout-throws-IOException" class="headerlink" title="public void connect(InetSocketAddress endpoint,int timeout) throws IOException"></a>public void connect(InetSocketAddress endpoint,int timeout) throws IOException</h4><p>这个和上一个相比，多了一个timeout参数。这个参数表示连接的超时时间，单位是毫秒。如果设置为0，则使用默认的超时时间。<br>connect方法可以通过Socket的bind方法来绑定本地IP</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.InetSocketAddress;</span><br><span class="line">import java.net.Socket;</span><br><span class="line"></span><br><span class="line">public class socket_connect &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		</span><br><span class="line">		try &#123;</span><br><span class="line">			Socket socket1 &#x3D; new Socket();</span><br><span class="line">			Socket socket2 &#x3D; new Socket();</span><br><span class="line">			Socket socket3 &#x3D; new Socket();</span><br><span class="line">			socket1.connect(new InetSocketAddress(&quot;www.supeixun.com&quot;,80));</span><br><span class="line">			socket1.close();</span><br><span class="line">			System.out.println(&quot;socket1连接成功！&quot;);</span><br><span class="line">			</span><br><span class="line">			socket2.bind(new InetSocketAddress(&quot;200.200.200.200&quot;, 0));</span><br><span class="line">			socket2.connect(new InetSocketAddress(&quot;200.200.200.4&quot;, 80));</span><br><span class="line">			socket2.close();</span><br><span class="line">			System.out.println(&quot;socket2连接成功！&quot;);</span><br><span class="line">			</span><br><span class="line">			socket3.bind(new InetSocketAddress(&quot;192.168.18.252&quot;, 0));</span><br><span class="line">			socket3.connect(new InetSocketAddress(&quot;200.200.200.4&quot;, 80),2000);</span><br><span class="line">			socket3.close();</span><br><span class="line">			System.out.println(&quot;socket3连接成功！&quot;);			</span><br><span class="line"></span><br><span class="line">		&#125; catch (IOException e) &#123;</span><br><span class="line">			&#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">			System.out.println(e.getMessage());</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/08/06/201708/Java网络编程笔记之使用SocketAddress管理网络地址四/" class="prev">上一篇：Java网络编程笔记之使用SocketAddress管理网络地址（四）</a>
+    
+    
+    <a href="/2017/08/04/201708/伸展树学习笔记/" class="next">下一篇：伸展树学习笔记</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

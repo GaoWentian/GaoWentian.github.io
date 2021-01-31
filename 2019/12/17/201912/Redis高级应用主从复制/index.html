@@ -1,0 +1,431 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Redis高级应用--主从复制 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介高并发互联网架构追求高并发，高性能和高可用。其中高并发指允许大量用户同时访问，高可用指服务器宕机时间少。业界高可用目标为5个9，即可用性达到99.999%，也就是说服务器年宕机时长低于315秒，计算公式为：（31536000-宕机时间）/ 31536000 * 100%   （31536000 ">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Redis高级应用--主从复制"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-12-17T15:17:24.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-12-17
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Redis高级应用--主从复制</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%AB%98%E5%B9%B6%E5%8F%91"><span class="toc-number">1.1.</span> <span class="toc-text">高并发</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E4%BD%9C%E7%94%A8"><span class="toc-number">1.2.</span> <span class="toc-text">主从复制作用</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BB%E4%BB%8E%E5%A4%8D%E5%88%B6%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">主从复制工作流程</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E7%AB%8B%E8%BF%9E%E6%8E%A5%E9%98%B6%E6%AE%B5%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-number">3.</span> <span class="toc-text">建立连接阶段工作流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E4%BB%8E%E8%BF%9E%E6%8E%A5%E6%8C%87%E4%BB%A4%EF%BC%88slave%E4%BD%BF%E7%94%A8%EF%BC%89"><span class="toc-number">3.1.</span> <span class="toc-text">主从连接指令（slave使用）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%B8%BB%E4%BB%8E%E6%96%AD%E5%BC%80%E8%BF%9E%E6%8E%A5%EF%BC%88slave%E4%BD%BF%E7%94%A8%EF%BC%89"><span class="toc-number">3.2.</span> <span class="toc-text">主从断开连接（slave使用）</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E9%98%B6%E6%AE%B5%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-number">4.</span> <span class="toc-text">数据同步阶段工作流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%83%A8%E5%88%86%E5%A4%8D%E5%88%B6%E9%98%B6%E6%AE%B5"><span class="toc-number">4.1.</span> <span class="toc-text">部分复制阶段</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%9C%8D%E5%8A%A1%E5%99%A8%E8%BF%90%E8%A1%8Cid"><span class="toc-number">4.1.1.</span> <span class="toc-text">服务器运行id</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%A4%8D%E5%88%B6%E7%BC%93%E5%86%B2%E5%8C%BA"><span class="toc-number">4.1.2.</span> <span class="toc-text">复制缓冲区</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E5%81%8F%E7%A7%BB%E9%87%8F"><span class="toc-number">4.1.3.</span> <span class="toc-text">偏移量</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E4%BC%A0%E6%92%AD%E9%98%B6%E6%AE%B5%E5%B7%A5%E4%BD%9C%E6%B5%81%E7%A8%8B"><span class="toc-number">5.</span> <span class="toc-text">命令传播阶段工作流程</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BF%83%E8%B7%B3%E6%9C%BA%E5%88%B6"><span class="toc-number">5.1.</span> <span class="toc-text">心跳机制</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%91%BD%E4%BB%A4%E4%BC%A0%E6%92%AD"><span class="toc-number">5.2.</span> <span class="toc-text">命令传播</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B0%E6%8D%AE%E5%90%8C%E6%AD%A5%E8%AF%B4%E6%98%8E"><span class="toc-number">6.</span> <span class="toc-text">数据同步说明</span></a></li></ol>
+    </div>
+    
+    <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><h4 id="高并发"><a href="#高并发" class="headerlink" title="高并发"></a>高并发</h4><p>互联网架构追求高并发，高性能和高可用。其中高并发指允许大量用户同时访问，高可用指服务器宕机时间少。业界高可用目标为5个9，即可用性达到99.999%，也就是说服务器年宕机时长低于315秒，计算公式为：（31536000-宕机时间）/ 31536000 * 100%   （31536000 = 365 * 24* 60 * 60=1年）</p>
+<h4 id="主从复制作用"><a href="#主从复制作用" class="headerlink" title="主从复制作用"></a>主从复制作用</h4><p>1、读写分离：master写，slave读，提高服务器的读写负载能力<br>2、负载均衡：基于主从结构，配合读写分离，由slave分担master负载，并根据需求的变化，改变slave的数量，通过多个从节点分担数据读取负载，由slave提供服务，实现快速的故障恢复<br>3、故障恢复：当master出现问题时，由slave提供服务，实现快速的故障恢复<br>4、数据冗余：实现数据热备份，是持久化之外的一种数据冗余方式<br>5、高可用基石：基于主从复制，构建哨兵模式与集群，实现Redis的高可用方案    </p>
+<h3 id="主从复制工作流程"><a href="#主从复制工作流程" class="headerlink" title="主从复制工作流程"></a>主从复制工作流程</h3><p>主从复制可分为三个阶段：</p>
+<ul>
+<li>建立连接阶段</li>
+<li>数据同步阶段</li>
+<li>命令传播阶段</li>
+</ul>
+<h3 id="建立连接阶段工作流程"><a href="#建立连接阶段工作流程" class="headerlink" title="建立连接阶段工作流程"></a>建立连接阶段工作流程</h3><table>
+<thead>
+<tr>
+<th>master</th>
+<th>slave</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/</td>
+<td>1、发送指令：slaveof ip port</td>
+</tr>
+<tr>
+<td>2、接收指令，响应slave</td>
+<td>/</td>
+</tr>
+<tr>
+<td>/</td>
+<td>3、保存master 的ip和端口</td>
+</tr>
+<tr>
+<td>/</td>
+<td>4、根据保存的信息创建连接master的socket</td>
+</tr>
+<tr>
+<td>/</td>
+<td>5、周期性发送命令：ping</td>
+</tr>
+<tr>
+<td>6、响应pong</td>
+<td>/</td>
+</tr>
+<tr>
+<td>/</td>
+<td>7、发送指令：auth password</td>
+</tr>
+<tr>
+<td>8、验证授权</td>
+<td>/</td>
+</tr>
+<tr>
+<td>/</td>
+<td>9、发送指令：replconflistening-port <port-number></td>
+</tr>
+<tr>
+<td>10、保存slave的端口号</td>
+<td>/</td>
+</tr>
+</tbody></table>
+<h4 id="主从连接指令（slave使用）"><a href="#主从连接指令（slave使用）" class="headerlink" title="主从连接指令（slave使用）"></a>主从连接指令（slave使用）</h4><p>方式一：客户端发送命令</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slaveof &lt;masterip&gt; &lt;masterport&gt;</span><br></pre></td></tr></table></figure>
+<p>方式二：启动slave服务器时加参数</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-server -slaveof  &lt;masterip&gt; &lt;masterport&gt;</span><br></pre></td></tr></table></figure>
+<p>方式三：服务器配置(保存在conf文件中)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slaveof &lt;masterip&gt; &lt;masterport&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="主从断开连接（slave使用）"><a href="#主从断开连接（slave使用）" class="headerlink" title="主从断开连接（slave使用）"></a>主从断开连接（slave使用）</h4><p>slave客户端发送命令：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slaveof no one</span><br></pre></td></tr></table></figure>
+<h3 id="数据同步阶段工作流程"><a href="#数据同步阶段工作流程" class="headerlink" title="数据同步阶段工作流程"></a>数据同步阶段工作流程</h3><table>
+<thead>
+<tr>
+<th>master</th>
+<th>slave</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/</td>
+<td>1、发送指令：psync2</td>
+</tr>
+<tr>
+<td>2、执行bgsave</td>
+<td>/</td>
+</tr>
+<tr>
+<td>3、第一个slave连接时，创建复制缓冲区（复制缓存区中保存生成RDB文件时master服务器执行的命令）</td>
+<td>/</td>
+</tr>
+<tr>
+<td>4、生成RDB文件，通过socket发送给slave</td>
+<td>/</td>
+</tr>
+<tr>
+<td>/</td>
+<td>5、接收RDB文件，清空数据，执行RDB文件恢复过程</td>
+</tr>
+<tr>
+<td>/</td>
+<td>6、发送命令告知RDB恢复已经完成</td>
+</tr>
+<tr>
+<td>7、发送复制缓冲区数据</td>
+<td>/</td>
+</tr>
+<tr>
+<td>/</td>
+<td>8、接收信息，执行bgrewriteaof,恢复数据</td>
+</tr>
+</tbody></table>
+<p>数据同步阶段，1-5称为全量复制，使用RDB方式同步；6-8称为部分复制，使用AOF方式同步。这是因为全量复制时，还会有master服务器还会执行指令，因此需要保存这些指令，待全量复制后，同步这一部分数据。</p>
+<h4 id="部分复制阶段"><a href="#部分复制阶段" class="headerlink" title="部分复制阶段"></a>部分复制阶段</h4><p>短时间断网，可以使用部分复制来实现同步，而不必全量复制。使用部分数据需要三个要素：</p>
+<ul>
+<li>服务器运行id（run id）；</li>
+<li>主服务器的复制积压缓冲区</li>
+<li>主从服务器的复制偏移量</li>
+</ul>
+<h5 id="服务器运行id"><a href="#服务器运行id" class="headerlink" title="服务器运行id"></a>服务器运行id</h5><ul>
+<li>服务器运行id是每台服务器运行时的身份识别码，一台服务器运行多次可以生成多个运行id</li>
+<li>运行id由40位字符组成，是随机十六进制字符</li>
+<li>用于服务器之间传输，识别身份</li>
+</ul>
+<h5 id="复制缓冲区"><a href="#复制缓冲区" class="headerlink" title="复制缓冲区"></a>复制缓冲区</h5><ul>
+<li>复制缓冲区又叫复制积压缓冲区，是一个先进先出的队列，用于存储服务器执行过的命令，每次传播命令，master将命令记下来，存储在复制缓冲区。例如下面命令：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">set name gavin</span><br></pre></td></tr></table></figure>
+保存为AOF格式为：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">$3 \r\n  #3表示指令的大小</span><br><span class="line">set \r\n</span><br><span class="line">$4 \r\n</span><br><span class="line">name \r\n</span><br><span class="line">$5 \r\n</span><br><span class="line">gavin \r\n</span><br></pre></td></tr></table></figure>
+然后将上面的数据保存在复制缓冲区中，复制缓冲区由偏移量和字节值组成,字节值表示上面指令，偏移量表示每个字节值代表的递增编号：</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>偏移量</th>
+<th>9041</th>
+<th>9042</th>
+<th>9043</th>
+<th>9044</th>
+<th>9045</th>
+<th>9046</th>
+<th>9047</th>
+<th>9048</th>
+<th>9049</th>
+<th>9050</th>
+<th>9051</th>
+<th>9052</th>
+<th>9053</th>
+<th>9054</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>字节值</td>
+<td>…</td>
+<td>$</td>
+<td>3</td>
+<td>\r</td>
+<td>\n</td>
+<td>s</td>
+<td>e</td>
+<td>t</td>
+<td>\r</td>
+<td>\n</td>
+<td>$</td>
+<td>4</td>
+<td>\r</td>
+<td>…</td>
+</tr>
+</tbody></table>
+<h5 id="偏移量"><a href="#偏移量" class="headerlink" title="偏移量"></a>偏移量</h5><ul>
+<li>偏移量是一个数字，描述缓冲区中指令字节位置</li>
+<li>master端每发送一次指令记录一次，slave端接收一次指令记录一次</li>
+<li>slave断线后对比master和slave的差异，然后恢复数据</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>master</th>
+<th>slave</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>/</td>
+<td>1、发送指令： psync2 runid offset</td>
+</tr>
+<tr>
+<td>2、执行bgsave生成RDB文件，记录当前复制偏移量offset</td>
+<td>/</td>
+</tr>
+<tr>
+<td>3、发送+FULLRESYNC runid offset 发送RDB文件给slave</td>
+<td>/</td>
+</tr>
+<tr>
+<td>/</td>
+<td>4、收到+FULLRESYNC 保存master的runid和offset，清空全部数据，接收RDB文件，恢复RDB数据</td>
+</tr>
+<tr>
+<td>/</td>
+<td>5、发送命令：psync2 runid offset</td>
+</tr>
+<tr>
+<td>6、接收命令，判断runid是否匹配，判断offset是否在复制缓冲区中</td>
+<td>/</td>
+</tr>
+<tr>
+<td>7、如果runid或offset有一个不满足，执行全量复制</td>
+<td>/</td>
+</tr>
+<tr>
+<td>7、如果runid或offset校验通过，offset与offset相同，忽略，不用执行同步</td>
+<td>/</td>
+</tr>
+<tr>
+<td>7、如果runid或offset校验通过，offset与offset不同，发送+ CONTINUE offset ，发送复制缓冲区中两个offset之间的数据</td>
+<td>/</td>
+</tr>
+<tr>
+<td>/</td>
+<td>8、收到+CONTINUE 保存master的offset接收 信息后，执行bgrewriteaof，恢复数据</td>
+</tr>
+</tbody></table>
+<h3 id="命令传播阶段工作流程"><a href="#命令传播阶段工作流程" class="headerlink" title="命令传播阶段工作流程"></a>命令传播阶段工作流程</h3><h4 id="心跳机制"><a href="#心跳机制" class="headerlink" title="心跳机制"></a>心跳机制</h4><ul>
+<li>master心跳：<ul>
+<li>指令：PING</li>
+<li>周期：由repl-ping-slave-period决定，默认10秒</li>
+<li>作用：判断slave是否在线</li>
+<li>查询：INFO replication (获取slave最后一次连接时间间隔，lag维持在0或者1视为正常)</li>
+</ul>
+</li>
+<li>slave心跳<ul>
+<li>指令：REPLCONF ACK {offset}</li>
+<li>周期：1秒</li>
+<li>作用：汇报slave自己的复制偏移量，获取追星数据变更指令，判断master是否在线</li>
+</ul>
+</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">min-slaves-to-write 2  </span><br><span class="line">min-slaves-max-lag 8</span><br></pre></td></tr></table></figure>
+<p>slave数量少于2个，或者所有slave的延迟都大于等于8时，此时master只能读，不能写，同时关闭数据同步功能。</p>
+<h4 id="命令传播"><a href="#命令传播" class="headerlink" title="命令传播"></a>命令传播</h4><table>
+<thead>
+<tr>
+<th>master</th>
+<th>slave</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>1、发送命令：ping</td>
+<td>1、发送命令：replconf ack offset</td>
+</tr>
+<tr>
+<td>2、接收命令，判断offset是否在复制缓冲区中</td>
+<td>/</td>
+</tr>
+<tr>
+<td>3、offset不在缓冲区，执行全量复制</td>
+<td>/</td>
+</tr>
+<tr>
+<td>3、如果offset在缓冲区，master的offset与slave的offset相同，忽略，不用执行同步</td>
+<td>/</td>
+</tr>
+<tr>
+<td>3、如果offset在缓冲区，master的offset与slave的offset不同，发送+ CONTINUE offset ，发送复制缓冲区中两个offset之间的数据</td>
+<td>/</td>
+</tr>
+<tr>
+<td>/</td>
+<td>4、收到+CONTINUE 保存master的offset接收 信息后，执行bgrewriteaof，恢复数据</td>
+</tr>
+</tbody></table>
+<h3 id="数据同步说明"><a href="#数据同步说明" class="headerlink" title="数据同步说明"></a>数据同步说明</h3><p>1、复制缓冲区大小设定不合理，会导致数据溢出。如进行全量复制周期太长，进行部分复制时发现数据已经存在丢失情况，必须进行第二次全量复制，导致slave陷入死循环，因此可以设置复制缓冲区大小：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">repl-backlog-size 1mb</span><br></pre></td></tr></table></figure>
+<p>2、master单机内存占用主机内存比例不应过大，建议使用50%<del>70%的内存，留下30%</del>50%的内存用于执行bgsave命令和创建复制缓冲区。<br>3、为避免slave进行全量复制、部分复制时服务器响应阻塞或数据不同步，建议关闭此期间的对外服务</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">slave-serve-stale-data yes|no</span><br></pre></td></tr></table></figure>
+
+
+
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/12/25/201912/Redis高级应用对象的实现原理/" class="prev">上一篇：Redis高级应用--对象的实现原理</a>
+    
+    
+    <a href="/2019/12/12/201912/Redis高级应用事务和分布式锁/" class="next">下一篇：Redis高级应用--事务和分布式锁</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

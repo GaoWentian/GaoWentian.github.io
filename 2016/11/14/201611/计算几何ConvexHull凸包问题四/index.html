@@ -1,0 +1,171 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>【计算几何】Convex Hull凸包问题（四） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="Graham 栈扫描算法这个算法很简单，只用简单的数据结构–栈算法可以分为两步，第一步是先对所有点排序，然后依次加入新的点得到新的边。如果和上一条边是左转关系就压栈处理，如果是右转关系就弹出栈，直到形成右转关系。
+
+首先是排序，先选择Y最小的那个点，如果Y最小的点有多个，就选最靠左的那个点。选好第一">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="【计算几何】Convex Hull凸包问题（四）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2016-11-14T10:59:46.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2016-11-14
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">【计算几何】Convex Hull凸包问题（四）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <p>Graham 栈扫描算法<br>这个算法很简单，只用简单的数据结构–栈<br>算法可以分为两步，第一步是先对所有点排序，然后依次加入新的点得到新的边。如果和上一条边是左转关系就压栈处理，如果是右转关系就弹出栈，直到形成右转关系。</p>
+<p><img src="/img/blog/2350612-ab917a91dfd31a43.png" alt="Alt text"></p>
+<p>首先是排序，先选择Y最小的那个点，如果Y最小的点有多个，就选最靠左的那个点。<br>选好第一个点，就开始对所有点进行排序，逆时针开始，按照角度的大小进行排序，角度小的在前，角度大的在后面。对所有点进行排序完就得到上面的图。<br>排序完，按照下图规则，开始判断。连接1、2点，并在T栈中取出3，如果23线和12线相比是左转关系，就把3压入栈S中。</p>
+<p><img src="/img/blog/2350612-07595128a7e14ff5.png" alt="Alt text"></p>
+<p>下图中34线和23线相比还是左转关系，继续将4压入栈S</p>
+<p><img src="/img/blog/2350612-31c3c2c4367ea893.png" alt="Alt text"></p>
+<p>按照这种规则，继续下去<br>如果遇到右转，我们就把前一个S栈中的值取出来，再继续判断，直到左转为止。</p>
+<p><img src="/img/blog/2350612-cecc648521a4ec7c.png" alt="Alt text"></p>
+<p>其代码可使用:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">while T !&#x3D; null:</span><br><span class="line">    if toLeft(S[1],S[0],T[0]):</span><br><span class="line">        S.push(T.pop[])</span><br><span class="line">    else:</span><br><span class="line">        S.pop()</span><br></pre></td></tr></table></figure>
+<p>该算法时间复杂度是O(nlogn)</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2016/12/03/201612/Redis高级应用应用场景学习笔记/" class="prev">上一篇：Redis高级应用--应用场景学习笔记</a>
+    
+    
+    <a href="/2016/11/14/201611/计算几何ConvexHull凸包问题三/" class="next">下一篇：【计算几何】Convex Hull凸包问题（三）</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

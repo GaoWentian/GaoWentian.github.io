@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java并发学习--线程间数据交换Exchanger | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="Exchanger用于进行线程间的数据交换，允许原子性的交换两个（多个）对象，但同时只有一对才会成功。
+1234567891011121314151617181920212223242526272829303132333435363738394041424344import java.util.co">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java并发学习--线程间数据交换Exchanger"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-11-27T20:35:56.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-28
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java并发学习--线程间数据交换Exchanger</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <p>Exchanger用于进行线程间的数据交换，允许原子性的交换两个（多个）对象，但同时只有一对才会成功。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br></pre></td><td class="code"><pre><span class="line">import java.util.concurrent.Exchanger;</span><br><span class="line">import java.util.concurrent.ExecutorService;</span><br><span class="line">import java.util.concurrent.Executors;</span><br><span class="line"></span><br><span class="line">public class ExchangerTest &#123;</span><br><span class="line"></span><br><span class="line">	private static final Exchanger&lt;String&gt; exgr &#x3D; new Exchanger&lt;String&gt;();</span><br><span class="line"></span><br><span class="line">	private static ExecutorService threadPool &#x3D; Executors.newFixedThreadPool(2);</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line"></span><br><span class="line">		threadPool.execute(new Runnable() &#123;</span><br><span class="line">			@Override</span><br><span class="line">			public void run() &#123;</span><br><span class="line">				try &#123;</span><br><span class="line">					String A &#x3D; &quot;银行流水A&quot;;&#x2F;&#x2F; A录入银行流水数据</span><br><span class="line">					String B &#x3D; exgr.exchange(A);</span><br><span class="line">					System.out.println(Thread.currentThread().getName()+&quot;接收到的B的值是&quot;+B);</span><br><span class="line">				&#125; catch (InterruptedException e) &#123;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;);</span><br><span class="line"></span><br><span class="line">		threadPool.execute(new Runnable() &#123;</span><br><span class="line">			@Override</span><br><span class="line">			public void run() &#123;</span><br><span class="line">				try &#123;</span><br><span class="line">					String B &#x3D; &quot;银行流水B&quot;;&#x2F;&#x2F; B录入银行流水数据</span><br><span class="line">					String A &#x3D; exgr.exchange(B);</span><br><span class="line">					System.out.println(Thread.currentThread().getName()+&quot;接收到的A的值是&quot;+A);</span><br><span class="line">				&#125; catch (InterruptedException e) &#123;</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;);</span><br><span class="line"></span><br><span class="line">		threadPool.shutdown();</span><br><span class="line"></span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;*</span><br><span class="line">pool-1-thread-1接收到的B的值是银行流水B</span><br><span class="line">pool-1-thread-2接收到的A的值是银行流水A</span><br><span class="line">*&#x2F;</span><br></pre></td></tr></table></figure>
+<p>学习资料：<br>[1] BrianGoetz, 戈茨, 童云兰. Java并发编程实战[M]. 机械工业出版社, 2012.<br>[2] <a target="_blank" rel="noopener" href="http://ifeve.com/concurrency-exchanger/">并发工具类（四）两个线程进行数据交换的Exchanger</a></p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/11/30/201711/Java并发学习CopyOnWrite容器/" class="prev">上一篇：Java并发学习--Copy-On-Write容器</a>
+    
+    
+    <a href="/2017/11/26/201711/Java并发学习同步屏障CyclicBarrier/" class="next">下一篇：Java并发学习--同步屏障CyclicBarrier</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

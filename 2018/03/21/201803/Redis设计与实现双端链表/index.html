@@ -1,0 +1,293 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>《Redis设计与实现》：双端链表 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介链表在Redis中应用广泛，比如列表键的底层实现之一就是链表。当列表键包含了比较多元素，或者列表中包含的元素都是比较长的字符串时，Redis就会使用链表作为列表键的底层实现。（其余情况使用ziplist压缩列表）
+链表实现每个链表的节点使用adlist.h中的listNode来表示：
+12345">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="《Redis设计与实现》：双端链表"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2018-03-20T23:30:14.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2018-03-21
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">《Redis设计与实现》：双端链表</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%93%BE%E8%A1%A8%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">链表实现</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%93%BE%E8%A1%A8API"><span class="toc-number">3.</span> <span class="toc-text">链表API</span></a></li></ol>
+    </div>
+    
+    <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>链表在Redis中应用广泛，比如列表键的底层实现之一就是链表。当列表键包含了比较多元素，或者列表中包含的元素都是比较长的字符串时，Redis就会使用链表作为列表键的底层实现。（其余情况使用ziplist压缩列表）</p>
+<h3 id="链表实现"><a href="#链表实现" class="headerlink" title="链表实现"></a>链表实现</h3><p>每个链表的节点使用adlist.h中的listNode来表示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;*</span><br><span class="line"> * 双端链表节点</span><br><span class="line"> *&#x2F;</span><br><span class="line">typedef struct listNode &#123;</span><br><span class="line">    &#x2F;&#x2F; 前置节点</span><br><span class="line">    struct listNode *prev;</span><br><span class="line">    &#x2F;&#x2F; 后置节点</span><br><span class="line">    struct listNode *next;</span><br><span class="line">    &#x2F;&#x2F; 节点的值</span><br><span class="line">    void *value;</span><br><span class="line">&#125; listNode;</span><br></pre></td></tr></table></figure>
+<p>使用adlist.h中的list持有整个链表：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;*</span><br><span class="line"> * 双端链表结构</span><br><span class="line"> *&#x2F;</span><br><span class="line">typedef struct list &#123;</span><br><span class="line">    &#x2F;&#x2F; 表头节点</span><br><span class="line">    listNode *head;</span><br><span class="line">    &#x2F;&#x2F; 表尾节点</span><br><span class="line">    listNode *tail;</span><br><span class="line">    &#x2F;&#x2F; 节点值复制函数，用于复制链表节点所保存的值</span><br><span class="line">    void *(*dup)(void *ptr);</span><br><span class="line">    &#x2F;&#x2F; 节点值释放函数，用于释放链表节点所保存的值</span><br><span class="line">    void (*free)(void *ptr);</span><br><span class="line">    &#x2F;&#x2F; 节点值对比函数，用于对比链表节点所保存的值与另一个输入值是否相等</span><br><span class="line">    int (*match)(void *ptr, void *key);</span><br><span class="line">    &#x2F;&#x2F; 链表所包含的节点数量</span><br><span class="line">    unsigned long len;</span><br><span class="line">&#125; list;</span><br></pre></td></tr></table></figure>
+<ul>
+<li>表头节点prev和表尾节点next都指向NULL，对链表的访问以NULL为终点。<br><img src="/img/blog/2350612-817580c736cc2471.png" alt="image.png"></li>
+</ul>
+<h3 id="链表API"><a href="#链表API" class="headerlink" title="链表API"></a>链表API</h3><table>
+<thead>
+<tr>
+<th align="center">函数</th>
+<th align="center">作用</th>
+<th align="center">时间复杂度</th>
+</tr>
+</thead>
+<tbody><tr>
+<td align="center">listSetDupMethod</td>
+<td align="center">将给定的函数设置为链表的节点值复制函数。</td>
+<td align="center">O(1)</td>
+</tr>
+<tr>
+<td align="center">listGetDupMethod</td>
+<td align="center">返回链表当前正在使用的节点值复制函数。</td>
+<td align="center">复制函数可以通过链表的 dup 属性直接获得，  O(1)</td>
+</tr>
+<tr>
+<td align="center">listSetFreeMethod</td>
+<td align="center">将给定的函数设置为链表的节点值释放函数。</td>
+<td align="center">O(1)</td>
+</tr>
+<tr>
+<td align="center">listGetFree</td>
+<td align="center">返回链表当前正在使用的节点值释放函数。</td>
+<td align="center">释放函数可以通过链表的 free 属性直接获得， O(1)</td>
+</tr>
+<tr>
+<td align="center">listSetMatchMethod</td>
+<td align="center">将给定的函数设置为链表的节点值对比函数。</td>
+<td align="center">O(1)</td>
+</tr>
+<tr>
+<td align="center">listGetMatchMethod</td>
+<td align="center">返回链表当前正在使用的节点值对比函数。</td>
+<td align="center">对比函数可以通过链表的 match 属性直接获得， O(1)</td>
+</tr>
+<tr>
+<td align="center">listLength</td>
+<td align="center">返回链表的长度（包含了多少个节点）。</td>
+<td align="center">链表长度可以通过链表的 len 属性直接获得， O(1)</td>
+</tr>
+<tr>
+<td align="center">listFirst</td>
+<td align="center">返回链表的表头节点。</td>
+<td align="center">表头节点可以通过链表的 head 属性直接获得， O(1)</td>
+</tr>
+<tr>
+<td align="center">listLast</td>
+<td align="center">返回链表的表尾节点。</td>
+<td align="center">表尾节点可以通过链表的 tail 属性直接获得， O(1)</td>
+</tr>
+<tr>
+<td align="center">listPrevNode</td>
+<td align="center">返回给定节点的前置节点。</td>
+<td align="center">前置节点可以通过节点的 prev 属性直接获得， O(1)</td>
+</tr>
+<tr>
+<td align="center">listNextNode</td>
+<td align="center">返回给定节点的后置节点。</td>
+<td align="center">后置节点可以通过节点的 next 属性直接获得， O(1)</td>
+</tr>
+<tr>
+<td align="center">listNodeValue</td>
+<td align="center">返回给定节点目前正在保存的值。</td>
+<td align="center">节点值可以通过节点的 value 属性直接获得， O(1)</td>
+</tr>
+<tr>
+<td align="center">listCreate</td>
+<td align="center">创建一个不包含任何节点的新链表。</td>
+<td align="center">O(1)</td>
+</tr>
+<tr>
+<td align="center">listAddNodeHead</td>
+<td align="center">将一个包含给定值的新节点添加到给定链表的表头。</td>
+<td align="center">O(1)</td>
+</tr>
+<tr>
+<td align="center">listAddNodeTail</td>
+<td align="center">将一个包含给定值的新节点添加到给定链表的表尾。</td>
+<td align="center">O(1)</td>
+</tr>
+<tr>
+<td align="center">listInsertNode</td>
+<td align="center">将一个包含给定值的新节点添加到给定节点的之前或者之后。</td>
+<td align="center">O(1)</td>
+</tr>
+<tr>
+<td align="center">listSearchKey</td>
+<td align="center">查找并返回链表中包含给定值的节点。</td>
+<td align="center">O(N) ， N 为链表长度</td>
+</tr>
+<tr>
+<td align="center">listIndex</td>
+<td align="center">返回链表在给定索引上的节点。</td>
+<td align="center">O(N) ， N 为链表长度</td>
+</tr>
+<tr>
+<td align="center">listDelNode</td>
+<td align="center">从链表中删除给定节点。</td>
+<td align="center">O(1)</td>
+</tr>
+<tr>
+<td align="center">listRotate</td>
+<td align="center">将链表的表尾节点弹出，然后将被弹出的节点插入到链表的表头， 成为新的表头节点。</td>
+<td align="center">O(1)</td>
+</tr>
+<tr>
+<td align="center">listDup</td>
+<td align="center">复制一个给定链表的副本。</td>
+<td align="center">O(N) ， N 为链表长度</td>
+</tr>
+<tr>
+<td align="center">listRelease</td>
+<td align="center">释放给定链表，以及链表中的所有节点。</td>
+<td align="center">O(N) ， N 为链表长度</td>
+</tr>
+</tbody></table>
+<p>学习资料：<br>[1] 黄健宏. Redis设计与实现[M]. 机械工业出版社, 2014.</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2018/12/25/201812/Java源码分析IteratorCollection/" class="prev">上一篇：Java源码分析--Iterator、Collection</a>
+    
+    
+    <a href="/2018/03/19/201803/Redis设计与实现简单动态字符串/" class="next">下一篇：《Redis设计与实现》：简单动态字符串</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

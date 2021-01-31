@@ -1,0 +1,195 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java NIO学习笔记 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="Java NIO介绍Java传统IO是基于流，而NIO是基于Block，也就是NIO的操作在正常情况下是以相对较大的Block为单位，而不是针对字节或者是字符。NIO和传统IO相比：
+123IO 基于流(Stream oriented), 而 NIO 基于 Buffer (Buffer orient">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java NIO学习笔记"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-08-22T21:43:50.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-08-23
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java NIO学习笔记</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#Java-NIO%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">Java NIO介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Java-NIO-%E7%BC%93%E5%AD%98%E5%8C%BA"><span class="toc-number">2.</span> <span class="toc-text">Java NIO 缓存区</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E9%81%93-Channel-%E4%B8%8E%E5%86%85%E5%AD%98%E6%98%A0%E5%B0%84"><span class="toc-number">3.</span> <span class="toc-text">通道(Channel)与内存映射</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Scatter-Gather"><span class="toc-number">4.</span> <span class="toc-text">Scatter &#x2F; Gather</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Selector"><span class="toc-number">5.</span> <span class="toc-text">Selector</span></a></li></ol>
+    </div>
+    
+    <h3 id="Java-NIO介绍"><a href="#Java-NIO介绍" class="headerlink" title="Java NIO介绍"></a>Java NIO介绍</h3><p>Java传统IO是基于流，而NIO是基于Block，也就是NIO的操作在正常情况下是以相对较大的Block为单位，而不是针对字节或者是字符。<br>NIO和传统IO相比：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">IO 基于流(Stream oriented), 而 NIO 基于 Buffer (Buffer oriented)</span><br><span class="line">IO 操作是阻塞的, 而 NIO 操作是非阻塞的</span><br><span class="line">IO 没有 selector 概念, 而 NIO 有 selector 概念.</span><br></pre></td></tr></table></figure>
+<p>NIO其他功能：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">多路选择的非封锁式I&#x2F;O设施</span><br><span class="line">支持文件锁和内存映射</span><br><span class="line">支持正则表达式的模式匹配设施</span><br><span class="line">字符集编码器和译码器</span><br></pre></td></tr></table></figure>
+<h3 id="Java-NIO-缓存区"><a href="#Java-NIO-缓存区" class="headerlink" title="Java NIO 缓存区"></a>Java NIO 缓存区</h3><p>　　标准的IO基于字节流和字符流进行操作的，而NIO是基于通道（Channel）和缓冲区（Buffer）进行操作，数据总是从通道读取到缓冲区中，或者从缓冲区写入到通道中。<br>Java NIO里关键的Buffer实现:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">ByteBuffer</span><br><span class="line">CharBuffer</span><br><span class="line">DoubleBuffer</span><br><span class="line">FloatBuffer</span><br><span class="line">IntBuffer</span><br><span class="line">LongBuffer</span><br><span class="line">ShortBuffer</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		IntBuffer buffer  &#x3D; IntBuffer.allocate(100);&#x2F;&#x2F;开辟容量为100大小的IntBuffer</span><br><span class="line">		System.out.println(&quot;Position：&quot;+ buffer.position() + &quot;， Limit：&quot;+ buffer.limit() + &quot;， Capacity:&quot;+buffer.capacity());</span><br><span class="line">		&#x2F;*while(buffer.hasRemaining())&#123;</span><br><span class="line">			System.out.println(buffer.get());</span><br><span class="line">		&#125;*&#x2F;</span><br><span class="line">		int[] data &#x3D; &#123;10,9,8,7,6,5,4,3,2,1&#125;;</span><br><span class="line">		buffer.put(data);</span><br><span class="line">		System.out.println(&quot;Position：&quot;+ buffer.position() + &quot;， Limit：&quot;+ buffer.limit() + &quot;， Capacity:&quot;+buffer.capacity());</span><br><span class="line">		buffer.put(100);</span><br><span class="line">		System.out.println(&quot;Position：&quot;+ buffer.position() + &quot;， Limit：&quot;+ buffer.limit() + &quot;， Capacity:&quot;+buffer.capacity());</span><br><span class="line">		buffer.flip();   &#x2F;&#x2F;重设缓冲区</span><br><span class="line">		System.out.println(&quot;Position：&quot;+ buffer.position() + &quot;， Limit：&quot;+ buffer.limit() + &quot;， Capacity:&quot;+buffer.capacity());</span><br><span class="line">	&#125;</span><br><span class="line">&#x2F;*</span><br><span class="line">输出结果是：</span><br><span class="line">Position：0， Limit：100， Capacity:100</span><br><span class="line">Position：10， Limit：100， Capacity:100</span><br><span class="line">Position：11， Limit：100， Capacity:100</span><br><span class="line">Position：0， Limit：11， Capacity:100</span><br><span class="line">*&#x2F;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Position：表示下一个缓存区读取或者写入的操作指针</span><br><span class="line">Limit：在写模式下，Buffer的limit表示你最多能往Buffer里写多少数据。 写模式下，limit等于Buffer的capacity。当切换Buffer到读模式时， limit表示你最多能读到多少数据。因此，当切换Buffer到读模式时，limit会被设置成写模式下的position值。换句话说，你能读到之前写入的所有数据（limit被设置成已写数据的数量，这个值在写模式下就是position）</span><br><span class="line">Capacity：表示缓冲区的最大容量</span><br></pre></td></tr></table></figure>
+<p>ByteBuffer提供了两种静态实例(开辟空间)方式：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public static ByteBuffer allocate(int capacity)  </span><br><span class="line">public static ByteBuffer allocateDirect(int capacity) </span><br></pre></td></tr></table></figure>
+<p>　　<br><img src="/img/blog/2350612-4ef709b44a848e88.jpg" alt="图片来源网络-JavaI/O流"><br>　　第一种分配方式产生的内存开销是在JVM中的，而第二种的分配方式产生的开销在JVM之外，以就是系统级的内存分配。当Java程序接收到外部传来的数据时，首先是被系统内存所获取，然后在由系统内存复制拷贝到JVM内存中供Java程序使用。所以在第二种分配方式中，可以省去复制这一步操作，效率上会有所提高。但是系统级内存的分配比起JVM内存的分配要耗时得多，所以并不是任何时候allocateDirect的操作效率都是最高的。</p>
+<h3 id="通道-Channel-与内存映射"><a href="#通道-Channel-与内存映射" class="headerlink" title="通道(Channel)与内存映射"></a>通道(Channel)与内存映射</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">1，  Channel是基于缓存区来读取和写入数据的；</span><br><span class="line">2，  Channel说双向的，既可以完成输入也可以完成输出；</span><br></pre></td></tr></table></figure>
+<p>下面是JAVA NIO中的一些主要Channel的实现：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">FileChannel从文件中读写数据。</span><br><span class="line">DatagramChannel以UDP的形式从网络中读写数据。</span><br><span class="line">SocketChannel以TCP的形式从网络中读写数据。</span><br><span class="line">ServerSocketChannel允许你监听TCP连接。</span><br></pre></td></tr></table></figure>
+<p>将buffer中的数据读出来</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;**</span><br><span class="line"> * 将buffer中的数据读出来</span><br><span class="line"> * @param args</span><br><span class="line"> *&#x2F;</span><br><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">	FileOutputStream fileOutputStream &#x3D; null;</span><br><span class="line">	FileChannel fileChannel &#x3D; null;</span><br><span class="line">	String[] data &#x3D; &#123;&quot;Scala&quot;,&quot;spark&quot;,&quot;Java&quot;,&quot;Hadoop&quot;&#125;;</span><br><span class="line">	</span><br><span class="line">	File file &#x3D; new File(&quot;F:\\javaio\\nio.txt&quot;);</span><br><span class="line">	try &#123;</span><br><span class="line">		fileOutputStream &#x3D; new FileOutputStream(file);</span><br><span class="line">		fileChannel &#x3D; fileOutputStream.getChannel();</span><br><span class="line">		</span><br><span class="line">	&#125; catch (FileNotFoundException e) &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">		e.printStackTrace();</span><br><span class="line">	&#125;</span><br><span class="line">               &#x2F;&#x2F;为Buffer初始化数据</span><br><span class="line">	ByteBuffer buffer &#x3D; ByteBuffer.allocate(1024);</span><br><span class="line">	for (String item : data) &#123;</span><br><span class="line">		buffer.put(item.getBytes());</span><br><span class="line">	&#125;</span><br><span class="line">	buffer.flip();</span><br><span class="line">	&#x2F;&#x2F;将buffer中的数据读出来，并写入到文件中</span><br><span class="line">	try &#123;</span><br><span class="line">		fileChannel.write(buffer);</span><br><span class="line">		fileChannel.close();</span><br><span class="line">		fileOutputStream.close();</span><br><span class="line">	&#125; catch (IOException e) &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">		e.printStackTrace();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="Scatter-Gather"><a href="#Scatter-Gather" class="headerlink" title="Scatter / Gather"></a>Scatter / Gather</h3><p>可以同时将多个buffer中的数据放入到一个数组后然后统一放入到channel后传递给服务器：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ByteBuffer buffer1 &#x3D; ByteBuffer.allocate(128);</span><br><span class="line">ByteBuffer buffer2 &#x3D; ByteBuffer.allocate(16);</span><br><span class="line">buffer1.put(&quot;hello &quot;.getBytes());</span><br><span class="line">buffer2.put(&quot;world&quot;.getBytes());</span><br><span class="line"></span><br><span class="line">buffer1.flip();</span><br><span class="line">buffer2.flip();</span><br><span class="line">ByteBuffer[] bufferArray &#x3D; &#123;buffer1, buffer2&#125;;</span><br><span class="line">socketChannel.write(bufferArray);</span><br></pre></td></tr></table></figure>
+<h3 id="Selector"><a href="#Selector" class="headerlink" title="Selector"></a>Selector</h3><p>　　Selector允许单线程处理多个 Channel。如果你的应用打开了多个连接（通道）,省去了创建线程以及线程之间进行上下文切换的开销。每个连接的流量都很低，使用Selector就会很方便。<br>通过调用selector类的静态方法open我们就可以创建一个selector对象：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Selector selector &#x3D; Selector.open();</span><br></pre></td></tr></table></figure>
+<p>为了保证selector能够监听多个channel，我们需要将channel注册到selector当中：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">channel.configureBlocking(false);</span><br><span class="line">SelectionKey key &#x3D; channel.register(selector, SelectionKey.OP_READ);</span><br></pre></td></tr></table></figure>
+<p>我们可以监听四种事件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">SelectionKey.OP_CONNECT：当客户端的尝试连接到服务器</span><br><span class="line">SelectionKey.OP_ACCEPT：当服务器接受来自客户端的请求</span><br><span class="line">SelectionKey.OP_READ：当服务器可以从channel中读取数据</span><br><span class="line">SelectionKey.OP_WRITE：当服务器可以向channel中写入数据</span><br></pre></td></tr></table></figure>
+<p>对SelectorKey调用channel方法可以得到key对应的channel:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Channel channel &#x3D; key.channel();</span><br></pre></td></tr></table></figure>
+<p>而key自身感兴趣的监听事件也可以通过interestOps来获得：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">int interestSet &#x3D; selectionKey.interestOps();</span><br></pre></td></tr></table></figure>
+<p>对selector调用selectedKeys()方法我们可以得到注册的所有key：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Set&lt;SelectionKey&gt; selectedKeys &#x3D; selector.selectedKeys();</span><br></pre></td></tr></table></figure>
+<p>学习资料：<br>[1] 并发编程网 – ifeve.com<a target="_blank" rel="noopener" href="http://ifeve.com/java-nio-all/">Java NIO 系列教程</a><br>[2] <a target="_blank" rel="noopener" href="https://segmentfault.com/a/1190000010812231">Java并发编程之NIO简明教程</a><br>[3] <a target="_blank" rel="noopener" href="http://blog.csdn.net/lg19870311/article/details/8934719">ByteBuffer的allocate和allocateDirect</a></p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/08/26/201708/算法导论学习笔记红黑树/" class="prev">上一篇：算法导论学习笔记--红黑树</a>
+    
+    
+    <a href="/2017/08/19/201708/Java基础之IO/" class="next">下一篇：Java基础之I/O</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

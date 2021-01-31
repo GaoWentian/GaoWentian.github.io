@@ -1,0 +1,176 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>算法导论学习笔记--快速排序 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="对于n个数的输入数组，快速排序最坏时间复杂度是O（n^2）,虽然最坏情况下的时间复杂度很差，但是快速排序通常是实际排序应用中最好的选择，因为它平均性能最好，期望时间复杂度是O（nlgn）。
+快速排序的描述快速排序分成三步：
+分解数组A[p..r],被划分为两个子数组A[p..q-1]和A[q+1..">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="算法导论学习笔记--快速排序"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-05-10T12:49:36.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-05-10
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">算法导论学习笔记--快速排序</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E7%9A%84%E6%8F%8F%E8%BF%B0"><span class="toc-number">1.</span> <span class="toc-text">快速排序的描述</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E8%A7%A3"><span class="toc-number">1.1.</span> <span class="toc-text">分解</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%A7%A3%E5%86%B3"><span class="toc-number">1.2.</span> <span class="toc-text">解决</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%88%E5%B9%B6"><span class="toc-number">1.3.</span> <span class="toc-text">合并</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F%E7%9A%84%E9%9A%8F%E6%9C%BA%E5%8C%96%E7%89%88%E6%9C%AC"><span class="toc-number">2.</span> <span class="toc-text">快速排序的随机化版本</span></a></li></ol>
+    </div>
+    
+    <p>对于n个数的输入数组，快速排序最坏时间复杂度是O（n^2）,虽然最坏情况下的时间复杂度很差，但是快速排序通常是实际排序应用中最好的选择，因为它平均性能最好，期望时间复杂度是O（nlgn）。</p>
+<h3 id="快速排序的描述"><a href="#快速排序的描述" class="headerlink" title="快速排序的描述"></a>快速排序的描述</h3><p>快速排序分成三步：</p>
+<h4 id="分解"><a href="#分解" class="headerlink" title="分解"></a>分解</h4><p>数组A[p..r],被划分为两个子数组A[p..q-1]和A[q+1..r],使得A[p..q-1]中的每一个元素都小于或等于A[q],而A[q]也小于A[q+1..r]中的每个元素。</p>
+<h4 id="解决"><a href="#解决" class="headerlink" title="解决"></a>解决</h4><p>通过递归调用快速排序，对子数组A[p..q-1]和A[q+1..r]进行排序。</p>
+<h4 id="合并"><a href="#合并" class="headerlink" title="合并"></a>合并</h4><p>因为子数组都是原址排序，所以不需要合并操作：数组A[p..r]已经有序。</p>
+<p>快速排序实现</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">QUICKSORT(A,p,r)&#123;</span><br><span class="line">	if(p &lt; r)&#123;</span><br><span class="line">		q &#x3D; PARTITION(A,p,r);</span><br><span class="line">		QUICKSORT(A,p,q-1)</span><br><span class="line">		QUICKSORT(A,q+1,r)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>数组的划分</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">PARTITION(A,p,r)&#123;</span><br><span class="line">	x &#x3D; A[r];</span><br><span class="line">	i &#x3D; p - 1;</span><br><span class="line">	for(j &#x3D; p;j &lt;&#x3D; r-1;j++)&#123;</span><br><span class="line">		if(A[j] &lt;&#x3D; x)&#123;</span><br><span class="line">			i &#x3D; i + 1;</span><br><span class="line">			swap(A[i],A[j]);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	swap(A[i+1],A[r]);</span><br><span class="line">	return i+1;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="快速排序的随机化版本"><a href="#快速排序的随机化版本" class="headerlink" title="快速排序的随机化版本"></a>快速排序的随机化版本</h3><p>随机划分使用 随机取样（random sampling）的随机化技术，从子数组A[p..r]中随机选择一个元素并与A[r]互换，因为主元是随机选择的，我们期望在平均情况下，对输入数组的划分能够比较对称。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">RANDOMIZED-PARTITION(A,p,r)&#123;</span><br><span class="line">	i &#x3D; RANDOM(p,r);</span><br><span class="line">	swap(A[r],A[i]);</span><br><span class="line">	return PARTITION(A,p,r);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">RANDOMIZED-QUICKSORT(A,p,r)&#123;</span><br><span class="line">	if(p &lt; r)&#123;</span><br><span class="line">		q &#x3D; RANDOMIZED-PARTITION(A,p,r);</span><br><span class="line">		RANDOMIZED-QUICKSORT(A,p,q-1)</span><br><span class="line">		RANDOMIZED-QUICKSORT(A,q+1,r)</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/05/12/201705/算法导论学习笔记中位数和顺序统计量/" class="prev">上一篇：算法导论学习笔记--中位数和顺序统计量</a>
+    
+    
+    <a href="/2017/05/10/201705/算法导论学习笔记优先队列/" class="next">下一篇：算法导论学习笔记--优先队列</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

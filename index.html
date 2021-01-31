@@ -1,0 +1,501 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <div class="article-list-wrap">
+  
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2020/11/05/202011/三Java并发Volatile和CAS/" itemprop="url">（三）Java并发-Volatile和CAS</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      volatile一旦一个共享变量（类的成员变量、类的静态成员变量）被 volatile 修饰之后，两个含义：
+
+1.volatile 保证了共享变量的可见性；
+2.禁止进行指令重排序。
+
+123456789101112public class ThreadSafeInteger &#123;      private int value;      public synchronized int ...
+      <a href="/2020/11/05/202011/三Java并发Volatile和CAS/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2020-11-05T15:16:56.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-11-05
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2020/11/05/202011/五Java并发Synchronized/" itemprop="url">（五）Java并发-Synchronized</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      使用当多个线程同时读写一个状态变量，如果没有同步措施，将会出现不可预见的结果。在Java中首要的同步策略是使用Synchronized关键字，它提供了可重入的独占锁。Synchronized可以保证方法或者代码块在运行时，同一时刻只有一个方法可以进入到临界区，它还保证共享变量的内存可见性。Java中每一个对象都可以作为锁，当一个线程试图访问同步代码块时，必须先获得对象的锁。
+
+Synchroni ...
+      <a href="/2020/11/05/202011/五Java并发Synchronized/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2020-11-04T16:15:01.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-11-05
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2020/10/22/202010/一Java并发多线程基础/" itemprop="url">（一）Java并发-多线程基础</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      线程的几种状态
+新建状态（New）当线程对象对创建后，即进入了新建状态。
+1Thread t &#x3D; new MyThread();
+就绪状态（Runnable）当调用线程对象的 start()方法
+12Thread t &#x3D; new MyThread();t.start();
+线程即进入就绪状态。处于就绪状态的线程，只是说明此线程已经做好了准备，随时等待 CPU 调度执行，并不是 ...
+      <a href="/2020/10/22/202010/一Java并发多线程基础/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2020-10-22T15:22:08.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-10-22
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2020/10/15/202010/四Java并发对象在内存中的布局/" itemprop="url">（四）Java并发-对象在内存中的布局</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      对象在内存中的布局Object对象内存布局查看对象在内存中的结构，需要借助Java Object Layout工具，在Maven中引入依赖：
+1234567&lt;dependencies&gt;  &lt;dependency&gt;    &lt;groupId&gt;org.openjdk.jol&lt;/groupId&gt;    &lt;artifactId&gt;jol-core& ...
+      <a href="/2020/10/15/202010/四Java并发对象在内存中的布局/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2020-10-14T16:22:25.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-10-15
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2020/10/15/202010/二Java并发可见性原子性和有序性/" itemprop="url">（二）Java并发-可见性、原子性和有序性</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      缓存问题造成的可见性单核CPU的情况下，多个线程使用同一个CPU,线程1读取共享变量A到CPU缓存，修改后对线程2是可见的，不存在一致性问题。一个线程对共享变量的修改对另一个线程可见称为可见性。多核CPU的情况下，线程1和线程2分别操作不同CPU的缓存，线程1对共享变量A的操作对线程2不可见，出现一致性问题。下面这段代码，使用两个线程对num分别加10000次，启动两个线程，结果应该是20000 ...
+      <a href="/2020/10/15/202010/二Java并发可见性原子性和有序性/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2020-10-14T16:10:14.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-10-15
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2020/04/25/202004/Kubernetes基础Pod控制器/" itemprop="url">Kubernetes基础--Pod控制器</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      ReplicationControllerReplicationController 可以保证它的 Pod 始终保持在运行状态。ReplicationController 的工作是确保 Pod 的数量始终与其标签选择器匹配，如果不匹配，ReplicationController 会采取适当的操作来协调 Pod 的数量。一个 ReplicationController 有三部分：
+
+label s ...
+      <a href="/2020/04/25/202004/Kubernetes基础Pod控制器/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2020-04-25T07:15:50.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-04-25
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2020/04/21/202004/Kubernetes基础Pod用法/" itemprop="url">Kubernetes基础--Pod用法</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      Pod 是 Kubernetes 调度的最小单元。一个 Pod 可以包含一个或多个容器，因此它可以被看作是内部容器的逻辑宿主机。Pod 有控制器管理的 Pod 和自主式 Pod 两种用法，本文介绍的是自主式 Pod。自主式 Pod 也就是没有控制器参与的 Pod，删除后无法再次创建。首先下载镜像到本地 Docker 仓库，用来演示创建 Pod 的过程。
+12docker pull tutum&# ...
+      <a href="/2020/04/21/202004/Kubernetes基础Pod用法/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2020-04-21T15:51:24.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-04-21
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2020/03/21/202003/Zookeeper基础简单用法/" itemprop="url">Zookeeper基础--简单用法</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      概述Zookeeper 是一个分布式协调服务的框架，用来解决分布式集群中的一致性问题。Zookeeper 本质上是一个分布式小文件存储系统，提供类似于目录树的方式存储数据，通过对数据状态变化的监控，实现基于数据的集群管理。Zookeeper 有一下应用场景：
+
+维护配置信息
+分布式锁服务
+集群管理
+生成分布式唯一 ID
+
+数据模型Zookeeper 数据节点是树状结构，树中的节点称为 znode ...
+      <a href="/2020/03/21/202003/Zookeeper基础简单用法/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2020-03-21T09:01:52.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-03-21
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2020/03/08/202003/Maven中dependencyManagement标签/" itemprop="url">Maven中dependencyManagement标签</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      Maven 使用 dependencyManagement 元素提供一种管理依赖版本号的方式，通常在项目最顶层的父 POM 文件中看到 dependencyManagement 元素。使用 dependencyManagement 元素能让所有在子项目中引用一个依赖而不显式的列出版本号。子项目中的 Maven 会沿着父层次向上走，直到找到一个拥有 dependencyManagement 元素的 ...
+      <a href="/2020/03/08/202003/Maven中dependencyManagement标签/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2020-03-08T14:19:43.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-03-08
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2020/03/07/202003/SpringBoot基础配置详解/" itemprop="url">SpringBoot基础--配置详解</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      简介SpringBoot 使用约定大于配置的开发原则，减少人为配置，直接使用默认配置就能开发。SpringBoot 使用全局的配置文件，开发过程中可以修改配置文件来修改 SpringBoot 自动配置的默认值。在 SpringBoot 中配置文件名是固定的：
+
+application.properties
+application.yml
+
+简单用法普通值k:value 形式，字符串默认不用加引号 ...
+      <a href="/2020/03/07/202003/SpringBoot基础配置详解/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2020-03-07T08:52:35.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-03-07
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+</div>
+
+<nav id="pagenavi">
+  
+  
+  <a href="/page/2/" class="next">下一页</a>
+  
+</nav>
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

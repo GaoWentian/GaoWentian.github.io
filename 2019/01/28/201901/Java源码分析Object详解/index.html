@@ -1,0 +1,197 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java源码分析--Object详解 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介Object类在java.lang包中，是所有类的父类，所有类都间接或者直接继承Object类。Object类中主要有registerNatives()、getClass()、hashCode()、equals()、clone()、toString()、notify()、notifyAll()、">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java源码分析--Object详解"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-01-28T11:30:43.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-01-28
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java源码分析--Object详解</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E4%BB%A3%E7%A0%81"><span class="toc-number">2.</span> <span class="toc-text">源代码</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#registerNatives-%E6%96%B9%E6%B3%95"><span class="toc-number">2.1.</span> <span class="toc-text">registerNatives()方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#getClass-%E6%96%B9%E6%B3%95"><span class="toc-number">2.2.</span> <span class="toc-text">getClass()方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#hashCode-%E6%96%B9%E6%B3%95"><span class="toc-number">2.3.</span> <span class="toc-text">hashCode()方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#equals-%E6%96%B9%E6%B3%95"><span class="toc-number">2.4.</span> <span class="toc-text">equals()方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#clone-%E6%96%B9%E6%B3%95"><span class="toc-number">2.5.</span> <span class="toc-text">clone()方法</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B5%85%E6%8B%B7%E8%B4%9D"><span class="toc-number">2.5.1.</span> <span class="toc-text">浅拷贝</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%B7%B1%E6%8B%B7%E8%B4%9D"><span class="toc-number">2.5.2.</span> <span class="toc-text">深拷贝</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#toString-%E6%96%B9%E6%B3%95"><span class="toc-number">2.6.</span> <span class="toc-text">toString()方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#notify-%E5%92%8CnotifyAll-%E6%96%B9%E6%B3%95"><span class="toc-number">2.7.</span> <span class="toc-text">notify()和notifyAll()方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#wait-%E6%96%B9%E6%B3%95"><span class="toc-number">2.8.</span> <span class="toc-text">wait()方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#finalize-%E6%96%B9%E6%B3%95"><span class="toc-number">2.9.</span> <span class="toc-text">finalize()方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">2.10.</span> <span class="toc-text">参考资料</span></a></li></ol></li></ol>
+    </div>
+    
+    <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>Object类在java.lang包中，是所有类的父类，所有类都间接或者直接继承Object类。Object类中主要有registerNatives()、getClass()、hashCode()、equals()、clone()、toString()、notify()、notifyAll()、wait()和finalize()等方法。其中<br>getClass()、notify()、notifyAll()和wait()等方法使用final关键字修饰，因此子类不能覆盖。</p>
+<h3 id="源代码"><a href="#源代码" class="headerlink" title="源代码"></a>源代码</h3><h4 id="registerNatives-方法"><a href="#registerNatives-方法" class="headerlink" title="registerNatives()方法"></a>registerNatives()方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">private static native void registerNatives();</span><br><span class="line">&#x2F;&#x2F;在类加载时就执行这个方法</span><br><span class="line">static &#123;</span><br><span class="line">    registerNatives();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>registerNatives()方法是注册一些本地方法，具体实现在本地的代码中，所以我也不清楚里面干了什么。学Java还是有必要学习一下JNI的，等我找到工作要好好研究一下。<br>在Java中，静态代码的调用顺序：父类静态–&gt;子类静态–&gt;父类非静态–&gt;父类构造–&gt;子类非静态–&gt;子类构造</p>
+<h4 id="getClass-方法"><a href="#getClass-方法" class="headerlink" title="getClass()方法"></a>getClass()方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public final native Class&lt;?&gt; getClass();</span><br></pre></td></tr></table></figure>
+<p>返回运行时的类</p>
+<h4 id="hashCode-方法"><a href="#hashCode-方法" class="headerlink" title="hashCode()方法"></a>hashCode()方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public native int hashCode();</span><br></pre></td></tr></table></figure>
+<p>返回对象的哈希码，在HashMap中，就是通过hashCode来提高查找哈希表的速度。</p>
+<h4 id="equals-方法"><a href="#equals-方法" class="headerlink" title="equals()方法"></a>equals()方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public boolean equals(Object obj) &#123;</span><br><span class="line">    return (this &#x3D;&#x3D; obj);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里判断的是对象，对象的地址相同，返回true，如果两个对象完全一样，但是地址不相同，也会返回false。</p>
+<p>在Java中，8种基本数据类型变量存储的是值，可以直接使用==来比较，而引用类型数据变量需要使用equals(),也可以重写该方法。</p>
+<ul>
+<li>数值型－ byte(1字节)、 short(2字节)、int(4字节)、 long(8字节)、float(4字节)、 double(8字节)</li>
+<li>字符型－ char (2字节)</li>
+<li>布尔型－boolean (1位)</li>
+<li>引用数据类型 —— class，interface，数组   (4个字节)</li>
+</ul>
+<h4 id="clone-方法"><a href="#clone-方法" class="headerlink" title="clone()方法"></a>clone()方法</h4><p>实现拷贝必须实现Cloneable接口，并重写clone()方法。  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protected native Object clone() throws CloneNotSupportedException;</span><br></pre></td></tr></table></figure>
+<p>clone分为浅拷贝和深拷贝：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">浅拷贝：拷贝出来的目标对象的指针和源对象的指针指向的内存空间是同一块空间。</span><br><span class="line">深拷贝：当一个类的拷贝构造方法，不仅要复制对象的所有非引用成员变量值，还要为引用类型的成员变量创建新的实例，并且初始化为形式参数实例值。</span><br></pre></td></tr></table></figure>
+<h5 id="浅拷贝"><a href="#浅拷贝" class="headerlink" title="浅拷贝"></a>浅拷贝</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">public class Professor &#123;</span><br><span class="line">    private String name;</span><br><span class="line">    private int age;</span><br><span class="line">    &#x2F;&#x2F;省略get和set方法</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Student implements Cloneable &#123;</span><br><span class="line">    private String name;</span><br><span class="line">    private int age;</span><br><span class="line">    private Professor professor;</span><br><span class="line">    &#x2F;&#x2F;省略get和set方法</span><br><span class="line">    public Professor getProfessor() &#123;</span><br><span class="line">        return professor;</span><br><span class="line">    &#125;</span><br><span class="line">    public void setProfessor(Professor professor) &#123;</span><br><span class="line">        this.professor &#x3D; professor;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;对对象Studentclone</span><br><span class="line">    @Override</span><br><span class="line">    public Object clone() throws CloneNotSupportedException&#123;</span><br><span class="line">        return super.clone();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">Professor p1 &#x3D; new Professor();</span><br><span class="line">&#x2F;&#x2F;省略赋值</span><br><span class="line">Student s1 &#x3D; new Student();</span><br><span class="line">&#x2F;&#x2F;省略赋值</span><br><span class="line">Student s2 &#x3D; (Student) s1.clone();</span><br><span class="line">Professor p2 &#x3D; s2.getProfessor();</span><br><span class="line">&#x2F;&#x2F;省略修改</span><br></pre></td></tr></table></figure>
+<p>在这里s2浅拷贝s1，如果现在对p2进行修改，那么s1中的Professor也会变化。因为p2只是引用了p1的地址，对p2的任何操作和操作p1是一样的。</p>
+<h5 id="深拷贝"><a href="#深拷贝" class="headerlink" title="深拷贝"></a>深拷贝</h5><p>代码修改为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br></pre></td><td class="code"><pre><span class="line">public class Professor &#123;</span><br><span class="line">    private String name;</span><br><span class="line">    private int age;</span><br><span class="line">    &#x2F;&#x2F;省略get和set方法</span><br><span class="line">    @Override</span><br><span class="line">    public Object clone() throws CloneNotSupportedException&#123;</span><br><span class="line">    	return super.clone();</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">public class Student implements Cloneable &#123;</span><br><span class="line">    private String name;</span><br><span class="line">    private int age;</span><br><span class="line">    private Professor professor;</span><br><span class="line">    &#x2F;&#x2F;省略get和set方法</span><br><span class="line">    public Professor getProfessor() &#123;</span><br><span class="line">        return professor;</span><br><span class="line">    &#125;</span><br><span class="line">    public void setProfessor(Professor professor) &#123;</span><br><span class="line">        this.professor &#x3D; professor;</span><br><span class="line">    &#125;</span><br><span class="line">    &#x2F;&#x2F;对对象Studentclone</span><br><span class="line">    @Override</span><br><span class="line">    public Object clone() throws CloneNotSupportedException&#123;</span><br><span class="line">        Student newStudent &#x3D; (Student) super.clone();</span><br><span class="line">        newStudent.professor &#x3D; (Professor) professor.clone();</span><br><span class="line">        return newStudent;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这样就实现了深拷贝，对p2的任何操作都不会影响p1。</p>
+<h4 id="toString-方法"><a href="#toString-方法" class="headerlink" title="toString()方法"></a>toString()方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">public String toString() &#123;</span><br><span class="line">    return getClass().getName() + &quot;@&quot; + Integer.toHexString(hashCode());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>toString()方法在子类中都会被重写，这里显示的是类名+”@”+对象哈希码的十六进制数</p>
+<h4 id="notify-和notifyAll-方法"><a href="#notify-和notifyAll-方法" class="headerlink" title="notify()和notifyAll()方法"></a>notify()和notifyAll()方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public final native void notify();</span><br><span class="line">public final native void notifyAll();</span><br></pre></td></tr></table></figure>
+<p>notify()方法会唤醒一个处于等待状态的线程，notifyAll()方法会唤醒同一个对象上所有调用wait()方法的线程，优先级别高的线程先调度。</p>
+<h4 id="wait-方法"><a href="#wait-方法" class="headerlink" title="wait()方法"></a>wait()方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;timeout是等待时间，毫秒。</span><br><span class="line">public final native void wait(long timeout) throws InterruptedException;</span><br><span class="line">&#x2F;&#x2F;nanos是纳秒。多加一个nanos参数是为了比wait(long timeout)更好的控制时间，其中1毫秒(ms)&#x3D;1000000纳秒(ns)</span><br><span class="line">public final void wait(long timeout, int nanos) throws InterruptedException &#123;</span><br><span class="line">    if (timeout &lt; 0) &#123;</span><br><span class="line">        throw new IllegalArgumentException(&quot;timeout value is negative&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (nanos &lt; 0 || nanos &gt; 999999) &#123;</span><br><span class="line">        throw new IllegalArgumentException(</span><br><span class="line">                            &quot;nanosecond timeout value out of range&quot;);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (nanos &gt; 0) &#123;</span><br><span class="line">        timeout++;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    wait(timeout);</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;不唤醒就一直等待</span><br><span class="line">public final void wait() throws InterruptedException &#123;</span><br><span class="line">    wait(0);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="finalize-方法"><a href="#finalize-方法" class="headerlink" title="finalize()方法"></a>finalize()方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">protected void finalize() throws Throwable &#123; &#125;</span><br></pre></td></tr></table></figure>
+<p>当垃圾回收器将要回收对象所占内存之前被调用。</p>
+<h4 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h4><p><a target="_blank" rel="noopener" href="https://www.cnblogs.com/acode/p/6306887.html">Java的clone()：深复制与浅复制</a></p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/01/29/201901/Java基础之注解/" class="prev">上一篇：Java基础之注解</a>
+    
+    
+    <a href="/2019/01/26/201901/Java源码分析全面解析HashMap/" class="next">下一篇：Java源码分析--全面解析HashMap</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

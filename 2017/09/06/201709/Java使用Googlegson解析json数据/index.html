@@ -1,0 +1,173 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java使用Google-gson解析json数据 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="首先在官网下载插件，是下载的版本是gson-2.8.2.jar，并导入到项目中，github地址为： https://github.com/google/gson
+获取json数据java解析json代码为：
+123456789JsonParser parser &amp;#x3D; new JsonPar">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java使用Google-gson解析json数据"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-09-05T20:10:34.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-09-06
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java使用Google-gson解析json数据</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%8E%B7%E5%8F%96json%E6%95%B0%E6%8D%AE"><span class="toc-number">1.</span> <span class="toc-text">获取json数据</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%94%9F%E6%88%90json%E6%95%B0%E6%8D%AE"><span class="toc-number">2.</span> <span class="toc-text">生成json数据</span></a></li></ol>
+    </div>
+    
+    <p>首先在官网下载插件，是下载的版本是gson-2.8.2.jar，并导入到项目中，github地址为： <a target="_blank" rel="noopener" href="https://github.com/google/gson">https://github.com/google/gson</a></p>
+<h3 id="获取json数据"><a href="#获取json数据" class="headerlink" title="获取json数据"></a>获取json数据</h3><p>java解析json代码为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">JsonParser parser &#x3D; new JsonParser();</span><br><span class="line">JsonObject object &#x3D; (JsonObject) parser.parse(new FileReader(&quot;jsonText.json&quot;));</span><br><span class="line">System.out.println(&quot;name&#x3D;&quot;+object.get(&quot;name&quot;).getAsString());</span><br><span class="line">JsonArray links &#x3D; object.get(&quot;links&quot;).getAsJsonArray();</span><br><span class="line">for (int i &#x3D; 0; i &lt; links.size(); i++) &#123;</span><br><span class="line">	JsonObject element &#x3D; links.get(i).getAsJsonObject();</span><br><span class="line">	System.out.println(&quot;name &#x3D; &quot; + element.get(&quot;name&quot;).getAsString());</span><br><span class="line">	System.out.println(&quot;url &#x3D; &quot; + element.get(&quot;url&quot;).getAsString());</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>json数据为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">    &quot;name&quot;: &quot;BeJson&quot;,</span><br><span class="line">    &quot;url&quot;: &quot;http:&#x2F;&#x2F;www.bejson.com&quot;,</span><br><span class="line">    &quot;page&quot;: 88,</span><br><span class="line">    &quot;isNonProfit&quot;: true,</span><br><span class="line">    &quot;address&quot;: &#123;</span><br><span class="line">        &quot;street&quot;: &quot;科技园路.&quot;,</span><br><span class="line">        &quot;city&quot;: &quot;江苏苏州&quot;,</span><br><span class="line">        &quot;country&quot;: &quot;中国&quot;</span><br><span class="line">    &#125;,</span><br><span class="line">    &quot;links&quot;: [</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;name&quot;: &quot;Google&quot;,</span><br><span class="line">            &quot;url&quot;: &quot;http:&#x2F;&#x2F;www.google.com&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;name&quot;: &quot;Baidu&quot;,</span><br><span class="line">            &quot;url&quot;: &quot;http:&#x2F;&#x2F;www.baidu.com&quot;</span><br><span class="line">        &#125;,</span><br><span class="line">        &#123;</span><br><span class="line">            &quot;name&quot;: &quot;SoSo&quot;,</span><br><span class="line">            &quot;url&quot;: &quot;http:&#x2F;&#x2F;www.SoSo.com&quot;</span><br><span class="line">        &#125;</span><br><span class="line">    ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="生成json数据"><a href="#生成json数据" class="headerlink" title="生成json数据"></a>生成json数据</h3><p>代码为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">JsonObject object &#x3D; new JsonObject();</span><br><span class="line">object.addProperty(&quot;name&quot;, &quot;BeJson&quot;);</span><br><span class="line">JsonArray links &#x3D; new JsonArray();</span><br><span class="line"></span><br><span class="line">JsonObject url1 &#x3D; new JsonObject();</span><br><span class="line">url1.addProperty(&quot;name&quot;, &quot;Google&quot;);</span><br><span class="line">url1.addProperty(&quot;url&quot;, &quot;http:&#x2F;&#x2F;www.google.com&quot;);</span><br><span class="line">links.add(url1);</span><br><span class="line"></span><br><span class="line">JsonObject url2 &#x3D; new JsonObject();</span><br><span class="line">url2.addProperty(&quot;name&quot;, &quot;Baidu&quot;);</span><br><span class="line">url2.addProperty(&quot;url&quot;, &quot;http:&#x2F;&#x2F;www.baidu.com&quot;);</span><br><span class="line">links.add(url2);</span><br><span class="line"></span><br><span class="line">JsonObject url3 &#x3D; new JsonObject();</span><br><span class="line">url3.addProperty(&quot;name&quot;, &quot;SoSo&quot;);</span><br><span class="line">url3.addProperty(&quot;url&quot;, &quot;http:&#x2F;&#x2F;www.SoSo.com&quot;);</span><br><span class="line">links.add(url3);</span><br><span class="line"></span><br><span class="line">object.add(&quot;links&quot;, links);</span><br><span class="line">System.out.println(object.toString());</span><br></pre></td></tr></table></figure>
+<p>生成的数据是：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">&#123;</span><br><span class="line">  &quot;name&quot;: &quot;BeJson&quot;,</span><br><span class="line">  &quot;links&quot;: [</span><br><span class="line">    &#123;</span><br><span class="line">      &quot;name&quot;: &quot;Google&quot;,</span><br><span class="line">      &quot;url&quot;: &quot;http:&#x2F;&#x2F;www.google.com&quot;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      &quot;name&quot;: &quot;Baidu&quot;,</span><br><span class="line">      &quot;url&quot;: &quot;http:&#x2F;&#x2F;www.baidu.com&quot;</span><br><span class="line">    &#125;,</span><br><span class="line">    &#123;</span><br><span class="line">      &quot;name&quot;: &quot;SoSo&quot;,</span><br><span class="line">      &quot;url&quot;: &quot;http:&#x2F;&#x2F;www.SoSo.com&quot;</span><br><span class="line">    &#125;</span><br><span class="line">  ]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/11/11/201711/Java并发学习原子操作类Atomic/" class="prev">上一篇：Java并发学习--原子操作类Atomic</a>
+    
+    
+    <a href="/2017/09/01/201709/MySQL索引/" class="next">下一篇：MySQL索引</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

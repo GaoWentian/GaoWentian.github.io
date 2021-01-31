@@ -1,0 +1,199 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>深入理解Java虚拟机--垃圾收集器与GC参数 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介程序计数器、虚拟机栈和本地方法栈的生存周期就是线程的生存周期，因此不需要考虑垃圾回收。Java中，GC的对象是堆空间和永久区。
+怎么判断一个对象是否需要回收？引用计数法引用计数法就是给对象中添加一个引用计数器，当有对象引用时，计数器数值加1，引用失效时，计数器数值减1，当计数器数值为0，就通知G">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="深入理解Java虚拟机--垃圾收集器与GC参数"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-02-12T11:41:50.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-02-12
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">深入理解Java虚拟机--垃圾收集器与GC参数</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%80%8E%E4%B9%88%E5%88%A4%E6%96%AD%E4%B8%80%E4%B8%AA%E5%AF%B9%E8%B1%A1%E6%98%AF%E5%90%A6%E9%9C%80%E8%A6%81%E5%9B%9E%E6%94%B6%EF%BC%9F"><span class="toc-number">2.</span> <span class="toc-text">怎么判断一个对象是否需要回收？</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BC%95%E7%94%A8%E8%AE%A1%E6%95%B0%E6%B3%95"><span class="toc-number">2.1.</span> <span class="toc-text">引用计数法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8F%AF%E8%BE%BE%E6%80%A7%E5%88%86%E6%9E%90%E7%AE%97%E6%B3%95"><span class="toc-number">2.2.</span> <span class="toc-text">可达性分析算法</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%EF%BC%9A%E6%88%91%E6%98%AF%E4%B8%8D%E6%98%AF%E8%BF%98%E8%83%BD%E6%8B%AF%E6%95%91%E4%B8%80%E4%B8%8B"><span class="toc-number">3.</span> <span class="toc-text">对象：我是不是还能拯救一下</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E7%AE%97%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">垃圾收集算法</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%87%E8%AE%B0-%E6%B8%85%E9%99%A4%E7%AE%97%E6%B3%95"><span class="toc-number">4.1.</span> <span class="toc-text">标记-清除算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A4%8D%E5%88%B6%E7%AE%97%E6%B3%95"><span class="toc-number">4.2.</span> <span class="toc-text">复制算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%A0%87%E8%AE%B0-%E6%95%B4%E7%90%86-%E5%8E%8B%E7%BC%A9%E7%AE%97%E6%B3%95"><span class="toc-number">4.3.</span> <span class="toc-text">标记-整理&#x2F;压缩算法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%80%BB%E7%BB%93"><span class="toc-number">4.4.</span> <span class="toc-text">总结</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%9E%83%E5%9C%BE%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-number">5.</span> <span class="toc-text">垃圾收集器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Serial%E6%94%B6%E9%9B%86%E5%99%A8-%E4%B8%B2%E8%A1%8C%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-number">5.1.</span> <span class="toc-text">Serial收集器(串行收集器)</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ParNew%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-number">5.2.</span> <span class="toc-text">ParNew收集器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Parallel%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-number">5.3.</span> <span class="toc-text">Parallel收集器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#CMS%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-number">5.4.</span> <span class="toc-text">CMS收集器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#G1%E6%94%B6%E9%9B%86%E5%99%A8"><span class="toc-number">5.5.</span> <span class="toc-text">G1收集器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#GC%E5%8F%82%E6%95%B0"><span class="toc-number">6.</span> <span class="toc-text">GC参数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E8%B5%84%E6%96%99"><span class="toc-number">7.</span> <span class="toc-text">参考资料</span></a></li></ol>
+    </div>
+    
+    <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>程序计数器、虚拟机栈和本地方法栈的生存周期就是线程的生存周期，因此不需要考虑垃圾回收。Java中，GC的对象是堆空间和永久区。</p>
+<h3 id="怎么判断一个对象是否需要回收？"><a href="#怎么判断一个对象是否需要回收？" class="headerlink" title="怎么判断一个对象是否需要回收？"></a>怎么判断一个对象是否需要回收？</h3><h4 id="引用计数法"><a href="#引用计数法" class="headerlink" title="引用计数法"></a>引用计数法</h4><p>引用计数法就是给对象中添加一个引用计数器，当有对象引用时，计数器数值加1，引用失效时，计数器数值减1，当计数器数值为0，就通知GC回收对象。<br><img src="https://www.gwt.fun/upload/0945b90b253049769f100343001ab1ee_QQ20190211172059.jpg" alt="QQ20190211172059jpg"><br>图片中的B对象引用了D对象，如果B对象不再引用D对象，D对象的计数器数值就置为0，这样GC也会收回D对象。如果对象之间存在循环引用，就会出现无法回收的对象。如下图所示：<br><img src="https://www.gwt.fun/upload/4e5371d36aad41c18b9f9d96e324994f_image.png" alt="imagepng"><br>图中BCD循环引用，根对象已经不引用B对象，也就是说BCD对象应该被GC，但因为BCD计数器数值都不为0，因此引用计数法无法通知GC来回收对象。就是存在这种问题，Java虚拟机中没有选用引用计数法来判断对象是否存活。</p>
+<h4 id="可达性分析算法"><a href="#可达性分析算法" class="headerlink" title="可达性分析算法"></a>可达性分析算法</h4><p>在Java和C#等主流商用程序语言中，都是使用可达性分析算法来判断对象是否存活。算法思路是从一系列的“GC Roots”的对象最为起始点，从这些节点向下搜索，走过的路径成为引用链，当一个对象到GC Roots没有任何引用链相连，就说明此对象不可用。如下图所示：<br><img src="https://www.gwt.fun/upload/4e5371d36aad41c18b9f9d96e324994f_image.png" alt="imagepng"><br>设A为根对象，如果A和B之间没有引用链相连，那么可以判定BCD不可达，需要GC来回收。<br>GC Roots对象包括：</p>
+<ul>
+<li>虚拟机栈中引用的对象</li>
+<li>方法区中类静态属性引用的对象</li>
+<li>方法区中常量引用的对象</li>
+<li>本地方法栈中JNI引用的对象</li>
+</ul>
+<h3 id="对象：我是不是还能拯救一下"><a href="#对象：我是不是还能拯救一下" class="headerlink" title="对象：我是不是还能拯救一下"></a>对象：我是不是还能拯救一下</h3><p>对象GC之前，至少要经过两次标记。如果对象在可达性分析算法之后，没有引用链与GC Roots相连，就会被第一次标记，如果对象没有覆盖finalize()方法或者已经调用过一次finalize()方法（finalize()方法只能被调用一次），就将这个对象回收。如果对象已经覆盖finalize()方法，并且未被调用finalize()方法，就将这个对象放在F-Queue的队列中，由Finalizer线程执行finalize()方法，但不承诺等待运行结束，如果对象未能在执行finalize()方法时自救成功，将会被GC第二次标记，并回收。<br>finalize()方法中，对象重新和引用链中任何一个对象关联上，例如this指向某个类变量或者对象的成员变量，那这个对象就不会被回收。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br></pre></td><td class="code"><pre><span class="line">package fun.gwt.jvm;</span><br><span class="line"></span><br><span class="line">public class GC &#123;</span><br><span class="line">	public static GC SAVE_HOOK &#x3D; null;</span><br><span class="line">	public void isAlive()&#123;</span><br><span class="line">		System.out.println(&quot;我还活着！&quot;);</span><br><span class="line">	&#125;</span><br><span class="line">	@Override</span><br><span class="line">	protected void finalize() throws Throwable&#123;</span><br><span class="line">		super.finalize();</span><br><span class="line">		System.out.println(&quot;执行finalize()方法！&quot;);</span><br><span class="line">		GC.SAVE_HOOK &#x3D; this;</span><br><span class="line">	&#125;</span><br><span class="line">	public static void main(String[] args) throws InterruptedException &#123;</span><br><span class="line">		SAVE_HOOK &#x3D; new GC();</span><br><span class="line">		&#x2F;&#x2F;第一次拯救自己</span><br><span class="line">		System.out.println(&quot;开始第一次拯救自己.....&quot;);</span><br><span class="line">		SAVE_HOOK &#x3D; null;</span><br><span class="line">		System.gc();</span><br><span class="line">		Thread.sleep(1000);</span><br><span class="line">		if (SAVE_HOOK !&#x3D; null)&#123;</span><br><span class="line">			SAVE_HOOK.isAlive();</span><br><span class="line">		&#125;else&#123;</span><br><span class="line">			System.out.println(&quot;我死了！&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		&#x2F;&#x2F;第二次拯救自己</span><br><span class="line">		System.out.println(&quot;开始第二次拯救自己.....&quot;);</span><br><span class="line">		SAVE_HOOK &#x3D; null;</span><br><span class="line">		System.gc();</span><br><span class="line">		Thread.sleep(1000);</span><br><span class="line">		if (SAVE_HOOK !&#x3D; null)&#123;</span><br><span class="line">			SAVE_HOOK.isAlive();</span><br><span class="line">		&#125;else&#123;</span><br><span class="line">			System.out.println(&quot;我死了！&quot;);</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;*</span><br><span class="line">开始第一次拯救自己.....</span><br><span class="line">执行finalize()方法！</span><br><span class="line">我还活着！</span><br><span class="line">开始第二次拯救自己.....</span><br><span class="line">我死了！</span><br><span class="line">*&#x2F;</span><br></pre></td></tr></table></figure>
+<h3 id="垃圾收集算法"><a href="#垃圾收集算法" class="headerlink" title="垃圾收集算法"></a>垃圾收集算法</h3><h4 id="标记-清除算法"><a href="#标记-清除算法" class="headerlink" title="标记-清除算法"></a>标记-清除算法</h4><p>标记清楚算法将垃圾回收分为两个阶段：标记阶段和清除阶段。<br>标记阶段首先根据根结点，标记所有从根结点可达的对象，未被标记的对象就是垃圾对象。在清除阶段，清除所有未被标记的对象。<br><img src="https://www.gwt.fun/upload/520e360573444b519731059d7c20c03f_image.png" alt="imagepng"><br>可以看到，该算法有两个不足：一是效率问题，标记和清除的效率都不高；二是空间问题，标记清楚之后产生大量不连续的碎片。以上图为例，如果需要一块大小为4的连续空间，整理后的空间就无法分配。如果无法分配，将提前触发下一次垃圾收集动作。</p>
+<h4 id="复制算法"><a href="#复制算法" class="headerlink" title="复制算法"></a>复制算法</h4><p>与标记-清除算法相比，复制算法是一种相对高效的回收方法，但是不适合像老年代这种存活对象较多的场合。存活对象较多，复制算法效率降低。复制算法将内存分为两个大小相同的部分，每次只用一块空间，垃圾收集时，将正在使用空间中的存活的对象复制到未使用的空间中，然后清除正在使用的空间，并交换两个内存的角色，完成垃圾回收。<br><img src="https://www.gwt.fun/upload/9ab4258fb5cc4767bef1fcfaacc571a1_image.png" alt="imagepng"> </p>
+<h4 id="标记-整理-压缩算法"><a href="#标记-整理-压缩算法" class="headerlink" title="标记-整理/压缩算法"></a>标记-整理/压缩算法</h4><p>标记-整理算法适合存活对象较多的场合，比如老年代。标记-整理算法将所有对象做标记后，将存活的对象整理到内存的一段，然后清理边界外的所有空间。<br><img src="https://www.gwt.fun/upload/41a413a5f67447c382457c3dcdcaee14_image.png" alt="imagepng"> </p>
+<h4 id="总结"><a href="#总结" class="headerlink" title="总结"></a>总结</h4><p>虚拟机采用这种方法回收新生代，将新生代中的内存分为三部分，一块较大的Eden空间和两块较小的Survivor空间，每次使用Eden和其中的一块Survivor空间。回收时将Eden和Survivor中存活的对象复制到另一块Survivor空间中，然后清理Eden和Survivor空间。Eden和两块Survivor空间的默认大小是8：1：1，每次都有10%的空间浪费。如果Survivor空间不足时将放到老年代中。<br>具体详见：<a target="_blank" rel="noopener" href="https://www.gwt.fun/articles/2019/01/30/1548860893505.html">深入理解Java虚拟机–内存分代策略及常用参数配置</a><br>下面的图实现了一次垃圾收集过程内存变化情况：新生代Eden中的大对象，如果Eden和Survivor中都无法存储，将直接存放到老年代中，Survivor中的老年对象进入老年代。最后Eden区和一块Survivor空间空闲。</p>
+<p><img src="https://www.gwt.fun/upload/864525d865094585b17fa115582ad9da_image.png" alt="imagepng"> </p>
+<h3 id="垃圾收集器"><a href="#垃圾收集器" class="headerlink" title="垃圾收集器"></a>垃圾收集器</h3><h4 id="Serial收集器-串行收集器"><a href="#Serial收集器-串行收集器" class="headerlink" title="Serial收集器(串行收集器)"></a>Serial收集器(串行收集器)</h4><p>Serial收集器是最古老，最稳定的收集器，但是在执行垃圾回收时会暂停其他所有线程，直到它收集结束。<br><img src="https://www.gwt.fun/upload/c86d4e4492f247f7a6e9e4590b1e8da3_image.png" alt="imagepng"><br>虚拟机运行在Client模式下的默认新生代收集器，比其他收集器简单高效。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:+UseSerialGC    &#x2F;&#x2F;新生代老年代使用串行回收</span><br></pre></td></tr></table></figure>
+<p>该收集器在新生代和老年代使用串行回收；其中新生代使用复制算法，老年代使用标记-整理算法</p>
+<h4 id="ParNew收集器"><a href="#ParNew收集器" class="headerlink" title="ParNew收集器"></a>ParNew收集器</h4><p>ParNew收集器是Serial收集器的多线程版本，新生代可以并行收集，老年代还是串行收集，所以只影响新生代。<br><img src="https://www.gwt.fun/upload/a39522124e8b4f94bb69d843c86bf20b_image.png" alt="imagepng"><br>使用参数：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">-XX:+UseParNewGC     &#x2F;&#x2F;使用ParNew收集器</span><br><span class="line">-XX:ParallelGCThreads &#x2F;&#x2F;限制线程数量</span><br></pre></td></tr></table></figure>
+<h4 id="Parallel收集器"><a href="#Parallel收集器" class="headerlink" title="Parallel收集器"></a>Parallel收集器</h4><p>Parallel 收集器和ParNew类似，新生代使用复制算法，老年代使用标记-整理算法。这个收集器更加关注吞吐量。<br><img src="https://www.gwt.fun/upload/a39522124e8b4f94bb69d843c86bf20b_image.png" alt="imagepng">  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">-XX:+UseParallelGC      &#x2F;&#x2F;使用Parallel收集器+ 老年代串行</span><br><span class="line">-XX:+UseParallelOldGC   &#x2F;&#x2F;使用Parallel收集器+ 并行老年代</span><br><span class="line">&#x2F;&#x2F;下面两个参数矛盾，因为停顿时间和吞吐量不能同时兼顾</span><br><span class="line">-XX:MaxGCPauseMills &#x2F;&#x2F;最大停顿时间，单位毫秒,GC尽力保证回收时间不超过设定值</span><br><span class="line">-XX:GCTimeRatio &#x2F;&#x2F;0-100的取值范围,垃圾收集时间占总时间的比,默认99，即最大允许1%时间做GC</span><br></pre></td></tr></table></figure>
+<h4 id="CMS收集器"><a href="#CMS收集器" class="headerlink" title="CMS收集器"></a>CMS收集器</h4><p>CMS（Concurrent Mark Sweep ）并发标记清除收集器是一种以获取最短回收停顿时间作为目标的收集器。CMS收集器使用的是标记-清除算法，并发阶段会降低吞吐量。CMS收集器是老年代收集器，新生代使用ParNew收集器。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:+UseConcMarkSweepGC   &#x2F;&#x2F;启用CMS收集器</span><br></pre></td></tr></table></figure>
+<p>CMS的标记过程分为四个阶段：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">初始标记</span><br><span class="line">并发标记</span><br><span class="line">重新标记</span><br><span class="line">并发清除</span><br></pre></td></tr></table></figure>
+<p>如下图所示,初始标记和重新标记阶段需要“Stop The World”，整个过程中最耗时的并发标记和并发清除是和用户线程一起执行，所以是一种并发低停顿收集器。<br><img src="https://www.gwt.fun/upload/a079e87e1aa2433797dd09f6cf7aa209_image.png" alt="imagepng"><br>在JDK1.5默认设置，CMS收集器在老年代使用68%空间就会被激活，因为和用户线程一起运行，不能在空间快满时再清理,如果内存预留不够，会引起concurrent mode failure  </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">-XX:CMSInitiatingOccupancyFraction  &#x2F;&#x2F;设置触发GC的阈值</span><br></pre></td></tr></table></figure>
+<p>虽然CMS收集器尽可能降低了停顿，但是会影响系统整体性能，在用户线程运行过程中，分一半CPU去执行GC，反应速度就下降一半。另外在清理阶段，用户线程还在运行，会产生新的垃圾，无法清理，导致清理不彻底。<br>CMS使用的是标记-清理算法，因此会产生大量碎片，可以通过以下参数来整理碎片：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">-XX:+ UseCMSCompactAtFullCollection &#x2F;&#x2F;Full GC后，进行一次整理,整理过程是独占的，会引起停顿时间变长</span><br><span class="line">-XX:+CMSFullGCsBeforeCompaction &#x2F;&#x2F;设置进行几次Full GC后，进行一次碎片整理</span><br><span class="line">-XX:ParallelCMSThreads &#x2F;&#x2F;设定CMS的线程数量</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h4 id="G1收集器"><a href="#G1收集器" class="headerlink" title="G1收集器"></a>G1收集器</h4><p>G1收集器是JDK1.7中引入，在Java9中为JVM默认垃圾收集器。G1垃圾收集器主要应用在多CPU和大内存的服务器环境中，可以极大减少垃圾收集器的停顿时间，提升服务器性能，可以解决CMS中Concurrent Mode Failed问题，并逐步替换掉CMS.<br>G1垃圾收集器不再将内存分为新生代和老年代，直接将堆空间划分为大小相同的子空间（Region），JVM可以设置这些Region空间的大小（每个子空间大小范围为1MB~32MB[必须是2的幂],最多可以设置2048个区域，最大支持32MB*2048=64G内存），每个Region标记为E、S、O和H，分别表示Eden、Survivor、Old、Humongous。其中E、S属于年轻代，O与H属于老年代。<br><img src="https://www.gwt.fun/upload/667a441c33554785b2a8247e138c1112_image.png" alt="imagepng"><br>与CMS的标记-整理算法不同，G1从整体来看是基于标记-整理算法实现，从两个Region之间来看是基于复制算法实现。</p>
+<p>G1跟踪每个Region里面垃圾堆积的价值大小（回收所获空间大小以及回收所需时间的经验值），后台维护一个优先列表，每次根据允许的收集时间，优先回收价值最大的Region，从而保证G1收集器在有限的时间内获得更高的效率。</p>
+<h3 id="GC参数"><a href="#GC参数" class="headerlink" title="GC参数"></a>GC参数</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">-XX:+UseSerialGC：在新生代和老年代使用串行收集器</span><br><span class="line">-XX:SurvivorRatio：设置eden区大小和survivior区大小的比例</span><br><span class="line">-XX:NewRatio:新生代和老年代的比</span><br><span class="line">-XX:+UseParNewGC：在新生代使用并行收集器</span><br><span class="line">-XX:+UseParallelGC ：新生代使用并行回收收集器</span><br><span class="line">-XX:+UseParallelOldGC：老年代使用并行回收收集器</span><br><span class="line">-XX:ParallelGCThreads：设置用于垃圾回收的线程数</span><br><span class="line">-XX:+UseConcMarkSweepGC：新生代使用并行收集器，老年代使用CMS+串行收集器</span><br><span class="line">-XX:ParallelCMSThreads：设定CMS的线程数量</span><br><span class="line">-XX:CMSInitiatingOccupancyFraction：设置CMS收集器在老年代空间被使用多少后触发</span><br><span class="line">-XX:+UseCMSCompactAtFullCollection：设置CMS收集器在完成垃圾收集后是否要进行一次内存碎片的整理</span><br><span class="line">-XX:CMSFullGCsBeforeCompaction：设定进行多少次CMS垃圾回收后，进行一次内存压缩</span><br><span class="line">-XX:+CMSClassUnloadingEnabled：允许对类元数据进行回收</span><br><span class="line">-XX:CMSInitiatingPermOccupancyFraction：当永久区占用率达到这一百分比时，启动CMS回收</span><br><span class="line">-XX:UseCMSInitiatingOccupancyOnly：表示只在到达阀值的时候，才进行CMS回收</span><br></pre></td></tr></table></figure>
+<h3 id="参考资料"><a href="#参考资料" class="headerlink" title="参考资料"></a>参考资料</h3><p>1.周志明. 深入理解Java虚拟机[M]. 机械工业出版社, 2013.<br>2<a target="_blank" rel="noopener" href="https://www.jianshu.com/p/548c67aa1bc0">G1从入门到放弃（一）</a></p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/02/14/201902/Java基础之序列化与反序列化/" class="prev">上一篇：Java基础之序列化与反序列化</a>
+    
+    
+    <a href="/2019/02/10/201902/Java基础之自动拆箱装箱/" class="next">下一篇：Java基础之自动拆箱装箱</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

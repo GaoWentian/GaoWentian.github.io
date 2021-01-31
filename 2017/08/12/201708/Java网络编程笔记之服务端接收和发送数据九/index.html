@@ -1,0 +1,162 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java网络编程笔记之服务端接收和发送数据（九） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="在建立完 ServerSocket 对象后，通过 accept 方法返回的 Socket 对象，服务端就可以和客户端进行数据交互。Socket 类和 ServerSocket 类都有两个得到输入输出流的方法：getInputStream 和 getOutputStream。对于 Socket 类而言">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java网络编程笔记之服务端接收和发送数据（九）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-08-11T23:28:16.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-08-12
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java网络编程笔记之服务端接收和发送数据（九）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <p>在建立完 ServerSocket 对象后，通过 accept 方法返回的 Socket 对象，服务端就可以和客户端进行数据交互。<br>Socket 类和 ServerSocket 类都有两个得到输入输出流的方法：getInputStream 和 getOutputStream。对于 Socket 类而言，使用 getInputStream 方法得到的 InputStream 是从服务端获取数据，而 getOutputStream 方法得到的 OutputStream 是向服务端发送数据。而 ServerSocket 的 getInputStream和 getOutputStream 方法也类似。InputStream 从客户端读取数据，OutputStream 向客户端发送数据。<br>下面的代码是一个接收 HTTP 请求，并返回 HTTP 请求头信息的程序，它演示了 ServerSocket 类如何读取和发送来自客户端的数据。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br></pre></td><td class="code"><pre><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line">import java.io.OutputStreamWriter;</span><br><span class="line">import java.net.ServerSocket;</span><br><span class="line">import java.net.Socket;</span><br><span class="line"></span><br><span class="line">public class HttpEchoServer extends Thread&#123;</span><br><span class="line">	private Socket socket;</span><br><span class="line">	public void run()&#123;</span><br><span class="line">		try &#123;</span><br><span class="line">			InputStreamReader isr &#x3D; new InputStreamReader(socket.getInputStream());</span><br><span class="line">			BufferedReader br &#x3D; new BufferedReader(isr);</span><br><span class="line">			OutputStreamWriter osw &#x3D; new OutputStreamWriter(socket.getOutputStream());</span><br><span class="line">			osw.write(&quot;HTTP&#x2F;1.1 200 ok \r\n\r\n&quot;);</span><br><span class="line">			String s &#x3D; &quot;&quot;;</span><br><span class="line">			while(!(s &#x3D; br.readLine()).equals(&quot;&quot;))&#123;</span><br><span class="line">				osw.write(&quot;&lt;html&gt;&lt;body&gt;&quot;+s+&quot;&lt;br&#x2F;&gt;&lt;&#x2F;body&gt;&lt;&#x2F;html&gt;&quot;);</span><br><span class="line">			&#125;</span><br><span class="line">			osw.flush();</span><br><span class="line">			socket.close();</span><br><span class="line">		</span><br><span class="line">		&#125; catch (IOException e) &#123;</span><br><span class="line">			&#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">	public HttpEchoServer(Socket socket)&#123;</span><br><span class="line">		this.socket &#x3D; socket;</span><br><span class="line">	&#125;</span><br><span class="line">	public static void main(String[] args) throws IOException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		ServerSocket serverSocket &#x3D; new ServerSocket(8888);</span><br><span class="line">		System.out.println(&quot;服务器已经启动，端口为：8888&quot;);</span><br><span class="line">		while(true)&#123;</span><br><span class="line">			Socket socket &#x3D; serverSocket.accept();</span><br><span class="line">			new HttpEchoServer(socket).start();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">浏览器中输入：http:&#x2F;&#x2F;localhost:8888&#x2F;</span><br><span class="line">GET &#x2F; HTTP&#x2F;1.1</span><br><span class="line">Host: localhost:8888</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Upgrade-Insecure-Requests: 1</span><br><span class="line">User-Agent: Mozilla&#x2F;5.0 (Windows NT 6.1; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;60.0.3112.78 Safari&#x2F;537.36</span><br><span class="line">Accept: text&#x2F;html,application&#x2F;xhtml+xml,application&#x2F;xml;q&#x3D;0.9,image&#x2F;webp,image&#x2F;apng,*&#x2F;*;q&#x3D;0.8</span><br><span class="line">Accept-Encoding: gzip, deflate, br</span><br><span class="line">Accept-Language: zh-CN,zh;q&#x3D;0.8</span><br><span class="line">Cookie: Hm_lvt_e412b6801483c42a3a6587d769295d4f&#x3D;1502344237</span><br></pre></td></tr></table></figure>
+<p>每读一行请求头信息，就向客户端写一行响应信息。最后用 flush 方法将输出缓冲区中的内容发送到客户端。只要使用 OutputStream，在最后就必须要调用 flush 方法。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/08/12/201708/Java网络编程笔记之关闭服务端连接十/" class="prev">上一篇：Java网络编程笔记之关闭服务端连接（十）</a>
+    
+    
+    <a href="/2017/08/12/201708/Java网络编程笔记之ServerSocket对象八/" class="next">下一篇：Java网络编程笔记之ServerSocket 对象（八）</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,291 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Redis高级应用--对象的实现原理 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="对象的类型Redis有5中基本数据类型，使用TYPE命令，即可查看对象类型:
+1234127.0.0.1:6379&amp;gt; SET name gavinOK127.0.0.1:6379&amp;gt; TYPE namestring
+
+
+
+对象
+TYPE类型输出
+
+
+
+字符串对象
+“string”
+
+
+列表">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Redis高级应用--对象的实现原理"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-12-25T15:35:11.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-12-25
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Redis高级应用--对象的实现原理</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E7%9A%84%E7%B1%BB%E5%9E%8B"><span class="toc-number">1.</span> <span class="toc-text">对象的类型</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E7%9A%84%E7%BC%96%E7%A0%81"><span class="toc-number">2.</span> <span class="toc-text">对象的编码</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%AF%B9%E8%B1%A1"><span class="toc-number">3.</span> <span class="toc-text">字符串对象</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#int"><span class="toc-number">3.1.</span> <span class="toc-text">int</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#embstr%E5%92%8Craw"><span class="toc-number">3.2.</span> <span class="toc-text">embstr和raw</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%97%E8%A1%A8%E5%AF%B9%E8%B1%A1"><span class="toc-number">4.</span> <span class="toc-text">列表对象</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#quicklist"><span class="toc-number">4.1.</span> <span class="toc-text">quicklist</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%93%88%E5%B8%8C%E5%AF%B9%E8%B1%A1"><span class="toc-number">5.</span> <span class="toc-text">哈希对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9B%86%E5%90%88%E5%AF%B9%E8%B1%A1"><span class="toc-number">6.</span> <span class="toc-text">集合对象</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E5%BA%8F%E9%9B%86%E5%90%88%E5%AF%B9%E8%B1%A1"><span class="toc-number">7.</span> <span class="toc-text">有序集合对象</span></a></li></ol>
+    </div>
+    
+    <h3 id="对象的类型"><a href="#对象的类型" class="headerlink" title="对象的类型"></a>对象的类型</h3><p>Redis有5中基本数据类型，使用TYPE命令，即可查看对象类型:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; SET name gavin</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; TYPE name</span><br><span class="line">string</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>对象</th>
+<th>TYPE类型输出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>字符串对象</td>
+<td>“string”</td>
+</tr>
+<tr>
+<td>列表对象</td>
+<td>“list”</td>
+</tr>
+<tr>
+<td>哈希对象</td>
+<td>“hash”</td>
+</tr>
+<tr>
+<td>集合对象</td>
+<td>“set”</td>
+</tr>
+<tr>
+<td>有序集合对象</td>
+<td>“zset”</td>
+</tr>
+</tbody></table>
+<h3 id="对象的编码"><a href="#对象的编码" class="headerlink" title="对象的编码"></a>对象的编码</h3><p>Redis使用OBJECT ENCODING命令查看对象内部实现数据结构：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; SET name gavin</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; SET age 10</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING name</span><br><span class="line">&quot;embstr&quot;</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING age</span><br><span class="line">&quot;int&quot;</span><br></pre></td></tr></table></figure>
+<table>
+<thead>
+<tr>
+<th>对象底层数据结构</th>
+<th>OBJECT ENCODING命令输出</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>整数</td>
+<td>int</td>
+</tr>
+<tr>
+<td>embstr编码的简单动态字符串</td>
+<td>embstr</td>
+</tr>
+<tr>
+<td>简单动态字符串</td>
+<td>raw</td>
+</tr>
+<tr>
+<td>字典</td>
+<td>hashtable</td>
+</tr>
+<tr>
+<td>双端链表</td>
+<td>linkedlist</td>
+</tr>
+<tr>
+<td>压缩列表</td>
+<td>ziplist</td>
+</tr>
+<tr>
+<td>整数集合</td>
+<td>intset</td>
+</tr>
+<tr>
+<td>跳跃表和字典</td>
+<td>skiplist</td>
+</tr>
+<tr>
+<td>快速列表</td>
+<td>quicklist</td>
+</tr>
+</tbody></table>
+<h3 id="字符串对象"><a href="#字符串对象" class="headerlink" title="字符串对象"></a>字符串对象</h3><p>字符串对象编码有三种int、embstr和raw</p>
+<h4 id="int"><a href="#int" class="headerlink" title="int"></a>int</h4><p>如果字符串保存的是整数，长度小于等于20字节，并且能转为整形，则编码为int</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">len &#x3D; sdslen(s);</span><br><span class="line">&#x2F;&#x2F;判断字符串长度是否小于20，并且s为long类型</span><br><span class="line">if (len &lt;&#x3D; 20 &amp;&amp; string2l(s,len,&amp;value)) &#123;</span><br><span class="line">    &#x2F;* This object is encodable as a long. Try to use a shared object.</span><br><span class="line">     * Note that we avoid using shared integers when maxmemory is used</span><br><span class="line">     * because every object needs to have a private LRU field for the LRU</span><br><span class="line">     * algorithm to work well. *&#x2F;</span><br><span class="line">    if ((server.maxmemory &#x3D;&#x3D; 0 ||</span><br><span class="line">        !(server.maxmemory_policy &amp; MAXMEMORY_FLAG_NO_SHARED_INTEGERS)) &amp;&amp;</span><br><span class="line">        value &gt;&#x3D; 0 &amp;&amp;</span><br><span class="line">        value &lt; OBJ_SHARED_INTEGERS)  </span><br><span class="line">    &#123;</span><br><span class="line">        decrRefCount(o);</span><br><span class="line">        incrRefCount(shared.integers[value]);&#x2F;&#x2F; 如果数字在0到10000之间，使用大小为10000的共享数组</span><br><span class="line">        return shared.integers[value];  &#x2F;&#x2F;直接返回共享数组中的地址</span><br><span class="line">    &#125; else &#123;</span><br><span class="line">        if (o-&gt;encoding &#x3D;&#x3D; OBJ_ENCODING_RAW) &#123;</span><br><span class="line">            sdsfree(o-&gt;ptr);</span><br><span class="line">            o-&gt;encoding &#x3D; OBJ_ENCODING_INT;</span><br><span class="line">            o-&gt;ptr &#x3D; (void*) value;</span><br><span class="line">            return o;</span><br><span class="line">        &#125; else if (o-&gt;encoding &#x3D;&#x3D; OBJ_ENCODING_EMBSTR) &#123;</span><br><span class="line">            decrRefCount(o);</span><br><span class="line">            return createStringObjectFromLongLongForValue(value);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F; 用到的其他定义</span><br><span class="line">#define OBJ_SHARED_INTEGERS 10000</span><br><span class="line">extern struct sharedObjectsStruct shared;</span><br><span class="line">struct sharedObjectsStruct &#123;</span><br><span class="line">    robj *crlf, *ok, *err, *emptybulk, *czero, *cone, *pong, *space,</span><br><span class="line">    *colon, *queued, *null[4], *nullarray[4], *emptymap[4], *emptyset[4],</span><br><span class="line">    *emptyarray, *wrongtypeerr, *nokeyerr, *syntaxerr, *sameobjecterr,</span><br><span class="line">    *outofrangeerr, *noscripterr, *loadingerr, *slowscripterr, *bgsaveerr,</span><br><span class="line">    *masterdownerr, *roslaveerr, *execaborterr, *noautherr, *noreplicaserr,</span><br><span class="line">    *busykeyerr, *oomerr, *plus, *messagebulk, *pmessagebulk, *subscribebulk,</span><br><span class="line">    *unsubscribebulk, *psubscribebulk, *punsubscribebulk, *del, *unlink,</span><br><span class="line">    *rpop, *lpop, *lpush, *rpoplpush, *zpopmin, *zpopmax, *emptyscan,</span><br><span class="line">    *multi, *exec,</span><br><span class="line">    *select[PROTO_SHARED_SELECT_CMDS],</span><br><span class="line">    *integers[OBJ_SHARED_INTEGERS],   &#x2F;&#x2F;定义大小为10000的数组</span><br><span class="line">    *mbulkhdr[OBJ_SHARED_BULKHDR_LEN], &#x2F;* &quot;*&lt;value&gt;\r\n&quot; *&#x2F;</span><br><span class="line">    *bulkhdr[OBJ_SHARED_BULKHDR_LEN];  &#x2F;* &quot;$&lt;value&gt;\r\n&quot; *&#x2F;</span><br><span class="line">    sds minstring, maxstring;</span><br><span class="line">&#125;;</span><br></pre></td></tr></table></figure>
+
+
+<h4 id="embstr和raw"><a href="#embstr和raw" class="headerlink" title="embstr和raw"></a>embstr和raw</h4><p>embstr和raw的分界线是44字节，如果大于44字节，使用raw，小于等于44字节使用embstr编码</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">#define OBJ_ENCODING_EMBSTR_SIZE_LIMIT 44     </span><br><span class="line">robj *createStringObject(const char *ptr, size_t len) &#123;</span><br><span class="line">    if (len &lt;&#x3D; OBJ_ENCODING_EMBSTR_SIZE_LIMIT)    &#x2F;&#x2F;  字符串长度小于44，使用EmbeddedString </span><br><span class="line">        return createEmbeddedStringObject(ptr,len);</span><br><span class="line">    else</span><br><span class="line">        return createRawStringObject(ptr,len);   &#x2F;&#x2F;字符串大于44，使用Raw</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="列表对象"><a href="#列表对象" class="headerlink" title="列表对象"></a>列表对象</h3><p>列表对象在3.2版本之前使用ziplist和linkedlist两种编码，在3.2版本之后使用quicklist编码。</p>
+<h4 id="quicklist"><a href="#quicklist" class="headerlink" title="quicklist"></a>quicklist</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; LPUSH list 1 2 3</span><br><span class="line">(integer) 3</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING list</span><br><span class="line">&quot;quicklist&quot;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="哈希对象"><a href="#哈希对象" class="headerlink" title="哈希对象"></a>哈希对象</h3><p>哈希对象编码使用ziplist和hashtable</p>
+<ul>
+<li>哈希对象保存的键值对的键和值得字符串长度都小于64字节使用ziplist</li>
+<li>哈希对象的键值对数量小于512个使用ziplist</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; hset book name 1234567890123456789012345678901234567890123456789012345678901234</span><br><span class="line">(integer) 0</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING book</span><br><span class="line">&quot;ziplist&quot;</span><br><span class="line">127.0.0.1:6379&gt; hset book name 12345678901234567890123456789012345678901234567890123456789012345</span><br><span class="line">(integer) 0</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING book</span><br><span class="line">&quot;hashtable&quot;</span><br><span class="line">127.0.0.1:6379&gt; EVAL &quot;for i&#x3D;1, 512 do redis.call(&#39;HSET&#39;, KEYS[1], i, i)end&quot; 1 &quot;numbers&quot;</span><br><span class="line">(nil)</span><br><span class="line">127.0.0.1:6379&gt; HLEN numbers</span><br><span class="line">(integer) 512</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING numbers</span><br><span class="line">&quot;ziplist&quot;</span><br><span class="line">127.0.0.1:6379&gt; HMSET numbers &quot;key&quot; &quot;value&quot;</span><br><span class="line">OK</span><br><span class="line">127.0.0.1:6379&gt; HLEN numbers</span><br><span class="line">(integer) 513</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING numbers</span><br><span class="line">&quot;hashtable&quot;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="集合对象"><a href="#集合对象" class="headerlink" title="集合对象"></a>集合对象</h3><p>集合对象编码使用intset和hashtable两种</p>
+<ul>
+<li>集合对象保存的都是整数，但是不超过512个，使用intset编码</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; sadd numbers 1 2 3 4 5</span><br><span class="line">(integer) 5</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING numbers</span><br><span class="line">&quot;intset&quot;</span><br><span class="line">127.0.0.1:6379&gt; sadd name &quot;h&quot; &quot;gavin&quot;</span><br><span class="line">(integer) 2</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING name</span><br><span class="line">&quot;hashtable&quot;</span><br><span class="line">127.0.0.1:6379&gt; EVAL &quot;for i&#x3D;1, 512 do redis.call(&#39;SADD&#39;, KEYS[1], i)end&quot; 1 &quot;numbers&quot;</span><br><span class="line">(nil)</span><br><span class="line">127.0.0.1:6379&gt; SCARD numbers</span><br><span class="line">(integer) 512</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING numbers</span><br><span class="line">&quot;intset&quot;</span><br><span class="line">127.0.0.1:6379&gt; SADD numbers 12312</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING numbers</span><br><span class="line">&quot;hashtable&quot;</span><br></pre></td></tr></table></figure>
+
+
+<h3 id="有序集合对象"><a href="#有序集合对象" class="headerlink" title="有序集合对象"></a>有序集合对象</h3><p>有序集合对象编码使用ziplist和skiplist</p>
+<ul>
+<li>有序集合保存元素数量小于128个使用ziplist</li>
+<li>有序集合保存元素成员长度小于64字节使用ziplist</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">127.0.0.1:6379&gt; ZADD price 1  apple123456789012345678901234567890123456789012345678901234567890</span><br><span class="line">(integer) 1</span><br><span class="line">127.0.0.1:6379&gt; OBJECT ENCODING price</span><br><span class="line">&quot;skiplist&quot;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+
+
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/12/26/201912/Redis高级应用阻塞的原因/" class="prev">上一篇：Redis高级应用--阻塞的原因</a>
+    
+    
+    <a href="/2019/12/17/201912/Redis高级应用主从复制/" class="next">下一篇：Redis高级应用--主从复制</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

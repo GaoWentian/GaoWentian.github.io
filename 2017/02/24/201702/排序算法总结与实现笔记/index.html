@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>排序算法总结与实现笔记 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="冒泡排序　　冒泡排序是最基础的排序算法，冒泡排序不断对比两个相邻的元素大小，将顺序错误的值交换。将大的值交换到数组的底部，过程像冒泡一样。排序算法时间复杂度是O(n^2)
+1234比较相邻的元素。如果第一个比第二个大，就交换他们两个。对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对。在这一">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="排序算法总结与实现笔记"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-02-23T22:13:23.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-02-24
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">排序算法总结与实现笔记</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%86%92%E6%B3%A1%E6%8E%92%E5%BA%8F"><span class="toc-number">1.</span> <span class="toc-text">冒泡排序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E9%80%89%E6%8B%A9%E6%8E%92%E5%BA%8F"><span class="toc-number">2.</span> <span class="toc-text">选择排序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%9B%B4%E6%8E%A5%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F"><span class="toc-number">3.</span> <span class="toc-text">直接插入排序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8A%98%E5%8D%8A%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%EF%BC%88%E4%BA%8C%E5%88%86%E6%8F%92%E5%85%A5%E6%8E%92%E5%BA%8F%EF%BC%89"><span class="toc-number">4.</span> <span class="toc-text">折半插入排序（二分插入排序）</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B8%8C%E5%B0%94%E6%8E%92%E5%BA%8F"><span class="toc-number">5.</span> <span class="toc-text">希尔排序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BD%92%E5%B9%B6%E6%8E%92%E5%BA%8F"><span class="toc-number">6.</span> <span class="toc-text">归并排序</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%BF%AB%E9%80%9F%E6%8E%92%E5%BA%8F"><span class="toc-number">7.</span> <span class="toc-text">快速排序</span></a></li></ol>
+    </div>
+    
+    <p><img src="/img/blog/2350612-852c2e7b62357dca.png" alt="Alt text"></p>
+<h4 id="冒泡排序"><a href="#冒泡排序" class="headerlink" title="冒泡排序"></a>冒泡排序</h4><p>　　冒泡排序是最基础的排序算法，冒泡排序不断对比两个相邻的元素大小，将顺序错误的值交换。将大的值交换到数组的底部，过程像冒泡一样。排序算法时间复杂度是O(n^2)</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">比较相邻的元素。如果第一个比第二个大，就交换他们两个。</span><br><span class="line">对每一对相邻元素作同样的工作，从开始第一对到结尾的最后一对。在这一点，最后的元素应该会是最大的数。</span><br><span class="line">针对所有的元素重复以上的步骤，除了最后一个。</span><br><span class="line">持续每次对越来越少的元素重复上面的步骤，直到没有任何一对数字需要比较。</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># include&lt;stdio.h&gt;</span><br><span class="line">&#x2F;*冒泡排序*&#x2F;</span><br><span class="line">void bubble_sort(int *list)</span><br><span class="line">&#123;</span><br><span class="line">	int length&#x3D; 10;  &#x2F;&#x2F;数组长度 </span><br><span class="line">	int tempNum;      </span><br><span class="line">	for(int index &#x3D; 0;index &lt; length;index++)</span><br><span class="line">	&#123;</span><br><span class="line">		for(int i &#x3D; 1;i &lt; length- index;i++)</span><br><span class="line">		&#123;</span><br><span class="line">			if(list[i-1] &gt; list[i])&#123;</span><br><span class="line">				tempNum &#x3D; list[i-1];</span><br><span class="line">				list[i-1] &#x3D; list[i];</span><br><span class="line">				list[i] &#x3D; tempNum;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	int list[10] &#x3D; &#123;12,43,56,54,23,10,3,65,84,2&#125;;</span><br><span class="line">	bubble_sort(list);</span><br><span class="line">	for(int i &#x3D; 0;i &lt; 10;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		printf(&quot;%d\t&quot;,list[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	return 0;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-ddef4c4d5a2b4fe7.gif" alt="Alt text"></p>
+<h4 id="选择排序"><a href="#选择排序" class="headerlink" title="选择排序"></a>选择排序</h4><p>　　选择排序是一种不稳定的排序。选择排序是将数组中最小（或最大）的值找出来，放到第一个位置上，然后在剩余的元素中找到最小（或最大）的值，放到第二个位置上。选择排序时间复杂度是O(n^2)，最好时间复杂度也是O(n^2)。<br>　　假如有数组[5,5,3]，使用选择排序进行排序，最小值3会和第一个5互换位置，这就导致第一个5挪到第二5后面，所以选择排序是不稳定的排序。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># include&lt;stdio.h&gt;</span><br><span class="line">&#x2F;*选择排序*&#x2F;</span><br><span class="line">void selection_sort(int *list)</span><br><span class="line">&#123;</span><br><span class="line">	int length&#x3D; 10;  &#x2F;&#x2F;数组长度 </span><br><span class="line">	int tempNum;      </span><br><span class="line">	for(int index &#x3D; 0;index &lt; length;index++)</span><br><span class="line">	&#123;</span><br><span class="line">		for(int i &#x3D; index;i &lt; length;i++)</span><br><span class="line">		&#123;</span><br><span class="line">			if(list[index] &gt; list[i])&#123;</span><br><span class="line">				tempNum &#x3D; list[index];</span><br><span class="line">				list[index] &#x3D; list[i];</span><br><span class="line">				list[i] &#x3D; tempNum;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	int list[10] &#x3D; &#123;12,43,56,54,23,10,3,65,84,2&#125;;</span><br><span class="line">	selection_sort(list);</span><br><span class="line">	for(int i &#x3D; 0;i &lt; 10;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		printf(&quot;%d\t&quot;,list[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	return 0;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-9f4661469c93a35d.gif" alt="Alt text"></p>
+<h4 id="直接插入排序"><a href="#直接插入排序" class="headerlink" title="直接插入排序"></a>直接插入排序</h4><p> 　　直接插入排序是将待排序的值，插入到前面已经排序好的值中，直到所有的值插入完。数组中的第一个值默认已经排序。直接插入排序的时间复杂度是Ｏ(n^2 )</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">从第一个元素开始，该元素可以认为已经被排序</span><br><span class="line">取出下一个元素，在已经排序的元素序列中从后向前扫描</span><br><span class="line">如果该元素（已排序）大于新元素，将该元素移到下一位置</span><br><span class="line">重复步骤3，直到找到已排序的元素小于或者等于新元素的位置</span><br><span class="line">将新元素插入到该位置后</span><br><span class="line">重复步骤2~5</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line"># include&lt;stdio.h&gt;</span><br><span class="line">&#x2F;*插入排序*&#x2F;</span><br><span class="line">void insert_sort(int *list)</span><br><span class="line">&#123;</span><br><span class="line">	int length&#x3D; 10;  &#x2F;&#x2F;数组长度 </span><br><span class="line">	int key;   &#x2F;&#x2F;存放要插入的值     </span><br><span class="line">	for(int index &#x3D; 1;index &lt; length;index++) &#x2F;&#x2F;这里是从1开始遍历，因为默认0是已经排序完的 </span><br><span class="line">	&#123;</span><br><span class="line">		key &#x3D; list[index];</span><br><span class="line">		for(int i &#x3D; index-1;i &gt;&#x3D; 0;i--)</span><br><span class="line">		&#123;</span><br><span class="line">			if(list[i] &gt; key)&#123;</span><br><span class="line">				list[i+1] &#x3D; list[i];</span><br><span class="line">				list[i] &#x3D; key;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	int list[10] &#x3D; &#123;12,43,56,54,23,10,3,65,84,2&#125;;</span><br><span class="line">	insert_sort(list);</span><br><span class="line">	for(int i &#x3D; 0;i &lt; 10;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		printf(&quot;%d\t&quot;,list[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	return 0;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-9653f634e8225456.gif" alt="Alt text"></p>
+<h4 id="折半插入排序（二分插入排序）"><a href="#折半插入排序（二分插入排序）" class="headerlink" title="折半插入排序（二分插入排序）"></a>折半插入排序（二分插入排序）</h4><p>　　折半插入是对直接插入的优化。由于直接插入算法中，需要将排序的元素依次插入前面排好序的元素中。折半查找减少了比较的次数，但是没有减少移动次数，所以算法时间复杂度还是Ｏ(n^2 )</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"># include&lt;stdio.h&gt;</span><br><span class="line">&#x2F;*插入排序*&#x2F;</span><br><span class="line">void binary_insertion_sort(int *list)</span><br><span class="line">&#123;</span><br><span class="line">	int length&#x3D; 10;  &#x2F;&#x2F;数组长度 </span><br><span class="line">	int key;   &#x2F;&#x2F;存放要插入的值     </span><br><span class="line">	for(int i &#x3D; 1;i &lt; length;i++) &#x2F;&#x2F;这里是从1开始遍历，因为默认0是已经排序完的 </span><br><span class="line">	&#123;</span><br><span class="line">		key &#x3D; list[i];</span><br><span class="line">		int left &#x3D; 0;</span><br><span class="line">		int right &#x3D; i - 1;</span><br><span class="line">		while(left &lt;&#x3D; right)</span><br><span class="line">		&#123;</span><br><span class="line">			int mid &#x3D; left + (right - left) &#x2F; 2;</span><br><span class="line">			if(key &lt; list[mid])&#123;</span><br><span class="line">				right &#x3D; mid - 1;</span><br><span class="line">			&#125;else&#123;</span><br><span class="line">				left &#x3D; mid + 1;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		&#x2F;*因为要排序的元素前面的元素是有序的，所以必须将left后面的元素向后移动位置</span><br><span class="line">		这样才能空出来位置将要排序的元素插入进去。 </span><br><span class="line">		*&#x2F;</span><br><span class="line">		for(int j &#x3D; i-1;j  &gt;&#x3D; left;j--)</span><br><span class="line">		&#123;</span><br><span class="line">			list[j+1] &#x3D; list[j]; </span><br><span class="line">		&#125;</span><br><span class="line">		list[left] &#x3D; key;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	int list[10] &#x3D; &#123;12,43,56,54,23,10,3,65,84,2&#125;;</span><br><span class="line">	binary_insertion_sort(list);</span><br><span class="line">	for(int i &#x3D; 0;i &lt; 10;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		printf(&quot;%d\t&quot;,list[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	return 0;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<h4 id="希尔排序"><a href="#希尔排序" class="headerlink" title="希尔排序"></a>希尔排序</h4><p>希尔排序也是插入排序的一种，也称为缩小增量排序，是一种不稳定排序。<br>以下面的数据为例 {12,43,56,54,23,10,3,65,84,2}，整个数据数量为10，，设置步长为5。则数据可以排列为:<br>12　43　56　54　23<br>10　3　65　84　2<br>然后对每一列排序，变为：<br>10　3　56　54　2<br>12　43　65　84　23<br>然后将步长改变为２，将上面的数据重新排列为:<br>10　3<br>56　54<br>2　12<br>43　65<br>84　23<br>然后对上面的数据按列排序，最后，将步长改为１，再按照列排序。即完成排序过程。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"># include&lt;stdio.h&gt;</span><br><span class="line">&#x2F;*希尔排序*&#x2F;</span><br><span class="line">void binary_insertion_sort(int *list)</span><br><span class="line">&#123;</span><br><span class="line">	int length &#x3D; 10;</span><br><span class="line">	int dist &#x3D; length &#x2F; 2;  &#x2F;&#x2F;步长</span><br><span class="line">	int key;</span><br><span class="line">	int j;</span><br><span class="line">	while(dist &gt;  0)</span><br><span class="line">	&#123;</span><br><span class="line">		for(int i&#x3D;dist;i &lt; length;i++)&#x2F;&#x2F;从第二排，第一个元素开始遍历，知道最后一个 </span><br><span class="line">		&#123;</span><br><span class="line">			key &#x3D; list[i];</span><br><span class="line">			j &#x3D; i;		&#x2F;&#x2F;i是该元素原来的位置，j是对比过后，改变的地址 </span><br><span class="line">			while(j &gt;&#x3D; dist &amp;&amp; key &lt; list[j-dist])&#x2F;&#x2F;找到前面的同列中是不是有小的，遍历一遍 </span><br><span class="line">			&#123;</span><br><span class="line">				list[j] &#x3D; list[j-dist];</span><br><span class="line">				j -&#x3D; dist;</span><br><span class="line">			&#125;</span><br><span class="line">			list[j] &#x3D; key;</span><br><span class="line">		&#125;</span><br><span class="line">		dist &#x2F;&#x3D; 2;		&#x2F;&#x2F;增量减半</span><br><span class="line">	&#125; </span><br><span class="line">&#125;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	int list[10] &#x3D; &#123;12,43,56,54,23,10,3,65,84,2&#125;;</span><br><span class="line">	binary_insertion_sort(list);</span><br><span class="line">	for(int i &#x3D; 0;i &lt; 10;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		printf(&quot;%d\t&quot;,list[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	return 0;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-c61e307644c69b87.gif" alt="Alt text"></p>
+<h4 id="归并排序"><a href="#归并排序" class="headerlink" title="归并排序"></a>归并排序</h4><p>　　归并排序是将两个已经排序好的数组合并，使用分治思想。我这里只实现了对数组的合并，可以使用递归对数组排序，使用2路归并算法。算法时间内复杂度为O(nlgn)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"># include&lt;stdio.h&gt;</span><br><span class="line">&#x2F;*归并排序*&#x2F;</span><br><span class="line">void merge_sort(int *list,int *list1,int *list2)</span><br><span class="line">&#123;</span><br><span class="line">	int length_list1 &#x3D; 5;</span><br><span class="line">	int length_list2 &#x3D; 5;</span><br><span class="line">	int j &#x3D; 0;</span><br><span class="line">	int key &#x3D; 0;</span><br><span class="line">	for(int i&#x3D;0;i&lt;length_list1;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		while(list2[j] &lt; list1[i] &amp;&amp; j &lt; length_list2)</span><br><span class="line">		&#123;</span><br><span class="line">			list[key] &#x3D; list2[j];</span><br><span class="line">			key++;</span><br><span class="line">			j++;</span><br><span class="line">		&#125;</span><br><span class="line">		list[key] &#x3D; list1[i];</span><br><span class="line">		key++;</span><br><span class="line">	&#125;</span><br><span class="line">	if(j &lt; (length_list2-1))</span><br><span class="line">	&#123;</span><br><span class="line">		for(int k&#x3D;j+1;k&lt;length_list2;k++)</span><br><span class="line">		&#123;</span><br><span class="line">			list[k] &#x3D; list2[k];</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	int list1[5] &#x3D; &#123;2,15,18,34,87&#125;;</span><br><span class="line">	int list2[5] &#x3D; &#123;4,21,43,54,65&#125;;</span><br><span class="line">	int list[10];</span><br><span class="line">	merge_sort(list,list1,list2);</span><br><span class="line">	for(int i &#x3D; 0;i &lt; 10;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		printf(&quot;%d\t&quot;,list[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	return 0;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-8d847934338e6eb4.gif" alt="Alt text"></p>
+<h4 id="快速排序"><a href="#快速排序" class="headerlink" title="快速排序"></a>快速排序</h4><p> 　　快速排序是随意选择一个元素作为基准数字，比基准数字大的在右边，比基准数字小的在左边。这样来快速排序。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br></pre></td><td class="code"><pre><span class="line"># include&lt;stdio.h&gt;</span><br><span class="line">&#x2F;*快速排序*&#x2F;</span><br><span class="line">&#x2F;* 这里是排序 *&#x2F;</span><br><span class="line">int quick_sort(int *list,int i,int j)</span><br><span class="line">&#123;</span><br><span class="line">	int base &#x3D; list[i];</span><br><span class="line">	while(i &lt; j)</span><br><span class="line">	&#123;</span><br><span class="line">		while(i &lt; j &amp;&amp; list[j] &gt;&#x3D; base)</span><br><span class="line">		&#123;</span><br><span class="line">			j -&#x3D; 1;</span><br><span class="line">		&#125;</span><br><span class="line">		while(i &lt; j &amp;&amp; list[j] &lt; base)</span><br><span class="line">		&#123;</span><br><span class="line">			list[i] &#x3D; list[j];</span><br><span class="line">			i +&#x3D; 1;</span><br><span class="line">			list[j] &#x3D; list[i];</span><br><span class="line">		&#125;</span><br><span class="line">		list[i] &#x3D; base;</span><br><span class="line">		&#x2F;*   测试输出每一次的变化 </span><br><span class="line">		for(int k &#x3D; 0;k &lt; 10;k++)</span><br><span class="line">		&#123;</span><br><span class="line">			printf(&quot;%d\t&quot;,list[k]);</span><br><span class="line">		&#125;</span><br><span class="line">		printf(&quot;\n&quot;);</span><br><span class="line">		*&#x2F;</span><br><span class="line">	&#125;</span><br><span class="line">	return i;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;* 这里是一个递归*&#x2F;</span><br><span class="line">void recursion(int *list,int i,int j)</span><br><span class="line">&#123;</span><br><span class="line">	int base &#x3D; 0;</span><br><span class="line">	if(i &lt; j)</span><br><span class="line">	&#123;</span><br><span class="line">		base &#x3D; quick_sort(list,i,j);</span><br><span class="line">		recursion(list,i,base);</span><br><span class="line">		recursion(list,base+1,j);</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	int list[10] &#x3D; &#123;2,15,18,34,87,4,21,43,54,65&#125;;</span><br><span class="line">	int i &#x3D; 0;</span><br><span class="line">	int length &#x3D; 10; </span><br><span class="line">	recursion(list,i,length-1);</span><br><span class="line">	for(int i &#x3D; 0;i &lt; 10;i++)</span><br><span class="line">	&#123;</span><br><span class="line">		printf(&quot;%d\t&quot;,list[i]);</span><br><span class="line">	&#125;</span><br><span class="line">	return 0;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-d50260d9479cea78.png" alt="Alt text"></p>
+<p><img src="/img/blog/2350612-8d25700a7ace85ca.gif" alt="Alt text"></p>
+<p>还有。。。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/02/27/201702/BruteForce算法和KMP算法笔记/" class="prev">上一篇：Brute-Force算法和KMP算法笔记</a>
+    
+    
+    <a href="/2017/01/25/201701/栈的应用数制转换和人工模拟栈代替系统栈/" class="next">下一篇：栈的应用（数制转换和人工模拟栈代替系统栈）</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

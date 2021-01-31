@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java网络编程笔记之关闭服务端连接（十） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="在客户端和服务端的数据交互完成后，一般需要关闭网络连接。对于服务端来说，需要关闭服务端建立的 Socket 和 ServerSocket。在关闭 Socket 后，客户端并不会马上感知自已的 Socket 已经关闭，也就是说，在服务端的 Socket 关闭后，客户端的 Socket 的 isClos">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java网络编程笔记之关闭服务端连接（十）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-08-12T09:43:42.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-08-12
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java网络编程笔记之关闭服务端连接（十）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <p>　　在客户端和服务端的数据交互完成后，一般需要关闭网络连接。对于服务端来说，需要关闭服务端建立的 Socket 和 ServerSocket。在关闭 Socket 后，客户端并不会马上感知自已的 Socket 已经关闭，也就是说，在服务端的 Socket 关闭后，客户端的 Socket 的 isClosed 和 isConnected 方法仍然会分别得到 false 和 true。但对已关闭的 Socket 的输入输出流进行操作会抛出一个 SocketException 异常。在关闭服务端的 ServerSocket 后，ServerSocket 对象所绑定的端口被释放。这时客户端将无法连接服务端程序。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.Socket;</span><br><span class="line">import java.net.UnknownHostException;</span><br><span class="line"></span><br><span class="line">public class Client &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws UnknownHostException, IOException, InterruptedException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		Socket socket &#x3D; new Socket(&quot;127.0.0.1&quot;,1234);</span><br><span class="line">		Thread.sleep(1000);</span><br><span class="line">		System.out.println(&quot;read（）&#x3D;&quot;+socket.getInputStream().read());</span><br><span class="line">		System.out.println(&quot;isConnected() &#x3D; &quot;+socket.isConnected());</span><br><span class="line">		System.out.println(&quot;isClosed() &#x3D; &quot; + socket.isClosed());</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.ServerSocket;</span><br><span class="line">import java.net.Socket;</span><br><span class="line"></span><br><span class="line">public class server &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws IOException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		ServerSocket serverSocket &#x3D; new ServerSocket(1234);</span><br><span class="line">		while(true)&#123;</span><br><span class="line">			Socket socket  &#x3D; serverSocket.accept();</span><br><span class="line">			socket.close();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">read（）&#x3D;-1       &#x2F;&#x2F;因为没有发送数据，没保存</span><br><span class="line">isConnected() &#x3D; true</span><br><span class="line">isClosed() &#x3D; false</span><br></pre></td></tr></table></figure>
+<p>可以使用 ServerSocket 类的 isClosed 和 isBound 方法判断 ServerSocket 是否处于活动状态</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.ServerSocket;</span><br><span class="line"></span><br><span class="line">public class testServer &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws IOException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		ServerSocket serverSocket &#x3D; new ServerSocket(1234);</span><br><span class="line">		if (serverSocket.isBound() &#x3D;&#x3D; true &amp;&amp; serverSocket.isClosed() &#x3D;&#x3D; false)&#123;</span><br><span class="line">			System.out.println(&quot;serverSocket 处于活动状态!&quot;);</span><br><span class="line">		&#125;else&#123;</span><br><span class="line">			System.out.println(&quot;serverSocket 处于非活动状态!&quot;);			</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>“非活动状态”可能是 serverSocket 对象已经关闭，也可能是 serverSocket 对象是使用 ServerSocket 类的默认构造方法创建的，而且未调用 bind 方法绑定端口。 isBound 方法返回 true不意味着 serverSocket 对象处于活动状态，调用 close 方法不会将绑定状态置为 false，和 Socket 类的 isConnected 方法类似。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/08/17/201708/Java网络编程笔记之获取ServerSocket信息十一/" class="prev">上一篇：Java网络编程笔记之获取 ServerSocket 信息（十一）</a>
+    
+    
+    <a href="/2017/08/12/201708/Java网络编程笔记之服务端接收和发送数据九/" class="next">下一篇：Java网络编程笔记之服务端接收和发送数据（九）</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,172 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java源码分析--Vector | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="介绍Vector和ArrayList一样，内部都是通过数组实现。Vector是线程安全的，但是由于使用了synchronized方法，性能上比ArrayList差。
+源码分析继承1234public class Vector&amp;lt;E&amp;gt;    extends AbstractList&amp;lt;E">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java源码分析--Vector"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-01-04T23:37:59.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-01-05
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java源码分析--Vector</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%8B%E7%BB%8D"><span class="toc-number">1.</span> <span class="toc-text">介绍</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%BA%90%E7%A0%81%E5%88%86%E6%9E%90"><span class="toc-number">2.</span> <span class="toc-text">源码分析</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%BB%A7%E6%89%BF"><span class="toc-number">2.1.</span> <span class="toc-text">继承</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%88%90%E5%91%98%E5%8F%98%E9%87%8F"><span class="toc-number">2.2.</span> <span class="toc-text">成员变量</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0"><span class="toc-number">2.3.</span> <span class="toc-text">构造函数</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#add"><span class="toc-number">2.4.</span> <span class="toc-text">add</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B6%E4%BB%96"><span class="toc-number">3.</span> <span class="toc-text">其他</span></a></li></ol>
+    </div>
+    
+    <h3 id="介绍"><a href="#介绍" class="headerlink" title="介绍"></a>介绍</h3><p>Vector和ArrayList一样，内部都是通过数组实现。Vector是线程安全的，但是由于使用了synchronized方法，性能上比ArrayList差。</p>
+<h3 id="源码分析"><a href="#源码分析" class="headerlink" title="源码分析"></a>源码分析</h3><h4 id="继承"><a href="#继承" class="headerlink" title="继承"></a>继承</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public class Vector&lt;E&gt;</span><br><span class="line">    extends AbstractList&lt;E&gt;</span><br><span class="line">    implements List&lt;E&gt;, RandomAccess, Cloneable, java.io.Serializable</span><br><span class="line">&#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>Vector继承于AbstractList，实现了List, RandomAccess, Cloneable这些接口。</p>
+<h4 id="成员变量"><a href="#成员变量" class="headerlink" title="成员变量"></a>成员变量</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">protected Object[] elementData;  &#x2F;&#x2F;存放数据的对象数组</span><br><span class="line">protected int elementCount;     &#x2F;&#x2F;记录存了多少个元素</span><br><span class="line">protected int capacityIncrement;  &#x2F;&#x2F;当向量溢出时增加的数量</span><br><span class="line">private static final long serialVersionUID &#x3D; -2767605614048989439L;</span><br></pre></td></tr></table></figure>
+<h4 id="构造函数"><a href="#构造函数" class="headerlink" title="构造函数"></a>构造函数</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br></pre></td><td class="code"><pre><span class="line"> &#x2F;&#x2F;传入两个参数initialCapacity和capacityIncrement，initialCapacity是Vector初始化的容量，capacityIncrement是当Vector溢出时增加的数量</span><br><span class="line"> public Vector(int initialCapacity, int capacityIncrement) &#123;</span><br><span class="line">     super();</span><br><span class="line">     if (initialCapacity &lt; 0)  </span><br><span class="line">         throw new IllegalArgumentException(&quot;Illegal Capacity: &quot;+</span><br><span class="line">                                            initialCapacity);</span><br><span class="line">     this.elementData &#x3D; new Object[initialCapacity];</span><br><span class="line">     this.capacityIncrement &#x3D; capacityIncrement;</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line"> public Vector(int initialCapacity) &#123;</span><br><span class="line">     this(initialCapacity, 0);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line">&#x2F;&#x2F;如果不规定向量大小，就默认为10</span><br><span class="line"> public Vector() &#123;</span><br><span class="line">     this(10);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br><span class="line"> &#x2F;&#x2F;将Collection转化为了数组</span><br><span class="line"> public Vector(Collection&lt;? extends E&gt; c) &#123;</span><br><span class="line">     elementData &#x3D; c.toArray();</span><br><span class="line">     elementCount &#x3D; elementData.length;</span><br><span class="line">     &#x2F;&#x2F; c.toArray might (incorrectly) not return Object[] (see 6260652)</span><br><span class="line">     &#x2F;&#x2F;返回若不是Object[]将调用Arrays.copyOf方法将其转为Object[]</span><br><span class="line">     if (elementData.getClass() !&#x3D; Object[].class)</span><br><span class="line">         elementData &#x3D; Arrays.copyOf(elementData, elementCount, Object[].class);</span><br><span class="line"> &#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<h4 id="add"><a href="#add" class="headerlink" title="add"></a>add</h4><p>add函数和Arraylist差不多，ArrayList是扩容空间1.5倍，Vector是扩容了2倍。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line">public synchronized boolean add(E e) &#123;</span><br><span class="line">    modCount++;</span><br><span class="line">    ensureCapacityHelper(elementCount + 1);  &#x2F;&#x2F;判断空间是否够用</span><br><span class="line">    elementData[elementCount++] &#x3D; e;</span><br><span class="line">    return true;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;minCapacity是需要最小空间的容量，低于这个值就存不进去数据</span><br><span class="line">private void ensureCapacityHelper(int minCapacity) &#123;   </span><br><span class="line">    &#x2F;&#x2F; overflow-conscious code</span><br><span class="line">    if (minCapacity - elementData.length &gt; 0) &#x2F;&#x2F;判断增加的大小是否在对象数组大小的范围内</span><br><span class="line">        grow(minCapacity);   &#x2F;&#x2F;如果空间不足，就需要扩容了</span><br><span class="line">&#125;</span><br><span class="line">private static final int MAX_ARRAY_SIZE &#x3D; Integer.MAX_VALUE - 8;</span><br><span class="line"></span><br><span class="line">private void grow(int minCapacity) &#123;</span><br><span class="line">    &#x2F;&#x2F; overflow-conscious code</span><br><span class="line">    int oldCapacity &#x3D; elementData.length;  &#x2F;&#x2F;当前容器的大小</span><br><span class="line">    &#x2F;&#x2F;如果增量capacityIncrement&gt;0,就将容器增加capacityIncrement</span><br><span class="line">    &#x2F;&#x2F;否则，容器增加一倍</span><br><span class="line">    int newCapacity &#x3D; oldCapacity + ((capacityIncrement &gt; 0) ?</span><br><span class="line">                                     capacityIncrement : oldCapacity);</span><br><span class="line">    &#x2F;&#x2F;如果空间还是不够用，直接扩容到需要的空间。</span><br><span class="line">    if (newCapacity - minCapacity &lt; 0)</span><br><span class="line">        newCapacity &#x3D; minCapacity;</span><br><span class="line">    if (newCapacity - MAX_ARRAY_SIZE &gt; 0)</span><br><span class="line">        newCapacity &#x3D; hugeCapacity(minCapacity);</span><br><span class="line">    elementData &#x3D; Arrays.copyOf(elementData, newCapacity);</span><br><span class="line">&#125;</span><br><span class="line">private static int hugeCapacity(int minCapacity) &#123;</span><br><span class="line">    if (minCapacity &lt; 0) &#x2F;&#x2F; overflow</span><br><span class="line">        throw new OutOfMemoryError();</span><br><span class="line">    return (minCapacity &gt; MAX_ARRAY_SIZE) ?</span><br><span class="line">        Integer.MAX_VALUE :</span><br><span class="line">        MAX_ARRAY_SIZE;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="其他"><a href="#其他" class="headerlink" title="其他"></a>其他</h3><p>其余的方法也不介绍了，因为和ArrayList差不多。Vector的所有方法都是用synchronized修饰，从而保证了访问vector的所有方法都必须获得对象的锁。虽然vector内部实现了同步，但是外部调用时，如果一些线程连续调用两个或者两个以上的同步方法，也会引起混乱。因此，在使用vector时，连续调用两个或两个以上的同步方法仍然需要进行同步处理。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/01/18/201901/Java源码分析Stack/" class="prev">上一篇：Java源码分析--Stack</a>
+    
+    
+    <a href="/2018/12/31/201812/深入理解Java虚拟机HotSpot对象创建过程/" class="next">下一篇：深入理解Java虚拟机--HotSpot对象创建过程</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,196 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>（五）Java并发-Synchronized | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="使用当多个线程同时读写一个状态变量，如果没有同步措施，将会出现不可预见的结果。在Java中首要的同步策略是使用Synchronized关键字，它提供了可重入的独占锁。Synchronized可以保证方法或者代码块在运行时，同一时刻只有一个方法可以进入到临界区，它还保证共享变量的内存可见性。Java中">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="（五）Java并发-Synchronized"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2020-11-04T16:15:01.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2020-11-05
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">（五）Java并发-Synchronized</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BD%BF%E7%94%A8"><span class="toc-number">1.</span> <span class="toc-text">使用</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%9E%E9%9D%99%E6%80%81%E5%90%8C%E6%AD%A5%E6%96%B9%E6%B3%95"><span class="toc-number">1.1.</span> <span class="toc-text">非静态同步方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%9D%99%E6%80%81%E5%90%8C%E6%AD%A5%E6%96%B9%E6%B3%95"><span class="toc-number">1.2.</span> <span class="toc-text">静态同步方法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%90%8C%E6%AD%A5%E4%BB%A3%E7%A0%81%E5%9D%97"><span class="toc-number">1.3.</span> <span class="toc-text">同步代码块</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E9%94%81%E5%8D%87%E7%BA%A7%E8%BF%87%E7%A8%8B"><span class="toc-number">2.</span> <span class="toc-text">锁升级过程</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%97%A0%E9%94%81%E7%8A%B6%E6%80%81"><span class="toc-number">2.1.</span> <span class="toc-text">无锁状态</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%81%8F%E5%90%91%E9%94%81"><span class="toc-number">2.2.</span> <span class="toc-text">偏向锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BD%BB%E9%87%8F%E7%BA%A7%E9%94%81"><span class="toc-number">2.3.</span> <span class="toc-text">轻量级锁</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%87%AA%E9%80%82%E5%BA%94%E8%87%AA%E6%97%8B%E9%94%81"><span class="toc-number">2.3.0.1.</span> <span class="toc-text">自适应自旋锁</span></a></li></ol></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E9%87%8F%E7%BA%A7%E9%94%81"><span class="toc-number">2.4.</span> <span class="toc-text">重量级锁</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E6%B6%88%E9%99%A4-lock-eliminate"><span class="toc-number">2.5.</span> <span class="toc-text">锁消除 lock eliminate</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%94%81%E7%B2%97%E5%8C%96-lock-coarsening"><span class="toc-number">2.6.</span> <span class="toc-text">锁粗化 lock coarsening</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8E%9F%E7%90%86"><span class="toc-number">3.</span> <span class="toc-text">原理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%B0%83%E7%94%A8wait-%E6%96%B9%E6%B3%95%E9%9C%80%E8%A6%81%E7%94%A8while"><span class="toc-number">3.1.</span> <span class="toc-text">为什么调用wait()方法需要用while()</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#notifyAll-%E5%94%A4%E9%86%92"><span class="toc-number">3.2.</span> <span class="toc-text">notifyAll()唤醒</span></a></li></ol></li></ol>
+    </div>
+    
+    <h2 id="使用"><a href="#使用" class="headerlink" title="使用"></a>使用</h2><p>当多个线程同时读写一个状态变量，如果没有同步措施，将会出现不可预见的结果。在Java中首要的同步策略是使用Synchronized关键字，它提供了可重入的独占锁。Synchronized可以保证方法或者代码块在运行时，同一时刻只有一个方法可以进入到临界区，它还保证共享变量的内存可见性。<br>Java中每一个对象都可以作为锁，当一个线程试图访问同步代码块时，必须先获得对象的锁。</p>
+<ul>
+<li>Synchronized加在非静态同步方法，锁是当前实例对象</li>
+<li>Synchronized加在静态同步方法，锁是当前类的class对象</li>
+<li>Synchronized加在同步方法块，锁是括号里面的对象</li>
+</ul>
+<h3 id="非静态同步方法"><a href="#非静态同步方法" class="headerlink" title="非静态同步方法"></a>非静态同步方法</h3><p>　　非静态同步方法用的都是同一把锁——实例对象本身，当一个实例对象的非静态方法获得锁后，其他线程想要获取该实例对象的其他非静态同步方法必须等待获取锁的方法释放锁后才能获得锁（如果其他线程访问该实例的非同步方法则不会阻塞）。注意这里是实例对象本身，如果是别的实例则不受影响。</p>
+<h3 id="静态同步方法"><a href="#静态同步方法" class="headerlink" title="静态同步方法"></a>静态同步方法</h3><p>　　静态同步方法用的也是同一把锁——类对象本身，如果一个静态同步方法获得锁后，其他的静态同步方法都必须等待该方法释放锁，不管是不是同一个实例对象的静态方法还是不同实例对象的静态同步方法，只要是一个类的实例对象。静态同步方法和非静态同步方法没有竞态条件。</p>
+<h3 id="同步代码块"><a href="#同步代码块" class="headerlink" title="同步代码块"></a>同步代码块</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">public class Test </span><br><span class="line">&#123; </span><br><span class="line">    public void method1() </span><br><span class="line">    &#123; </span><br><span class="line">        synchronized(this) </span><br><span class="line">        &#123;   </span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line">    public synchronized void method2() </span><br><span class="line">    &#123; </span><br><span class="line">    &#125; </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p>上述代码中， synchronized 代码块中传入的是 this，和同步非静态方法是一样的，当代码块获得锁后，另一个获取 method2 方法的线程必须阻塞，代码块中传入 Test.this 和 this 的作用一样。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class Test&#123; </span><br><span class="line">  </span><br><span class="line">    pubic static void method1()&#123; </span><br><span class="line">        synchronized(Test.class)&#123; </span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line">    public static synchronized void method2()&#123; </span><br><span class="line">    &#125; </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">public class Test&#123; </span><br><span class="line">    public static Test test; </span><br><span class="line">    public Test()&#123; </span><br><span class="line">        test&#x3D;this; </span><br><span class="line">    &#125; </span><br><span class="line">    public static void method1()&#123; </span><br><span class="line">        synchronized(test.getClass())&#123; </span><br><span class="line">        &#125; </span><br><span class="line">    &#125; </span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<p>上面的两段代码和静态同步方法是一样的，不能传入 this，只能使用 Class 对象。</p>
+<h2 id="锁升级过程"><a href="#锁升级过程" class="headerlink" title="锁升级过程"></a>锁升级过程</h2><p>在JDK1.6之前，synchronized是重量级锁，加锁需要从用户态切换为内核态，会引起线程上下文切换和线程调度，增加系统开销。因此JDK1.6对Synchronized进行优化。<br><img src="https://www.gwt.fun/img/blog/java%E5%86%85%E5%AD%98%E7%BB%93%E6%9E%84.png" alt="image"><br>优化后的Synchronized分为四种状态：无锁状态-&gt;偏向锁-&gt;轻量级锁-&gt;重量级锁。</p>
+<h3 id="无锁状态"><a href="#无锁状态" class="headerlink" title="无锁状态"></a>无锁状态</h3><p>无锁状态mark word中的偏向锁位位0，锁标志位位01. </p>
+<h3 id="偏向锁"><a href="#偏向锁" class="headerlink" title="偏向锁"></a>偏向锁</h3><p>在大多数情况下，锁不仅不存在多线程竞争，而且总是由同一线程多次获得，因此引入偏向锁。偏向锁在markword上记录当前线程指针，下次同一个线程加锁的时候，不需要争用，只需要判断线程指针是否同一个，所以偏向锁就是指偏向加锁的第一个线程。如果当前对象的偏向锁标志没有设置，使用CAS竞争锁；如果设置了，尝试使用CAS将偏向锁指向当前线程。hashCode备份在线程栈上线程销毁，锁降级为无锁。</p>
+<h3 id="轻量级锁"><a href="#轻量级锁" class="headerlink" title="轻量级锁"></a>轻量级锁</h3><p>如果存在多个线程争抢锁，锁升级为轻量级锁。每个线程有自己的LockRecord在自己的线程栈上，用CAS去争用markword的LR的指针，指针指向哪个线程的LR，哪个线程就拥有锁。线程通过CAS争用锁，会浪费CPU，因此线程争抢锁自旋10次，会升级为重量级锁，线程进入阻塞队列中，等待占用锁的线程释放锁，唤醒阻塞队列的线程（唤醒所有阻塞线程，因此Synchronized是非公平锁）。</p>
+<h5 id="自适应自旋锁"><a href="#自适应自旋锁" class="headerlink" title="自适应自旋锁"></a>自适应自旋锁</h5><p>JDK1.6之后引入自适应自旋锁,意味着自旋的时间（次数）不再固定，而是由前一次在同一个锁上的自旋时间及锁的拥有者的状态来决定。如果在同一个锁对象上，自旋等待刚刚成功获得过锁，并且持有锁的线程正在运行中，那么虚拟机就会认为这次自旋也是很有可能再次成功，进而它将允许自旋等待持续相对更长的时间。如果对于某个锁，自旋很少成功获得过，那在以后尝试获取这个锁时将可能省略掉自旋过程，直接阻塞线程，避免浪费处理器资源。</p>
+<h3 id="重量级锁"><a href="#重量级锁" class="headerlink" title="重量级锁"></a>重量级锁</h3><p>synchronized的重量级锁基于操作系统的Mutex Lock实现，获取和释放锁会带来用户态到内核态的切换，会切换线程上下文。</p>
+<h3 id="锁消除-lock-eliminate"><a href="#锁消除-lock-eliminate" class="headerlink" title="锁消除 lock eliminate"></a>锁消除 lock eliminate</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">add</span><span class="params">(String str1,String str2)</span></span>&#123;</span><br><span class="line">         StringBuffer sb = <span class="keyword">new</span> StringBuffer();</span><br><span class="line">         sb.append(str1).append(str2);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>我们都知道 StringBuffer 是线程安全的，因为它的关键方法都是被 synchronized 修饰过的，但我们看上面这段代码，我们会发现，sb 这个引用只会在 add 方法中使用，不可能被其它线程引用（因为是局部变量，栈私有），因此 sb 是不可能共享的资源，JVM 会自动消除 StringBuffer 对象内部的锁。</p>
+<h3 id="锁粗化-lock-coarsening"><a href="#锁粗化-lock-coarsening" class="headerlink" title="锁粗化 lock coarsening"></a>锁粗化 lock coarsening</h3><figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="function"><span class="keyword">public</span> String <span class="title">test</span><span class="params">(String str)</span></span>&#123;</span><br><span class="line">       </span><br><span class="line">       <span class="keyword">int</span> i = <span class="number">0</span>;</span><br><span class="line">       StringBuffer sb = <span class="keyword">new</span> StringBuffer():</span><br><span class="line">       <span class="keyword">while</span>(i &lt; <span class="number">100</span>)&#123;</span><br><span class="line">           sb.append(str);</span><br><span class="line">           i++;</span><br><span class="line">       &#125;</span><br><span class="line">       <span class="keyword">return</span> sb.toString():</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>JVM 会检测到这样一连串的操作都对同一个对象加锁（while 循环内 100 次执行 append，没有锁粗化的就要进行 100  次加锁/解锁），此时 JVM 就会将加锁的范围粗化到这一连串的操作的外部（比如 while 虚幻体外），使得这一连串操作只需要加一次锁即可。</p>
+<h2 id="原理"><a href="#原理" class="headerlink" title="原理"></a>原理</h2><p>Synchronized是使用管程实现，管程对应的英文是Monitor。在管程的数据模型中，对共享变量和条件变量的操作是封装的，当线程使用共享变量时，会尝试获得锁，每次只允许一个线程获取锁进入管程，其余线程进入同步队列。管程内有条件变量的等待队列，当线程获取锁后，因不满足条件，调用wait()后，会将线程放入等待队列中。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">while (条件不满足) &#123;</span><br><span class="line">    wait();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>等待条件满足时，调用notifyAll()方法(Synchronized调用notifyAll()方法，是非公平锁)，等待队列中的线程进入同步队列中，并争抢锁。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">if (条件满足) &#123;</span><br><span class="line">    notifyAll();    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p><img src="https://www.gwt.fun/img/blog/%E7%AE%A1%E7%A8%8B.png" alt="image"></p>
+<h3 id="为什么调用wait-方法需要用while"><a href="#为什么调用wait-方法需要用while" class="headerlink" title="为什么调用wait()方法需要用while()"></a>为什么调用wait()方法需要用while()</h3><p>因为调用wait()方法进入等待队列的线程，不需要经过notify()也可以退出等待状态，比如线程结束后自动退出等待状态。另外也可能调用notify()之后，条件又不满足了，还需要再进入等待队列中等待资源。</p>
+<h3 id="notifyAll-唤醒"><a href="#notifyAll-唤醒" class="headerlink" title="notifyAll()唤醒"></a>notifyAll()唤醒</h3><ul>
+<li>notify来唤起的线程，先进入wait的线程会先被唤醒</li>
+<li>notifyAll唤起的线程，默认情况使用LIFO策略，最后进入的会先被唤醒<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">public class NotifyTest &#123;</span><br><span class="line">  private static final Object lock &#x3D; new Object();</span><br><span class="line">  public static void main(String[] args) &#123;</span><br><span class="line">    for (int i &#x3D; 0; i &lt; 5; i++) &#123;</span><br><span class="line">      new Thread(()-&gt; &#123;</span><br><span class="line">        synchronized (lock) &#123;</span><br><span class="line">          System.out.println(Thread.currentThread().getName()+ &quot;_准备调用wait方法!&quot;);</span><br><span class="line">          try &#123;</span><br><span class="line">            lock.wait();</span><br><span class="line">          &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">          &#125;</span><br><span class="line">          System.out.println(Thread.currentThread().getName()+ &quot;_收到notify通知，执行后续操作!&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;, &quot;thread_&quot;+i).start();</span><br><span class="line">    &#125;</span><br><span class="line">    new Thread(()-&gt; &#123;</span><br><span class="line">      synchronized (lock) &#123;</span><br><span class="line">        System.out.println(Thread.currentThread().getName()+ &quot;_等待7秒后调用notify通知所有等待线程!&quot;);</span><br><span class="line">        try &#123;</span><br><span class="line">          Thread.sleep(7 *1000);</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">          e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        lock.notifyAll();</span><br><span class="line">      &#125;</span><br><span class="line">    &#125;, &quot;thread_notify&quot;).start();</span><br><span class="line">    for (int i &#x3D; 1000; i &lt; 1005; i++) &#123;</span><br><span class="line">      new Thread(()-&gt; &#123;</span><br><span class="line">        System.out.println(Thread.currentThread().getName() + &quot;_进入同步队列，准备争抢锁！&quot;);</span><br><span class="line">        synchronized (lock) &#123;</span><br><span class="line">          System.out.println(Thread.currentThread().getName()+ &quot;_同步队列获取锁资源了！&quot;);</span><br><span class="line">        &#125;</span><br><span class="line">      &#125;, &quot;thread_&quot;+i).start();</span><br><span class="line">    &#125;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line">thread_0_准备调用wait方法!</span><br><span class="line">thread_3_准备调用wait方法!</span><br><span class="line">thread_2_准备调用wait方法!</span><br><span class="line">thread_1_准备调用wait方法!</span><br><span class="line">thread_4_准备调用wait方法!</span><br><span class="line">thread_notify_等待7秒后调用notify通知所有等待线程!</span><br><span class="line">thread_1000_进入同步队列，准备争抢锁！</span><br><span class="line">thread_1001_进入同步队列，准备争抢锁！</span><br><span class="line">thread_1002_进入同步队列，准备争抢锁！</span><br><span class="line">thread_1004_进入同步队列，准备争抢锁！</span><br><span class="line">thread_1003_进入同步队列，准备争抢锁！</span><br><span class="line">thread_4_收到notify通知，执行后续操作!</span><br><span class="line">thread_1_收到notify通知，执行后续操作!</span><br><span class="line">thread_2_收到notify通知，执行后续操作!</span><br><span class="line">thread_3_收到notify通知，执行后续操作!</span><br><span class="line">thread_0_收到notify通知，执行后续操作!</span><br><span class="line">thread_1003_同步队列获取锁资源了！</span><br><span class="line">thread_1004_同步队列获取锁资源了！</span><br><span class="line">thread_1002_同步队列获取锁资源了！</span><br><span class="line">thread_1000_同步队列获取锁资源了！</span><br><span class="line">thread_1001_同步队列获取锁资源了！</span><br></pre></td></tr></table></figure></li>
+</ul>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2020/11/05/202011/三Java并发Volatile和CAS/" class="prev">上一篇：（三）Java并发-Volatile和CAS</a>
+    
+    
+    <a href="/2020/10/22/202010/一Java并发多线程基础/" class="next">下一篇：（一）Java并发-多线程基础</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

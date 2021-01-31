@@ -1,0 +1,163 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java网络编程笔记之使用SocketAddress管理网络地址（四） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="Socket类的connect方法不提供简单的直接调用IP和端口方式，而是使用SocketAddress类来向connect方法传递服务器的IP和端口。虽然麻烦，但是带来一个好处，就是网络地址可以重用。网络地址重用表现在两个方面：1.通过建立一个SocketAddress对象，可以多次连接同一个服务">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java网络编程笔记之使用SocketAddress管理网络地址（四）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-08-05T23:16:27.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-08-06
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java网络编程笔记之使用SocketAddress管理网络地址（四）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <p>Socket类的connect方法不提供简单的直接调用IP和端口方式，而是使用SocketAddress类来向connect方法传递服务器的IP和端口。虽然麻烦，但是带来一个好处，就是网络地址可以重用。<br>网络地址重用表现在两个方面：<br>1.通过建立一个SocketAddress对象，可以多次连接同一个服务器时使用这个Socket对象。<br>2.Socket类中提供了两个方法：getRemoteSocketAddress和getLocalSocketAddress，通过两个方法可以得到服务器和本机的网络地址。并且得到的网络地址在有效的Socket对象关闭后仍然可以使用。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">public SocketAddress getRemoteSocketAddress();</span><br><span class="line">public SocketAddress  getLocalSocketAddress();</span><br></pre></td></tr></table></figure>
+<p>不管在使用Socket类连接服务器时是直接使用IP和端口还是使用SocketAddress，这两个方法都返回SocketAddress形式的网络地址。当Socket对象未连接时这两个方法都返回null，但是只有在Socket未连接时这两个方法才返回null，当已经连接成功过的Socket对象关闭之后仍然可以使用这两个方法得到响应的IP地址。<br>SocketAddress类只是一个抽象类，除了有一个默认的构造方法外，其他方法都是abstract的，因此必须使用SocketAddress的子类来建立SocketAddress对象。在JDK1.4中提供了IP网络地址的实现类：java.net.InetSocketAddress。这个类是从SocketAddress继承的，可以通过下面的方法建立SocketAddress对象：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">SocketAddress socketAddress &#x3D; new InetSocketAddress(host,ip);</span><br></pre></td></tr></table></figure>
+<p>共享网络IP</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br></pre></td><td class="code"><pre><span class="line">import java.io.IOException;</span><br><span class="line">import java.net.InetSocketAddress;</span><br><span class="line">import java.net.Socket;</span><br><span class="line">import java.net.SocketAddress;</span><br><span class="line">import java.net.UnknownHostException;</span><br><span class="line"></span><br><span class="line">public class socketAddressExample &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		Socket socket1;</span><br><span class="line">		try &#123;</span><br><span class="line">			socket1 &#x3D; new Socket(&quot;www.xxxxx.com&quot;, 80);</span><br><span class="line">			SocketAddress socketaddress &#x3D; socket1.getRemoteSocketAddress();</span><br><span class="line">			socket1.close();</span><br><span class="line">			</span><br><span class="line">			Socket socket2 &#x3D; new Socket();</span><br><span class="line">			socket2.connect(socketaddress);</span><br><span class="line">			socket2.close();</span><br><span class="line">			</span><br><span class="line">			InetSocketAddress inetSocketAddress1 &#x3D; (InetSocketAddress) socketaddress;</span><br><span class="line">			System.out.println(&quot;服务器域名是：&quot;+ inetSocketAddress1.getAddress().getHostName());</span><br><span class="line">			System.out.println(&quot;服务器IP是：&quot;+ inetSocketAddress1.getAddress().getHostAddress());</span><br><span class="line">			System.out.println(&quot;服务器端口是：&quot;+ inetSocketAddress1.getPort());</span><br><span class="line">			</span><br><span class="line">			InetSocketAddress inetSocketAddress2 &#x3D; (InetSocketAddress) socket2.getLocalSocketAddress();</span><br><span class="line">			System.out.println(&quot;本地IP是：&quot;+ inetSocketAddress2.getAddress().getLocalHost());</span><br><span class="line">			System.out.println(&quot;本地端口是：&quot;+ inetSocketAddress2.getPort());</span><br><span class="line">			</span><br><span class="line">		&#125; catch (UnknownHostException e) &#123;</span><br><span class="line">			&#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125; catch (IOException e) &#123;</span><br><span class="line">			&#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">			System.out.println(e.getMessage());</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;&#x2F;输出结果</span><br><span class="line">&#x2F;*</span><br><span class="line">服务器域名是：www.xxxx.com</span><br><span class="line">服务器IP是：xxx.xxx.xxx.xxx   </span><br><span class="line">服务器端口是：80</span><br><span class="line">本地IP是：Gavin-PC&#x2F;192.168.107.1</span><br><span class="line">本地端口是：62750</span><br><span class="line"></span><br><span class="line">*&#x2F;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/08/08/201708/Java网络编程笔记之Socket超时五/" class="prev">上一篇：Java网络编程笔记之Socket超时（五）</a>
+    
+    
+    <a href="/2017/08/05/201708/Java网络编程笔记之多种建立网络连接的方式三/" class="next">下一篇：Java网络编程笔记之多种建立网络连接的方式（三）</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

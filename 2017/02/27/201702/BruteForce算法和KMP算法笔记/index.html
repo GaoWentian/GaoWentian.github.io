@@ -1,0 +1,168 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Brute-Force算法和KMP算法笔记 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="模式匹配是数据结构中字符串的一种基本运算，给定一个子串，要求在某个字符串中找出与该子串相同的子串，这就是模式匹配。
+1、Brute-Force模式匹配算法　　Brute-Force算法的思想是：在主串S=”s1,s2,s3,…,sn”中的第一个字符与模式串T=”t1,t2,t3,…tn”中的第一个字">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Brute-Force算法和KMP算法笔记"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-02-26T23:13:03.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-02-27
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Brute-Force算法和KMP算法笔记</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-5"><a class="toc-link" href="#1%E3%80%81Brute-Force%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95"><span class="toc-number">1.</span> <span class="toc-text">1、Brute-Force模式匹配算法</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2%E3%80%81KMP%E6%A8%A1%E5%BC%8F%E5%8C%B9%E9%85%8D%E7%AE%97%E6%B3%95"><span class="toc-number">2.</span> <span class="toc-text">2、KMP模式匹配算法</span></a></li></ol>
+    </div>
+    
+    <p>　　模式匹配是数据结构中字符串的一种基本运算，给定一个子串，要求在某个字符串中找出与该子串相同的子串，这就是模式匹配。</p>
+<h5 id="1、Brute-Force模式匹配算法"><a href="#1、Brute-Force模式匹配算法" class="headerlink" title="1、Brute-Force模式匹配算法"></a>1、Brute-Force模式匹配算法</h5><p>　　Brute-Force算法的思想是：在主串S=”s1,s2,s3,…,sn”中的第一个字符与模式串T=”t1,t2,t3,…tn”中的第一个字符开始匹配，如果相等，则比较S串第二个字符和T串中的第二个字符。如果T串中的每个字符都与S串中连续的字符匹配成功，则返回S串中第一个下标的位置。如果匹配不想等，则将S中的第二个字符与T中第一个字符匹配，然后一次匹配下去。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br></pre></td><td class="code"><pre><span class="line"># include&lt;stdio.h&gt;</span><br><span class="line">&#x2F;*</span><br><span class="line">	S[] 是主串</span><br><span class="line">	T[] 是模式串 </span><br><span class="line">	pos 是指在S中第pos个位置开始匹配，我设置为0</span><br><span class="line">	return i  如果匹配成功，返回 子串在S中第一个位置的下标。 匹配失败，返回-1 </span><br><span class="line">*&#x2F; </span><br><span class="line">int index_BF(char S[],char T[], int pos)</span><br><span class="line">&#123;</span><br><span class="line">	int i &#x3D; pos;&#x2F;&#x2F;i是S中的位置 </span><br><span class="line">	int j &#x3D; 0; &#x2F;&#x2F;j是T中的位置 </span><br><span class="line">	while(S[i] !&#x3D; &#39;\0&#39; &amp;&amp; T[j] !&#x3D; &#39;\0&#39;)&#123;</span><br><span class="line">		if(S[i+j] &#x3D;&#x3D; T[j])&#123; &#x2F;&#x2F;两个字符判断成功，则j+1.判断下一个字符 </span><br><span class="line">			j++;</span><br><span class="line">		&#125;else&#123; &#x2F;&#x2F;判断失败，则将T第一个与S第二个匹配 。于是i+1，S取下一个。j&#x3D;0，T重新开始匹配 </span><br><span class="line">			i++;</span><br><span class="line">			j &#x3D; 0;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125; </span><br><span class="line">	if(T[j] &#x3D;&#x3D; &#39;\0&#39;)&#123; &#x2F;&#x2F;T中所有字符与S中连续字符匹配成功。 </span><br><span class="line">		return i; </span><br><span class="line">	&#125;else&#123;</span><br><span class="line">		return -1;</span><br><span class="line">	&#125; </span><br><span class="line">&#125;</span><br><span class="line">int main()</span><br><span class="line">&#123;</span><br><span class="line">	char S[] &#x3D; &quot;qwertyuiop&quot;;</span><br><span class="line">	char T[] &#x3D; &quot;io&quot;;</span><br><span class="line">	int pos &#x3D; 0;</span><br><span class="line">	int index &#x3D; index_BF(S,T,pos);</span><br><span class="line">	printf(&quot;%d&quot;,index);</span><br><span class="line">	return 0;</span><br><span class="line">&#125; </span><br></pre></td></tr></table></figure>
+<h5 id="2、KMP模式匹配算法"><a href="#2、KMP模式匹配算法" class="headerlink" title="2、KMP模式匹配算法"></a>2、KMP模式匹配算法</h5><p>　　看了一晚上终于明白KMP算法。KMP算法使用一种预先处理的方式。首先将模式串自我匹配。<br><img src="/img/blog/2350612-819fff1986969718.png" alt="Alt text"><br>这个图中我们可以看到，刚开始出现的是a,b,c，于是我们就在模式串中找到a,b,c。通过这种自我匹配的方式，找到模式串可能出现的位置。<br>那么模式串是怎样自我匹配的呢。这里有前缀和后缀的概念。<br><img src="/img/blog/2350612-7612744106884da8.png" alt="Alt text"><br>这样就能判断字符串前部和后部是不是有重复。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br></pre></td><td class="code"><pre><span class="line">#include &lt;stdio.h&gt;  </span><br><span class="line">#include &lt;string.h&gt;  </span><br><span class="line">  </span><br><span class="line">int next[32] &#x3D; &#123;-999&#125;;  </span><br><span class="line"></span><br><span class="line">&#x2F;*这个函数就是对模式串预处理</span><br><span class="line">将预处理的信息保存到next数组中。</span><br><span class="line">整个程序只运行一次这个函数</span><br><span class="line"> </span><br><span class="line">*&#x2F; </span><br><span class="line">void get_next(char T[])  </span><br><span class="line">&#123;  </span><br><span class="line">    int k &#x3D; -1;  </span><br><span class="line">    int j &#x3D; 0;  </span><br><span class="line">    int tLen &#x3D; strlen(T);</span><br><span class="line">    next[j] &#x3D; k;  &#x2F;&#x2F;模式串第一个设置为-1 </span><br><span class="line">    while (j &lt; tLen - 1)  </span><br><span class="line">    &#123;  </span><br><span class="line">		if ( (k &#x3D;&#x3D; -1) || (T[j] &#x3D;&#x3D; T[k]) ) </span><br><span class="line">        &#123;  </span><br><span class="line">            k++; </span><br><span class="line">            j++;  </span><br><span class="line">            next[j] &#x3D; k;  </span><br><span class="line">        &#125;  </span><br><span class="line">        else  </span><br><span class="line">        &#123;  </span><br><span class="line">            k &#x3D; next[k];   </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line">int index_KMP(char S[], char T[], int pos)  </span><br><span class="line">&#123;  </span><br><span class="line">    int i &#x3D; pos;    </span><br><span class="line">    int j &#x3D; 0;</span><br><span class="line">    int sLen &#x3D; strlen(S);</span><br><span class="line">    int tLen &#x3D; strlen(T);</span><br><span class="line">    while ( i &lt; sLen &amp;&amp; j &lt; tLen )  </span><br><span class="line">    &#123;  </span><br><span class="line">        &#x2F;* j &#x3D; -1 表示next[0]*&#x2F;  </span><br><span class="line">		if ( (j &#x3D;&#x3D; -1)  || S[i] &#x3D;&#x3D; T[j])  </span><br><span class="line">        &#123;  </span><br><span class="line">            i++;  </span><br><span class="line">            j++;</span><br><span class="line">          </span><br><span class="line">        &#125;  </span><br><span class="line">        else  </span><br><span class="line">        &#123;  </span><br><span class="line">        	printf(&quot;j &#x3D;&#x3D; %d\t&quot;,j);</span><br><span class="line">            j &#x3D; next[j];  &#x2F;&#x2F;next[j]里面存的是开始匹配的位置。 </span><br><span class="line">            </span><br><span class="line">        &#125;  </span><br><span class="line">    &#125;  </span><br><span class="line">  </span><br><span class="line">    if (tLen &#x3D;&#x3D; j)  &#x2F;&#x2F;表示整个T都对比完了，匹配成功了 </span><br><span class="line">    &#123;  </span><br><span class="line">        return i - tLen ;  </span><br><span class="line">    &#125;  </span><br><span class="line">    else  </span><br><span class="line">    &#123;  </span><br><span class="line">        return -1;  </span><br><span class="line">    &#125;  </span><br><span class="line">&#125;  </span><br><span class="line">  </span><br><span class="line">int main(void)  </span><br><span class="line">&#123;  </span><br><span class="line">    char s[] &#x3D; &quot;qwertyuiop&quot;;  </span><br><span class="line">    char t[] &#x3D; &quot;io&quot;;  </span><br><span class="line">    int i;</span><br><span class="line">    int pos &#x3D; 0;  </span><br><span class="line">    int index;  </span><br><span class="line">    &#x2F;&#x2F; 预处理next数组 </span><br><span class="line">    get_next(t);  </span><br><span class="line">    index &#x3D; index_KMP(s, t, pos);  </span><br><span class="line">    printf(&quot;%d\n&quot;, index); </span><br><span class="line"></span><br><span class="line">	return 0; </span><br><span class="line">&#125;  </span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/03/11/201703/ApacheBenchab测试/" class="prev">上一篇：ApacheBench（ab）测试</a>
+    
+    
+    <a href="/2017/02/24/201702/排序算法总结与实现笔记/" class="next">下一篇：排序算法总结与实现笔记</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

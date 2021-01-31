@@ -1,0 +1,166 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>【计算几何】Convex Hull凸包问题（二） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="上次我们使用了一个解决凸包问题的算法，但是，算法的时间复杂度是O(n^4)，这是一个非常恐怖的时间复杂度，这种算法在实际项目中是绝对不会出现的。于是我们改进这个算法。现在我们从极边（也就是凸包上的边）开始考虑，连接任意两个点，如果这条边仅在边的一侧有点，那我们就能确定这个边是极边了
+
+任取两点，做向">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="【计算几何】Convex Hull凸包问题（二）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2016-11-14T10:34:34.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2016-11-14
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">【计算几何】Convex Hull凸包问题（二）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <p>上次我们使用了一个解决凸包问题的算法，但是，算法的时间复杂度是O(n^4)，这是一个非常恐怖的时间复杂度，这种算法在实际项目中是绝对不会出现的。于是我们改进这个算法。<br>现在我们从极边（也就是凸包上的边）开始考虑，连接任意两个点，如果这条边仅在边的一侧有点，那我们就能确定这个边是极边了</p>
+<p><img src="/img/blog/2350612-afe11850dc529b5e.png" alt="Alt text"></p>
+<p>任取两点，做向量pq，如果pq两侧都有值，我们就不认为这是极边，按照这种思路，我们就能写出来算法。而判断一个点是否在向量一侧可以参照上个算法的toLeft()函数,这样我们就改进了这个凸包算法<br><img src="/img/blog/2350612-9d76dbd7a38b046b.png" alt="Alt text"></p>
+<p>附上代码：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br></pre></td><td class="code"><pre><span class="line"># -*- coding: utf-8 -*-</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">Created on Mon Nov 23 22:20:11 2015</span><br><span class="line">@author: gavin</span><br><span class="line">&quot;&quot;&quot;</span><br><span class="line">def Area(p,q,s):</span><br><span class="line">    return p[0]*q[1]-p[1]*q[0]+q[0]*s[1]-q[1]*s[0]+s[0]*p[1]-s[1]*p[0]</span><br><span class="line">def toLeft(p,q,s):</span><br><span class="line">    return Area(p,q,s)&gt;0</span><br><span class="line">def checkEdge(S,n,p,q):</span><br><span class="line">    LEmpty &#x3D; REmpty &#x3D; 1</span><br><span class="line">    k &#x3D; 0    </span><br><span class="line">    while k&lt;n and (LEmpty or REmpty):</span><br><span class="line">        if (k !&#x3D; p) and (k !&#x3D; q):</span><br><span class="line">            if toLeft(S[p],S[q],S[k]):</span><br><span class="line">                LEmpty &#x3D; 0</span><br><span class="line">            else:</span><br><span class="line">                REmpty &#x3D; 0            </span><br><span class="line">        k+&#x3D;1</span><br><span class="line">    </span><br><span class="line">    if (LEmpty or REmpty):    </span><br><span class="line">        S[p][2] &#x3D; S[q][2] &#x3D; 1</span><br><span class="line">def markEE(S,n):</span><br><span class="line">    k &#x3D; p &#x3D; q &#x3D; 0</span><br><span class="line">    #初始化所有点都是非极点</span><br><span class="line">    for k in range(0,n):</span><br><span class="line">        S[k][2] &#x3D; 0     </span><br><span class="line">    #遍历两个点</span><br><span class="line">    for p in range(0,n):</span><br><span class="line">        for q in range(p+1,n):</span><br><span class="line">            checkEdge(S,n,p,q)</span><br><span class="line">        </span><br><span class="line">pointList &#x3D; [[1,1,0],[1,3,0],[2,4,0],[4,3,0],[5,1,0],[2,3,0],[2,2,0],[3,2,0],[3,3,0]] #二维数组，前两位是坐标，后一位存储是否为极点，0非极点，1极点</span><br><span class="line">markEE(pointList,len(pointList))</span><br><span class="line">print pointList</span><br></pre></td></tr></table></figure>
+<p>可以看到，这个算法的时间复杂度为O(n^3),这个算法和上一个算法相比，有了非常明显的进步。但是O(n^3)算法复杂度相对而言还是非常的高，那么我们还能改进这个算法吗？答案当然是可以！</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2016/11/14/201611/计算几何ConvexHull凸包问题三/" class="prev">上一篇：【计算几何】Convex Hull凸包问题（三）</a>
+    
+    
+    <a href="/2016/11/14/201611/计算几何ConvexHull凸包问题一/" class="next">下一篇：【计算几何】Convex Hull凸包问题（一）</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

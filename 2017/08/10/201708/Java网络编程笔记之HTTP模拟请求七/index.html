@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java网络编程笔记之HTTP模拟请求（七） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="123456789101112131415161718192021222324252627282930313233343536373839404142434445464748495051525354555657585960616263646566676869707172737475767778798">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java网络编程笔记之HTTP模拟请求（七）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-08-10T12:51:40.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-08-10
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java网络编程笔记之HTTP模拟请求（七）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E7%94%A8%E5%A4%B4%E5%AD%97%E6%AE%B5"><span class="toc-number">1.</span> <span class="toc-text">通用头字段</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Connection"><span class="toc-number">1.1.</span> <span class="toc-text">Connection</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Date"><span class="toc-number">1.2.</span> <span class="toc-text">Date</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Content-Length"><span class="toc-number">1.3.</span> <span class="toc-text">Content-Length</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-%E8%AF%B7%E6%B1%82%E6%B6%88%E6%81%AF%E5%A4%B4%E5%AD%97%E6%AE%B5"><span class="toc-number">2.</span> <span class="toc-text">HTTP 请求消息头字段</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Host"><span class="toc-number">2.1.</span> <span class="toc-text">Host</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Accept"><span class="toc-number">2.2.</span> <span class="toc-text">Accept</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#User-Agent"><span class="toc-number">2.3.</span> <span class="toc-text">User-Agent</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Range"><span class="toc-number">2.4.</span> <span class="toc-text">Range</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#HTTP-%E5%93%8D%E5%BA%94%E6%B6%88%E6%81%AF%E5%A4%B4%E5%AD%97%E6%AE%B5"><span class="toc-number">3.</span> <span class="toc-text">HTTP 响应消息头字段</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#Accept-Ranges"><span class="toc-number">3.1.</span> <span class="toc-text">Accept-Ranges</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Content-Range"><span class="toc-number">3.2.</span> <span class="toc-text">Content-Range</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Location"><span class="toc-number">3.3.</span> <span class="toc-text">Location</span></a></li></ol></li></ol>
+    </div>
+    
+    <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br><span class="line">92</span><br><span class="line">93</span><br><span class="line">94</span><br><span class="line">95</span><br><span class="line">96</span><br><span class="line">97</span><br><span class="line">98</span><br><span class="line">99</span><br><span class="line">100</span><br><span class="line">101</span><br><span class="line">102</span><br><span class="line">103</span><br><span class="line">104</span><br><span class="line">105</span><br><span class="line">106</span><br><span class="line">107</span><br><span class="line">108</span><br><span class="line">109</span><br><span class="line">110</span><br><span class="line">111</span><br><span class="line">112</span><br><span class="line">113</span><br><span class="line">114</span><br><span class="line">115</span><br><span class="line">116</span><br><span class="line">117</span><br><span class="line">118</span><br><span class="line">119</span><br><span class="line">120</span><br><span class="line">121</span><br><span class="line">122</span><br><span class="line">123</span><br><span class="line">124</span><br><span class="line">125</span><br><span class="line">126</span><br><span class="line">127</span><br><span class="line">128</span><br><span class="line">129</span><br><span class="line">130</span><br><span class="line">131</span><br><span class="line">132</span><br><span class="line">133</span><br><span class="line">134</span><br><span class="line">135</span><br><span class="line">136</span><br><span class="line">137</span><br><span class="line">138</span><br><span class="line">139</span><br><span class="line">140</span><br></pre></td><td class="code"><pre><span class="line">package creatHTTP;</span><br><span class="line"></span><br><span class="line">import java.io.BufferedReader;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.io.InputStream;</span><br><span class="line">import java.io.InputStreamReader;</span><br><span class="line">import java.io.OutputStream;</span><br><span class="line">import java.io.OutputStreamWriter;</span><br><span class="line">import java.net.InetSocketAddress;</span><br><span class="line">import java.net.Socket;</span><br><span class="line"></span><br><span class="line">public class HttpSimulator &#123;</span><br><span class="line">	</span><br><span class="line">	private Socket socket;</span><br><span class="line">	private int port &#x3D; 80;</span><br><span class="line">	private String host &#x3D; &quot;localhost&quot;;</span><br><span class="line">	private String request &#x3D; &quot;&quot;;</span><br><span class="line">	private boolean isPort,isHead;</span><br><span class="line">	</span><br><span class="line">	public void run()throws Exception&#123;</span><br><span class="line">		BufferedReader reader &#x3D; new BufferedReader(new InputStreamReader(System.in));</span><br><span class="line">		while(true)&#123;</span><br><span class="line">			if(!readHostAndPort(reader))&#123;  &#x2F;&#x2F;从控制台读取域名和端口号</span><br><span class="line">				break;</span><br><span class="line">			&#125;</span><br><span class="line">			readHeadRequest(reader);&#x2F;&#x2F;从控制台读取HTTP请求消息</span><br><span class="line">			sendHttpRequest();&#x2F;&#x2F;向服务器发送HTTP请求消息</span><br><span class="line">			readHeadResponse(reader);&#x2F;&#x2F;读取服务器回送的HTTP响应消息。</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws Exception &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		new HttpSimulator().run();</span><br><span class="line">	&#125;</span><br><span class="line">	</span><br><span class="line">	&#x2F;**</span><br><span class="line">	 * </span><br><span class="line">	 * 从控制台读取数据,输入q退出程序</span><br><span class="line">	 *&#x2F;</span><br><span class="line">	private boolean readHostAndPort(BufferedReader reader)throws Exception &#123;</span><br><span class="line">		System.out.println(&quot;host:port&gt;&quot;);</span><br><span class="line">		String[] ss &#x3D; null;</span><br><span class="line">		String s &#x3D; reader.readLine();&#x2F;&#x2F;从控制台读取一行字符串</span><br><span class="line">		if(s.equals(&quot;q&quot;))&#123;   &#x2F;&#x2F;退出程序</span><br><span class="line">			return false;</span><br><span class="line">		&#125;else&#123;</span><br><span class="line">			ss &#x3D; s.split(&quot;[:]&quot;);&#x2F;&#x2F;将域名和端口分开</span><br><span class="line">			if(!ss[0].equals(&quot;&quot;))&#123;</span><br><span class="line">				host &#x3D; ss[0];</span><br><span class="line">			&#125;</span><br><span class="line">			if(ss.length &gt; 1)&#123;</span><br><span class="line">				port &#x3D; Integer.parseInt(ss[1]);</span><br><span class="line">			&#125;</span><br><span class="line">			System.out.println(host+&quot;:&quot;+String.valueOf(port));</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		return true;</span><br><span class="line">	&#125;</span><br><span class="line">	&#x2F;**</span><br><span class="line">	 *   从控制台读取HTTP请求消息</span><br><span class="line">	 *&#x2F;</span><br><span class="line">	private void readHeadRequest(BufferedReader reader) throws Exception&#123;</span><br><span class="line">		System.out.println(&quot;请输入HTTP请求：&quot;);</span><br><span class="line">		String s &#x3D; reader.readLine(); &#x2F;&#x2F;读取行</span><br><span class="line">		request &#x3D; s + &quot;\r\n&quot;;</span><br><span class="line">		boolean isPort &#x3D; s.substring(0, 4).equals(&quot;POST&quot;);</span><br><span class="line">		boolean isHead &#x3D; s.substring(0, 4).equals(&quot;HEAD&quot;);</span><br><span class="line">		while(!(s &#x3D; reader.readLine()).equals(&quot;&quot;))&#123;</span><br><span class="line">			request &#x3D; request + s + &quot;\r\n&quot;;</span><br><span class="line">		&#125;</span><br><span class="line">		request &#x3D; request + &quot;\r\n&quot;;   &#x2F;&#x2F;跳出循环</span><br><span class="line">		if(isPort)&#123;</span><br><span class="line">			System.out.println(&quot;请输入POST方法的内容：&quot;);</span><br><span class="line">			s &#x3D; reader.readLine();</span><br><span class="line">			request &#x3D; request + s;</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">	&#x2F;**</span><br><span class="line">	 * 读取数据</span><br><span class="line">	 * @param reader</span><br><span class="line">	 *&#x2F;</span><br><span class="line">	private void readHeadResponse(BufferedReader reader) &#123;</span><br><span class="line">		String s &#x3D; &quot;&quot;;</span><br><span class="line">		try &#123;</span><br><span class="line">			InputStream in &#x3D; socket.getInputStream();</span><br><span class="line">			InputStreamReader inReader &#x3D; new InputStreamReader(in);</span><br><span class="line">			BufferedReader socketReader &#x3D; new BufferedReader(inReader);</span><br><span class="line">			System.out.println(&quot;----------HTTP头----------&quot;);</span><br><span class="line">			boolean b &#x3D; true;</span><br><span class="line">			while((s &#x3D; socketReader.readLine()) !&#x3D; null)&#123;</span><br><span class="line">				if(s.equals(&quot;&quot;) &amp;&amp; b &#x3D;&#x3D; true &amp;&amp; !isHead)&#123;</span><br><span class="line">					System.out.println(&quot;------------------&quot;);</span><br><span class="line">					b &#x3D; false;</span><br><span class="line">					System.out.println(&quot;是否显示HTTP的内容（Y&#x2F;N）:&quot;);</span><br><span class="line">					String choice &#x3D; reader.readLine();</span><br><span class="line">					if(choice.equals(&quot;Y&quot;)|| choice.equals(&quot;y&quot;))&#123;</span><br><span class="line">						System.out.println(&quot;----------HTTP内容----------&quot;);</span><br><span class="line">						continue;</span><br><span class="line">					&#125;else&#123;</span><br><span class="line">						break;</span><br><span class="line">					&#125;</span><br><span class="line">				&#125;else&#123;</span><br><span class="line">					System.out.println(s);</span><br><span class="line">				&#125;</span><br><span class="line">			&#125;</span><br><span class="line">		&#125; catch (IOException e) &#123;</span><br><span class="line">			System.out.println(&quot;error:&quot;+e.getMessage());</span><br><span class="line">		&#125;finally&#123;</span><br><span class="line">			try &#123;</span><br><span class="line">				socket.close();</span><br><span class="line">			&#125; catch (IOException e) &#123;</span><br><span class="line">				&#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">				e.printStackTrace();</span><br><span class="line">			&#125;</span><br><span class="line">		&#125;</span><br><span class="line">		</span><br><span class="line">		System.out.println(&quot;-----------------&quot;);</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#x2F;**</span><br><span class="line"> *  发送数据</span><br><span class="line"> * </span><br><span class="line"> * </span><br><span class="line"> *&#x2F;</span><br><span class="line">	private void sendHttpRequest() throws Exception&#123;</span><br><span class="line">		socket &#x3D; new Socket();</span><br><span class="line">		socket.setSoTimeout(10 * 1000);&#x2F;&#x2F;设置超时时间为10秒</span><br><span class="line">		System.out.println(&quot;正在连接服务器..&quot;);</span><br><span class="line">		socket.connect(new InetSocketAddress(host, port), 10*1000);</span><br><span class="line">		System.out.println(&quot;连接服务器成功！&quot;);</span><br><span class="line">		OutputStream out &#x3D; socket.getOutputStream();</span><br><span class="line">		OutputStreamWriter write &#x3D; new OutputStreamWriter(out);</span><br><span class="line">		write.write(request);</span><br><span class="line">		write.flush();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br></pre></td><td class="code"><pre><span class="line">host:port&gt;</span><br><span class="line">www.xxxxx.com</span><br><span class="line">www.xxxxx.com:80</span><br><span class="line">请输入HTTP请求：</span><br><span class="line">GET &#x2F; HTTP&#x2F;1.1</span><br><span class="line">Host:www.xxxxx.com</span><br><span class="line"></span><br><span class="line">正在连接服务器..</span><br><span class="line">连接服务器成功！</span><br><span class="line">----------HTTP头----------</span><br><span class="line">HTTP&#x2F;1.1 200 OK</span><br><span class="line">Server: nginx&#x2F;1.12.0</span><br><span class="line">Content-Type: text&#x2F;html; charset&#x3D;UTF-8</span><br><span class="line">Transfer-Encoding: chunked</span><br><span class="line">Connection: keep-alive</span><br><span class="line">Cache-Control: no-cache</span><br><span class="line">Date: Thu, 10 Aug 2017 03:46:31 GMT</span><br><span class="line">------------------</span><br><span class="line">是否显示HTTP的内容（Y&#x2F;N）:</span><br></pre></td></tr></table></figure>
+<h3 id="通用头字段"><a href="#通用头字段" class="headerlink" title="通用头字段"></a>通用头字段</h3><h4 id="Connection"><a href="#Connection" class="headerlink" title="Connection"></a>Connection</h4><p>　　这个字段只在 HTTP1.1 协议中存在。它决定了客户端和服务器进行了一次会话后，服务器是否立即关闭网络连接。 在客户端最直接的表现是使用 read 方法(readLine 方法也是一样)读完客户端请求的 Web 资源后，是否立即返回-1（readLine 返回 null）。Connection 有两个值：Close 和 Keep-Alive。当使用 Connection：Close 时，和 HTTP1.0 协议是一样的，当 read 方法读完数据时立即返回, 而使用 Connection：Keep-Alive 时，read 方法在读完数据后还要被阻塞一段时间。直接读取数据超时时间过后，还继续往下执行。</p>
+<h4 id="Date"><a href="#Date" class="headerlink" title="Date"></a>Date</h4><p>　　Date 头字段描述了请求消息和响应消息被创建的时间。这个字段值是一个 HTTP-date 类型，它的格式必须是 GMT（格林尼治）时间，GMT 时间是就是北京时间减 8 小时。下面是 Date 字段的一个例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Date: Tue, 15 Nov 2007 08:12:31 GMT</span><br></pre></td></tr></table></figure>
+<h4 id="Content-Length"><a href="#Content-Length" class="headerlink" title="Content-Length"></a>Content-Length</h4><p>指定消息实体的字节数。在请求消息中 POST 方法必须使用 Content-Length 来指定请求消息的实体内容的字节数。在响应消息中这个字段值指定了当前 HTTP 响应所返回的 Web 资源的字节数。</p>
+<h3 id="HTTP-请求消息头字段"><a href="#HTTP-请求消息头字段" class="headerlink" title="HTTP 请求消息头字段"></a>HTTP 请求消息头字段</h3><h4 id="Host"><a href="#Host" class="headerlink" title="Host"></a>Host</h4><p>Host 字段用于指定客户端所访问的资源所在的主机名和端口号。如果端口号等于连接服务器时所使用的<br>端口号，则端口号可以省略。</p>
+<h4 id="Accept"><a href="#Accept" class="headerlink" title="Accept"></a>Accept</h4><p>Accept 字段头确定客户端可以接收的媒体类型。一般的格式是”<em>/</em>“或”类型/“子类型”。这个子段头可以传递多个媒体类型，中间用”，”隔开。如下面是一个 Accept 的例子：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">Accept:：image&#x2F;gif，image&#x2F;jpg</span><br></pre></td></tr></table></figure>
+<p>如果请求头使用上述的 Accept 字段值，则服务器端在动态生成网页的 IMG 头时将首先包含 gif 格式的图像，如果 gif 图象不存在，则包含 jpg 格式的图象。</p>
+<h4 id="User-Agent"><a href="#User-Agent" class="headerlink" title="User-Agent"></a>User-Agent</h4><p>这个字段头用于指定客户端是用什么访问的服务器</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">User-Agent:Mozilla&#x2F;5.0 (Windows NT 6.1; Win64; x64) AppleWebKit&#x2F;537.36 (KHTML, like Gecko) Chrome&#x2F;60.0.3112.78 Safari&#x2F;537.36</span><br></pre></td></tr></table></figure>
+<p>服务器可以通过这个字段检查客户机的浏览器版本，并根据不同的版本来确定向客户端发送的数据。</p>
+<h4 id="Range"><a href="#Range" class="headerlink" title="Range"></a>Range</h4><p>Range 字段头通过服务器只传输一部分 Web 资源。这个字段头可以用来实现断点续传功能。有很多下载工具就是通过这个字段头进行断点续传的。Range字段可以通过三种格式设置要传输的字节范围：<br>（1）Range: bytes=1000-2000<br>传输范围从 1000 到 2000 字节。<br>（2）Range: bytes=1000-<br>传输 Web 资源中第 1000 个字节以后的所有内容。<br>（3）Range bytes=1000<br>传输最后 1000 个字节。</p>
+<h3 id="HTTP-响应消息头字段"><a href="#HTTP-响应消息头字段" class="headerlink" title="HTTP 响应消息头字段"></a>HTTP 响应消息头字段</h3><h4 id="Accept-Ranges"><a href="#Accept-Ranges" class="headerlink" title="Accept-Ranges"></a>Accept-Ranges</h4><p>这个字段说明 Web 服务器是否支持 Range（是否支持断点续传功能），如果支持，则返回 Accept-Ranges: bytes，如果不支持，则返回 Accept-Ranges: none</p>
+<h4 id="Content-Range"><a href="#Content-Range" class="headerlink" title="Content-Range"></a>Content-Range</h4><p>指定了返回的 Web 资源的字节范围。这个字段值的格式是：<br>开始字节位置—结束字节位置/Web 资源的总字节数</p>
+<h4 id="Location"><a href="#Location" class="headerlink" title="Location"></a>Location</h4><p>这个字段指定了上哪个新地址获得新的 Web 资源。当 Web 资源更换 URL 后，而一些老用户不能及时得知这个新的 URL；因此，在老用户访问原来的 URL 时，使用 Location 将这个新的 URL 返回给客户端。这个地址转换对用户来说是完全透明，也就是302跳转。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/08/12/201708/Java网络编程笔记之ServerSocket对象八/" class="prev">上一篇：Java网络编程笔记之ServerSocket 对象（八）</a>
+    
+    
+    <a href="/2017/08/10/201708/Java网络编程笔记之Socket类的getter和setter方法六/" class="next">下一篇：Java网络编程笔记之Socket类的getter和setter方法（六）</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,186 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java网络编程笔记之InetAddress对象（一） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介常用的实现系统间通信的协议有TCP/IP和UDP/IP。TCP/IP 协议族中的主要 socket 类型为流套接字（sockets sockets）和数据报套接字（datagram sockets）。
+TCP/IPTCP/IP是一种可靠的网络数据传输协议。TCP/IP要求通信双方先建立连接，再进">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java网络编程笔记之InetAddress对象（一）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-08-02T21:35:48.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-08-03
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java网络编程笔记之InetAddress对象（一）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#TCP-IP"><span class="toc-number">1.1.</span> <span class="toc-text">TCP&#x2F;IP</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#UDP-IP"><span class="toc-number">1.2.</span> <span class="toc-text">UDP&#x2F;IP</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#InetAddress%E5%AF%B9%E8%B1%A1"><span class="toc-number">2.</span> <span class="toc-text">InetAddress对象</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#getLocalHost%E6%96%B9%E6%B3%95"><span class="toc-number">2.1.</span> <span class="toc-text">getLocalHost方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#getByName%E6%96%B9%E6%B3%95"><span class="toc-number">2.2.</span> <span class="toc-text">getByName方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#getAllByName%E6%96%B9%E6%B3%95"><span class="toc-number">2.3.</span> <span class="toc-text">getAllByName方法</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#getByAddress%E6%96%B9%E6%B3%95"><span class="toc-number">2.4.</span> <span class="toc-text">getByAddress方法</span></a></li></ol></li></ol>
+    </div>
+    
+    <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>常用的实现系统间通信的协议有TCP/IP和UDP/IP。TCP/IP 协议族中的主要 socket 类型为流套接字（sockets sockets）和数据报套接字（datagram sockets）。</p>
+<h4 id="TCP-IP"><a href="#TCP-IP" class="headerlink" title="TCP/IP"></a>TCP/IP</h4><p>TCP/IP是一种可靠的网络数据传输协议。TCP/IP要求通信双方先建立连接，再进行传输，保证数据的可靠性，但是会牺牲一些性能。流套接字将TCP作为其端对端协议（底层使用IP协议），提供了一个可信赖的字节流服务。一个TCP/IP流套接字代表了TCP连接的一端。</p>
+<h4 id="UDP-IP"><a href="#UDP-IP" class="headerlink" title="UDP/IP"></a>UDP/IP</h4><p>UDP/IP不保证数据一定到达。UDP/IP不直接给通信双方建立连接，，而是发送到网络上进行传输，因此不保证数据传输的可靠性，但是性能上表现较好。数据报套接字使用UDP协议（底层同样使用IP协议），提供了一个”尽力而为”（best-effort）的数据报服务，应用程序可以通过它发送最长65500 字节的个人信息。</p>
+<h3 id="InetAddress对象"><a href="#InetAddress对象" class="headerlink" title="InetAddress对象"></a>InetAddress对象</h3><p>InetAddress对象代表了一个网络目标地址，包括主机名和数字类型的地址信息。该类有两个子类，Inet4Address 和 Inet6Address，分别对应了目前IP 地址的两个版本。创建InetAddress对象必须依靠它的四个静态方法。getLocalHost方法得到本机的InetAddress对象，getByName、getAllByName和getByAddress得到远程主机的InetAddress对象。</p>
+<h4 id="getLocalHost方法"><a href="#getLocalHost方法" class="headerlink" title="getLocalHost方法"></a>getLocalHost方法</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import java.net.InetAddress;</span><br><span class="line">import java.net.UnknownHostException;</span><br><span class="line"></span><br><span class="line">public class InetAddressExample &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		try &#123;</span><br><span class="line">			InetAddress lcoalAddress &#x3D; InetAddress.getLocalHost();</span><br><span class="line">			System.out.println(lcoalAddress.toString());</span><br><span class="line">		&#125; catch (UnknownHostException e) &#123;</span><br><span class="line">			&#x2F;&#x2F; TODO Auto-generated catch block</span><br><span class="line">			e.printStackTrace();</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">运行结果是：</span><br><span class="line">name-PC&#x2F;192.168.9.80</span><br></pre></td></tr></table></figure>
+<p>InetAddress类中覆盖了Object类中的toString方法</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public String toString() &#123;</span><br><span class="line">    String hostName &#x3D; holder().getHostName();</span><br><span class="line">    return ((hostName !&#x3D; null) ? hostName : &quot;&quot;)</span><br><span class="line">        + &quot;&#x2F;&quot; + getHostAddress();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>如果本机中绑定多个IP，getLocalHost只返回第一个IP，如果想返回全部IP，可以使用getAllByName方法。</p>
+<h4 id="getByName方法"><a href="#getByName方法" class="headerlink" title="getByName方法"></a>getByName方法</h4><p>getByName方法可以通过指定的域名从DNS中得到相应的IP地址。如果host所指域名对应多个IP，getByName返回第一个IP地址。getByName方法不会验证IP地址是否正确。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">import java.net.InetAddress;</span><br><span class="line">import java.net.UnknownHostException;</span><br><span class="line"></span><br><span class="line">public class InetAddressExample2 &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws UnknownHostException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		if(args.length &#x3D;&#x3D; 0)&#123;</span><br><span class="line">			return;</span><br><span class="line">		&#125;</span><br><span class="line">		String host &#x3D; args[0];</span><br><span class="line">		InetAddress address &#x3D; InetAddress.getByName(host);</span><br><span class="line">		System.out.println(address);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>传入值<a href="http://www.baidu.com，输出：">www.baidu.com，输出：</a></p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">www.baidu.com&#x2F;115.239.210.27</span><br></pre></td></tr></table></figure>
+<h4 id="getAllByName方法"><a href="#getAllByName方法" class="headerlink" title="getAllByName方法"></a>getAllByName方法</h4><p>使用getAllByName方法可以从DNS中得到域名对应的所有IP地址。返回一个InetAddress类型的数组。getAllByName方法也不会验证IP地址是否存在。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">import java.net.InetAddress;</span><br><span class="line">import java.net.UnknownHostException;</span><br><span class="line"></span><br><span class="line">public class InetAddressExample3 &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws UnknownHostException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		if(args.length &#x3D;&#x3D; 0)&#123;</span><br><span class="line">			return;</span><br><span class="line">		&#125;</span><br><span class="line">		String host &#x3D; args[0];</span><br><span class="line">		InetAddress addresses[] &#x3D; InetAddress.getAllByName(host);</span><br><span class="line">		for(InetAddress address : addresses)&#123;</span><br><span class="line">			System.out.println(address);</span><br><span class="line">		&#125;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">www.baidu.com&#x2F;115.239.210.27</span><br><span class="line">www.baidu.com&#x2F;115.239.211.112</span><br></pre></td></tr></table></figure>
+<p>实际上，getByName方法返回的IP地址是getAllByName返回的第一个IP地址，实际上，getByName就是这样实现的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">public static InetAddress getByName(String host)</span><br><span class="line">    throws UnknownHostException &#123;</span><br><span class="line">    return InetAddress.getAllByName(host)[0];</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="getByAddress方法"><a href="#getByAddress方法" class="headerlink" title="getByAddress方法"></a>getByAddress方法</h4><p>这个方法必须通过IP来创建InetAddress对象，并且IP地址必须是byte数组形式。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">import java.net.InetAddress;</span><br><span class="line">import java.net.UnknownHostException;</span><br><span class="line"></span><br><span class="line">public class InetAddressExample4 &#123;</span><br><span class="line"></span><br><span class="line">	public static void main(String[] args) throws UnknownHostException &#123;</span><br><span class="line">		&#x2F;&#x2F; TODO Auto-generated method stub</span><br><span class="line">		byte ip[] &#x3D; new byte[]&#123;(byte)141,(byte)146,8,66&#125;;</span><br><span class="line">		InetAddress address1 &#x3D; InetAddress.getByAddress(ip);</span><br><span class="line">		InetAddress address2 &#x3D; InetAddress.getByAddress(&quot;Oracle官网&quot;,ip);</span><br><span class="line">		System.out.println(address1);</span><br><span class="line">		System.out.println(address2);</span><br><span class="line">	&#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>输出结果</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;141.146.8.66</span><br><span class="line">Oracle官网&#x2F;141.146.8.66</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/08/04/201708/AVL树学习笔记/" class="prev">上一篇：AVL树学习笔记</a>
+    
+    
+    <a href="/2017/07/28/201707/二叉树的遍历/" class="next">下一篇：二叉树的遍历</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

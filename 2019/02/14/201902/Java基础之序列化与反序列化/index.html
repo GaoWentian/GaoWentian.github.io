@@ -1,0 +1,188 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java基础之序列化与反序列化 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介在Java运行过程中创建的对象，随着JVM的的停止，对象也会消失。为了将对象保存在本地硬盘或者是进行网络传输，需要将对象序列化，在需要的时候重新获取对象状态。Java为对象序列化和反序列化提供了两个接口：
+12java.io.Serializablejava.io.Externalizable
+">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java基础之序列化与反序列化"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-02-13T16:08:19.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-02-14
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java基础之序列化与反序列化</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Serializable"><span class="toc-number">2.</span> <span class="toc-text">Serializable</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#Externalizable"><span class="toc-number">3.</span> <span class="toc-text">Externalizable</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#serialVersionUID"><span class="toc-number">4.</span> <span class="toc-text">serialVersionUID</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#transient"><span class="toc-number">5.</span> <span class="toc-text">transient</span></a></li></ol>
+    </div>
+    
+    <h4 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h4><p>在Java运行过程中创建的对象，随着JVM的的停止，对象也会消失。为了将对象保存在本地硬盘或者是进行网络传输，需要将对象序列化，在需要的时候重新获取对象状态。Java为对象序列化和反序列化提供了两个接口：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">java.io.Serializable</span><br><span class="line">java.io.Externalizable</span><br></pre></td></tr></table></figure>
+<p>下面通过例子来演示两个接口的作用和区别。</p>
+<h4 id="Serializable"><a href="#Serializable" class="headerlink" title="Serializable"></a>Serializable</h4><p>实现对象的序列化，必须实现Serializable接口。首先实现要序列化的对象：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> java.io.Serializable;</span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">Student</span> <span class="keyword">implements</span> <span class="title">Serializable</span></span>&#123;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">static</span> <span class="keyword">final</span> <span class="keyword">long</span> serialVersionUID = <span class="number">1195127496667537096L</span>;</span><br><span class="line">	<span class="keyword">private</span> String name;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> age;</span><br><span class="line">	<span class="keyword">private</span> String sex;</span><br><span class="line">	<span class="keyword">private</span> <span class="keyword">int</span> id;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">getName</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> name;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setName</span><span class="params">(String name)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.name = name;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getAge</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> age;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setAge</span><span class="params">(<span class="keyword">int</span> age)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.age = age;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">getSex</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> sex;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setSex</span><span class="params">(String sex)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.sex = sex;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">int</span> <span class="title">getId</span><span class="params">()</span> </span>&#123;</span><br><span class="line">		<span class="keyword">return</span> id;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">void</span> <span class="title">setId</span><span class="params">(<span class="keyword">int</span> id)</span> </span>&#123;</span><br><span class="line">		<span class="keyword">this</span>.id = id;</span><br><span class="line">	&#125;</span><br><span class="line">	<span class="comment">//重写toString方法，方便输出信息</span></span><br><span class="line">	<span class="meta">@Override</span></span><br><span class="line">	<span class="function"><span class="keyword">public</span> String <span class="title">toString</span><span class="params">()</span></span>&#123;</span><br><span class="line">		<span class="keyword">return</span> <span class="string">&quot;姓名是：&quot;</span>+name+<span class="string">&quot;,年龄是&quot;</span>+age+<span class="string">&quot;，性别是：&quot;</span>+sex+<span class="string">&quot;,学号是:&quot;</span>+id;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>演示怎么样序列化和反序列化：</p>
+<figure class="highlight java"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">package</span> fun.gwt.base;</span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> java.io.File;</span><br><span class="line"><span class="keyword">import</span> java.io.FileInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.FileOutputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectInputStream;</span><br><span class="line"><span class="keyword">import</span> java.io.ObjectOutputStream;</span><br><span class="line"></span><br><span class="line"><span class="keyword">public</span> <span class="class"><span class="keyword">class</span> <span class="title">SerializableDemos</span> </span>&#123;</span><br><span class="line"></span><br><span class="line">	<span class="function"><span class="keyword">public</span> <span class="keyword">static</span> <span class="keyword">void</span> <span class="title">main</span><span class="params">(String[] args)</span> <span class="keyword">throws</span> Exception </span>&#123;</span><br><span class="line">		<span class="comment">//初始化对象</span></span><br><span class="line">		Student stu = <span class="keyword">new</span> Student();</span><br><span class="line">		stu.setName(<span class="string">&quot;Gavin&quot;</span>);</span><br><span class="line">		stu.setAge(<span class="number">24</span>);</span><br><span class="line">		stu.setSex(<span class="string">&quot;男&quot;</span>);</span><br><span class="line">		stu.setId(<span class="number">123456</span>);</span><br><span class="line">		System.out.println(stu);</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//创建对象输出流</span></span><br><span class="line">		ObjectOutputStream oos = <span class="keyword">new</span> ObjectOutputStream(<span class="keyword">new</span> </span><br><span class="line">		<span class="comment">//将对象保存在了本地文件中</span></span><br><span class="line">		FileOutputStream(<span class="string">&quot;studentObject&quot;</span>));</span><br><span class="line">		oos.writeObject(stu);</span><br><span class="line">		oos.close();</span><br><span class="line">		</span><br><span class="line">		<span class="comment">//读出来对象</span></span><br><span class="line">		File file = <span class="keyword">new</span> File(<span class="string">&quot;studentObject&quot;</span>);</span><br><span class="line">		<span class="comment">//读取文件内容</span></span><br><span class="line">		ObjectInputStream ois = <span class="keyword">new</span> ObjectInputStream(<span class="keyword">new</span> FileInputStream(file));</span><br><span class="line">		Student stu1 = (Student) ois.readObject();</span><br><span class="line">		System.out.println(stu1);</span><br><span class="line">		ois.close();</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">/*</span></span><br><span class="line"><span class="comment">姓名是：Gavin,年龄是24，性别是：男,学号是:123456</span></span><br><span class="line"><span class="comment">姓名是：Gavin,年龄是24，性别是：男,学号是:123456</span></span><br><span class="line"><span class="comment">*/</span></span><br></pre></td></tr></table></figure>
+<h4 id="Externalizable"><a href="#Externalizable" class="headerlink" title="Externalizable"></a>Externalizable</h4><p>将上面的代码修改为实现Externalizable接口的Demo，需要在类中添加writeExternal()和readExternal()方法，下面是修改好的：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br></pre></td><td class="code"><pre><span class="line">package fun.gwt.base;</span><br><span class="line"></span><br><span class="line">import java.io.Externalizable;</span><br><span class="line">import java.io.IOException;</span><br><span class="line">import java.io.ObjectInput;</span><br><span class="line">import java.io.ObjectOutput;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">public class Student implements Externalizable&#123;</span><br><span class="line">	&#x2F;**</span><br><span class="line">	 * </span><br><span class="line">	 *&#x2F;</span><br><span class="line">	private static final long serialVersionUID &#x3D; 1195127496667537096L;</span><br><span class="line">	private String name;</span><br><span class="line">	private int age;</span><br><span class="line">	private String sex;</span><br><span class="line">	private int id;</span><br><span class="line">	public String getName() &#123;</span><br><span class="line">		return name;</span><br><span class="line">	&#125;</span><br><span class="line">	public void setName(String name) &#123;</span><br><span class="line">		this.name &#x3D; name;</span><br><span class="line">	&#125;</span><br><span class="line">	public int getAge() &#123;</span><br><span class="line">		return age;</span><br><span class="line">	&#125;</span><br><span class="line">	public void setAge(int age) &#123;</span><br><span class="line">		this.age &#x3D; age;</span><br><span class="line">	&#125;</span><br><span class="line">	public String getSex() &#123;</span><br><span class="line">		return sex;</span><br><span class="line">	&#125;</span><br><span class="line">	public void setSex(String sex) &#123;</span><br><span class="line">		this.sex &#x3D; sex;</span><br><span class="line">	&#125;</span><br><span class="line">	public int getId() &#123;</span><br><span class="line">		return id;</span><br><span class="line">	&#125;</span><br><span class="line">	public void setId(int id) &#123;</span><br><span class="line">		this.id &#x3D; id;</span><br><span class="line">	&#125;</span><br><span class="line">	@Override</span><br><span class="line">	public String toString()&#123;</span><br><span class="line">		return &quot;姓名是：&quot;+name+&quot;,年龄是&quot;+age+&quot;，性别是：&quot;+sex+&quot;,学号是:&quot;+id;</span><br><span class="line">	&#125;</span><br><span class="line">	@Override</span><br><span class="line">	public void writeExternal(ObjectOutput out) throws IOException &#123;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">	@Override</span><br><span class="line">	public void readExternal(ObjectInput in) throws IOException,</span><br><span class="line">			ClassNotFoundException &#123;</span><br><span class="line">		</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>序列化和反序列化的main方法不需要修改，直接执行：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">姓名是：Gavin,年龄是24，性别是：男,学号是:123456</span><br><span class="line">姓名是：null,年龄是0，性别是：null,学号是:0</span><br></pre></td></tr></table></figure>
+<p>输出结果发现对象序列化了，但是对象的状态并没有序列化成功，里面的值都变成了默认值。Externalizable继承Serializable类，并且增加了writeExternal()和readExternal()方法，用户必须自己实现这两个方法。现在修改代码为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">@Override</span><br><span class="line">public void writeExternal(ObjectOutput out) throws IOException &#123;</span><br><span class="line">	out.writeObject(name);</span><br><span class="line">	out.writeInt(id);</span><br><span class="line">	out.writeObject(sex);</span><br><span class="line">&#125;</span><br><span class="line">@Override</span><br><span class="line">public void readExternal(ObjectInput in) throws IOException,</span><br><span class="line">		ClassNotFoundException &#123;</span><br><span class="line">	name &#x3D; (String)in.readObject();</span><br><span class="line">	id &#x3D; in.readInt();</span><br><span class="line">	sex &#x3D; (String)in.readObject();</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>这里只穿进去3个值，输出结果为:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">姓名是：Gavin,年龄是24，性别是：男,学号是:123456</span><br><span class="line">姓名是：Gavin,年龄是0，性别是：男,学号是:123456</span><br></pre></td></tr></table></figure>
+<p>可以看到，年龄没有序列化，这就是Externalizable类和Serializable类的区别。</p>
+<h4 id="serialVersionUID"><a href="#serialVersionUID" class="headerlink" title="serialVersionUID"></a>serialVersionUID</h4><p>serialVersionUID主要是判断类是否发生改变。主要分为两种情况：</p>
+<ul>
+<li>没有指定serialVersionUID的值</li>
+<li>指定了serialVersionUID的值  </li>
+</ul>
+<p>1、没有指定serialVersionUID的值，JVM为自动为类创建一个serialVersionUID，对类的任何修改都会使JVM改变serialVersionUID的值。如果对象反序列化之前改变了类，那么在反序列化时，JVM会对比serialVersionUID的值，修改了类，serialVersionUID的值不相同，会反序列化失败。<br>2、如果指定serialVersionUID的值，在对象反序列化之前修改了类，如果不影响反序列化，那么在反序列化时，对比serialVersionUID值相同，还是可以进行反序列化操作。</p>
+<h4 id="transient"><a href="#transient" class="headerlink" title="transient"></a>transient</h4><p>对于一些成员变量不需要进行序列化，因此可以使用transient关键字修饰该成员变量，反序列化后该成员变量为默认值。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/02/14/201902/从线程安全角度看单例模式/" class="prev">上一篇：从线程安全角度看单例模式</a>
+    
+    
+    <a href="/2019/02/12/201902/深入理解Java虚拟机垃圾收集器与GC参数/" class="next">下一篇：深入理解Java虚拟机--垃圾收集器与GC参数</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

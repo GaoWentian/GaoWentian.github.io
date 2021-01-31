@@ -1,0 +1,208 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Redis高级应用--数据持久化 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="一、Redis数据持久化Redis数据保存在内存中，服务器由于一些原因断电后会丢失数据，因此需要将数据保存在硬盘上，防止服务器断电后数据丢失。将数据保存在硬盘上的过程就叫做数据持久化。持久化方式可分为两种：
+
+将数据当前的状态进行保存，通过快照的方式，只保存数据；
+将数据操作的过程进行保存，只保存数">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Redis高级应用--数据持久化"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2016-10-25T11:08:56.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2016-10-25
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Redis高级应用--数据持久化</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%80%E3%80%81Redis%E6%95%B0%E6%8D%AE%E6%8C%81%E4%B9%85%E5%8C%96"><span class="toc-number">1.</span> <span class="toc-text">一、Redis数据持久化</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%8C%E3%80%81RDB%E6%96%B9%E5%BC%8F"><span class="toc-number">2.</span> <span class="toc-text">二、RDB方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#RDB%E6%96%87%E4%BB%B6%E7%9A%84%E5%88%9B%E5%BB%BA"><span class="toc-number">2.1.</span> <span class="toc-text">RDB文件的创建</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#1-%E9%85%8D%E7%BD%AE"><span class="toc-number">2.1.1.</span> <span class="toc-text">1.配置</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#2-%E7%94%A8%E6%88%B7%E6%89%A7%E8%A1%8Csave-%E6%88%96bgsave%E5%91%BD%E4%BB%A4"><span class="toc-number">2.1.2.</span> <span class="toc-text">2.用户执行save 或bgsave命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#3-%E6%89%A7%E8%A1%8Cflushall%E5%91%BD%E4%BB%A4"><span class="toc-number">2.1.3.</span> <span class="toc-text">3.执行flushall命令</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#4-%E6%89%A7%E8%A1%8C%E5%A4%8D%E5%88%B6%E6%97%B6"><span class="toc-number">2.1.4.</span> <span class="toc-text">4.执行复制时</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SAVE%E6%8C%87%E4%BB%A4%E7%9B%B8%E5%85%B3%E9%85%8D%E7%BD%AE"><span class="toc-number">2.2.</span> <span class="toc-text">SAVE指令相关配置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#RDB%E6%96%87%E4%BB%B6%E7%9A%84%E8%BD%BD%E5%85%A5"><span class="toc-number">2.3.</span> <span class="toc-text">RDB文件的载入</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%89%E3%80%81AOF%E6%96%B9%E5%BC%8F"><span class="toc-number">3.</span> <span class="toc-text">三、AOF方式</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#AOF%E8%AE%BE%E7%BD%AE"><span class="toc-number">3.1.</span> <span class="toc-text">AOF设置</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#AOF%E9%87%8D%E5%86%99"><span class="toc-number">3.2.</span> <span class="toc-text">AOF重写</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#%E6%89%8B%E5%8A%A8%E9%87%8D%E5%86%99"><span class="toc-number">3.2.1.</span> <span class="toc-text">手动重写</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E9%87%8D%E5%86%99"><span class="toc-number">3.2.2.</span> <span class="toc-text">自动重写</span></a></li></ol></li></ol></li></ol>
+    </div>
+    
+    <h3 id="一、Redis数据持久化"><a href="#一、Redis数据持久化" class="headerlink" title="一、Redis数据持久化"></a>一、Redis数据持久化</h3><p>Redis数据保存在内存中，服务器由于一些原因断电后会丢失数据，因此需要将数据保存在硬盘上，防止服务器断电后数据丢失。将数据保存在硬盘上的过程就叫做数据持久化。持久化方式可分为两种：</p>
+<ul>
+<li>将数据当前的状态进行保存，通过快照的方式，只保存数据；</li>
+<li>将数据操作的过程进行保存，只保存数据的操作过程；</li>
+</ul>
+<p>reids支持两种持久化操作，一种是RDB方式，一种是AOF操作方式。RDB方式会根据制定规则“定时”将数据保存在硬盘上。而AOF方式会在每次执行命令后将命令本身记录下来。</p>
+<h3 id="二、RDB方式"><a href="#二、RDB方式" class="headerlink" title="二、RDB方式"></a>二、RDB方式</h3><h4 id="RDB文件的创建"><a href="#RDB文件的创建" class="headerlink" title="RDB文件的创建"></a>RDB文件的创建</h4><p>RDB方式当符合条件时，redis会将 所有数据生成副本保存在本地，这个过程成为快照。以下几种方式对数据进行快照：</p>
+<ul>
+<li>配置的规则</li>
+<li>执行save或者bgsave命令</li>
+<li>执行flushall命令</li>
+<li>执行复制<h5 id="1-配置"><a href="#1-配置" class="headerlink" title="1.配置"></a>1.配置</h5>在redis安装文件中，打开redis.conf文件<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">save 900 1</span><br><span class="line">save 300 10</span><br><span class="line">save 60 10000</span><br></pre></td></tr></table></figure>
+条件之间是“或”的关系。save 900 1 是指在15分钟（900秒）内有一个或者一个以上键被更改就进行快照。值得注意的是，这里使用的是BGSAVE命令而不是SAVE命令。<br><img src="/img/blog/2350612-f78cbed9c79dd644.png" alt="Alt text"></li>
+</ul>
+<h5 id="2-用户执行save-或bgsave命令"><a href="#2-用户执行save-或bgsave命令" class="headerlink" title="2.用户执行save 或bgsave命令"></a>2.用户执行save 或bgsave命令</h5><p>服务器进行重启或者是备份时，需要手动对redis进行快照。  </p>
+<ul>
+<li>当执行save时，redis会执行快照操作，此时该过程会阻塞所有请求。  </li>
+<li>bgsave会异步的执行快照操作。，执行bgsave后会返回ok，然后通过lastsave来返回最近一次执行快照成功的时间。  <h5 id="3-执行flushall命令"><a href="#3-执行flushall命令" class="headerlink" title="3.执行flushall命令"></a>3.执行flushall命令</h5>当执行flushall命令，redis会清空数据库中所有数据。<h5 id="4-执行复制时"><a href="#4-执行复制时" class="headerlink" title="4.执行复制时"></a>4.执行复制时</h5>当设置主从模式之后，redis会在复制开始之前进行自动快照。<h4 id="SAVE指令相关配置"><a href="#SAVE指令相关配置" class="headerlink" title="SAVE指令相关配置"></a>SAVE指令相关配置</h4>创建新的redis.conf文件，文件内容如下：<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">port 6379</span><br><span class="line">daemonize yes</span><br><span class="line">logfile &quot;6379.log&quot;  #配置redis的log文件名称</span><br><span class="line">dir &#x2F;data&#x2F;redis&#x2F;   #设置存储rdb文件的路径，应该存在存储空间较大的目录中</span><br><span class="line">dbfilename dump-6379.rdb #设置rdb文件的名称，通常为dump-端口号.rdb</span><br><span class="line">rdbcompression yes #设置rdb文件是否压缩，默认为yes，采用lzf压缩，如果设置为no，可以节省CPU运行时间，但是存储文件会变大。</span><br><span class="line">rdbchecksum yes #设置rdb文件是否进行格式校验，校验在读文件和写文件过程均进行。默认为开启状态，如果设置为no，可以节约10%时间，但是数据可能会损坏。</span><br></pre></td></tr></table></figure>
+并且使用一下命令启动redis，即可通过新的配置文件启动redis:<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">redis-server redis.conf </span><br></pre></td></tr></table></figure>
+
+
+</li>
+</ul>
+<h4 id="RDB文件的载入"><a href="#RDB文件的载入" class="headerlink" title="RDB文件的载入"></a>RDB文件的载入</h4><p>RDB文件的载入是在服务器启动时自动执行，Redis没有专门用于载入RDB文件的命令，如果服务器启动时检测到RDB文件的存在则自动载入RDB文件。如果开启AOF持久化，那么服务器会优先使用AOF文件载入数据库。另外服务器载入RDB文件期间，数据库会处于阻塞状态，拒绝所有命令请求，直到载入数据完成。</p>
+<h3 id="三、AOF方式"><a href="#三、AOF方式" class="headerlink" title="三、AOF方式"></a>三、AOF方式</h3><h4 id="AOF设置"><a href="#AOF设置" class="headerlink" title="AOF设置"></a>AOF设置</h4><p>AOF（Append Only File）方式可以将redis的每一条命令追加到硬盘文件中。默认AOF是没有开启的。通过</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">appendonly yes </span><br></pre></td></tr></table></figure>
+<p>开启AOF模式。</p>
+<p><img src="/img/blog/2350612-833a916f94f6f915.png" alt="Alt text"></p>
+<p>但是由于操作系统原因，AOF模式保存的数据并没有保存到硬盘，而是保存在硬盘缓存。默认情况下是30秒执行一次同步。redis无法容忍这样的损失。这就要AOF模式将硬盘缓存中的数据立即同步到硬盘。在redis中可以通过appendfsync参数设置同步时机。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"># appendfsync always  # 每次，数据零误差，性能较低，不建议使用</span><br><span class="line">appendfsync everysec  # 每秒，性能较高，建议使用</span><br><span class="line"># appendfsync no      # 系统控制，不可控</span><br><span class="line">appendfilename appendonly-端口号.aof # 配置aof持久化文件名，默认为appendonly.aof，建议为appendonly-端口号.aof</span><br><span class="line">dir  &#x2F;data  # aof文件存储目录</span><br></pre></td></tr></table></figure>
+<p>同时开启AOF和RDB，保证数据安全和备份。当服务器redis开启后，会首先加载AOF中的数据。因为AOF方式丢失的数据更少。</p>
+<h4 id="AOF重写"><a href="#AOF重写" class="headerlink" title="AOF重写"></a>AOF重写</h4><p>命令不断写入AOF，文件会越来越大，因此Redis引入AOF重写机制压缩文件体积。AOF重写是将多条命令合并为一条命令，例如：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">lpush list a</span><br><span class="line">lpush list b</span><br><span class="line">lpush list c</span><br></pre></td></tr></table></figure>
+<p>重写为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">lpush list a b c</span><br></pre></td></tr></table></figure>
+<p>值得注意的是，AOF重写不会对原来的文件进行读取、修改和分析，而是创建新的AOF文件，来替换旧AOF文件。AOF重写不是读取和分析旧AOF文件，而是直接去数据库读取list的值，然后用新的命令代替原来的命令。</p>
+<h5 id="手动重写"><a href="#手动重写" class="headerlink" title="手动重写"></a>手动重写</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">bgrewriteaof     # 执行指令重写aof文件</span><br></pre></td></tr></table></figure>
+<p>bgrewriteaof命令是调用fork函数，创建子进程去重写文件</p>
+<h5 id="自动重写"><a href="#自动重写" class="headerlink" title="自动重写"></a>自动重写</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">auto-aof-rewrite-min-size size  # AOF文件达到这个大小就重写</span><br><span class="line">auto-aof-rewrite-percentage percentage  # 达到这个比例就重写</span><br></pre></td></tr></table></figure>
+<p>自动重写出发条件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">aof_current_size &gt; auto-aof-rewrite-min-size</span><br><span class="line"></span><br><span class="line">(aof_current_size - aof_base_size) &#x2F;</span><br><span class="line">aof_base_size &gt;&#x3D; auto-aof-rewrite-percentage</span><br></pre></td></tr></table></figure>
+<p>其中aof_current_size和aof_base_size参数可以通过info指令查看当前redis的参数值。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2016/11/14/201611/计算几何ConvexHull凸包问题一/" class="prev">上一篇：【计算几何】Convex Hull凸包问题（一）</a>
+    
+    
+    <a href="/2016/10/11/201610/Redis数据类型/" class="next">下一篇：Redis数据类型</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

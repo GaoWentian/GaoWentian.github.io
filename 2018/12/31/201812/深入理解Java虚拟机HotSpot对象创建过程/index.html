@@ -1,0 +1,200 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>深入理解Java虚拟机--HotSpot对象创建过程 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="对象创建对象创建过程虚拟机遇到new指令，先去检查这个指令的参数是否在常量池中定位到一个类的符号引用并检查这个符号引用的类是否已经被加载、解析和初始化过。
+
+检查常量池中是否有将要创建对象所属类的符号引用
+常量池中没有类的符号引用，说明这个类还未定义，报ClassNotFoundException;">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="深入理解Java虚拟机--HotSpot对象创建过程"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2018-12-30T18:24:49.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2018-12-31
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">深入理解Java虚拟机--HotSpot对象创建过程</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">对象创建</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%88%9B%E5%BB%BA%E8%BF%87%E7%A8%8B"><span class="toc-number">1.1.</span> <span class="toc-text">对象创建过程</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%86%E9%85%8D%E5%86%85%E5%AD%98%E7%9A%84%E4%B8%A4%E7%A7%8D%E6%96%B9%E5%BC%8F"><span class="toc-number">1.2.</span> <span class="toc-text">分配内存的两种方式</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E7%9A%84%E5%86%85%E5%AD%98%E5%B8%83%E5%B1%80"><span class="toc-number">2.</span> <span class="toc-text">对象的内存布局</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E5%A4%B4"><span class="toc-number">2.1.</span> <span class="toc-text">对象头</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AE%9E%E4%BE%8B%E6%95%B0%E6%8D%AE"><span class="toc-number">2.2.</span> <span class="toc-text">实例数据</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%AF%B9%E9%BD%90%E5%A1%AB%E5%85%85"><span class="toc-number">2.3.</span> <span class="toc-text">对齐填充</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E8%B1%A1%E7%9A%84%E8%AE%BF%E9%97%AE%E5%AE%9A%E4%BD%8D"><span class="toc-number">3.</span> <span class="toc-text">对象的访问定位</span></a></li></ol>
+    </div>
+    
+    <h3 id="对象创建"><a href="#对象创建" class="headerlink" title="对象创建"></a>对象创建</h3><h4 id="对象创建过程"><a href="#对象创建过程" class="headerlink" title="对象创建过程"></a>对象创建过程</h4><p>虚拟机遇到new指令，先去检查这个指令的参数是否在常量池中定位到一个类的符号引用并检查这个符号引用的类是否已经被加载、解析和初始化过。</p>
+<ul>
+<li>检查常量池中是否有将要创建对象所属类的符号引用<ul>
+<li>常量池中没有类的符号引用，说明这个类还未定义，报ClassNotFoundException;</li>
+</ul>
+</li>
+<li>检查这个符号引用的类是否已经被JVM加载<ul>
+<li>类未加载，找打类的class文件，加载到方法区；</li>
+<li>类已经被JVM加载，则准备为对象分配内存</li>
+</ul>
+</li>
+<li>对象所需的内存大小在类加载完成后便完全确定（类的所有对象的内存大小相同），把一块确定大小的内存在Java堆中划分出来。</li>
+<li>内存分配完成后，虚拟机需要将分配到的内存空间都初始化为零（不包括对象头）。</li>
+<li>设置对象头中的信息</li>
+<li>完成创建，可以调用对象的构造函数初始化。<h4 id="分配内存的两种方式"><a href="#分配内存的两种方式" class="headerlink" title="分配内存的两种方式"></a>分配内存的两种方式</h4>用哪种方式由Java堆是否完整和gc收集器决定</li>
+<li>指针碰撞。（如果内存是规整的，用过的内存在一边，空闲的内存在另一边，中间放着一个指针作为分界点的指示器，分配内存就是将指针向空闲区域移动一段与对象相同的距离。）</li>
+<li>空闲列表，（已使用的内存和空闲的内存相互交错，虚拟机必须维护一个表，记录哪块内存是可用的，分配内存的时候就可以在列表中找到一块足够大的空间划分给对象。）</li>
+</ul>
+<p>对象在虚拟机中的创建是非常频繁的行为，修改指针指向位置在并发下并不是线程安全的，虚拟机采用CAS来保证更新操作的原子性。</p>
+<h3 id="对象的内存布局"><a href="#对象的内存布局" class="headerlink" title="对象的内存布局"></a>对象的内存布局</h3><p>对象在内存中存储的布局可以分为3块区域：</p>
+<ul>
+<li>对象头（Header）</li>
+<li>实例数据（Instance Data）</li>
+<li>对齐填充（Padding）</li>
+</ul>
+<h4 id="对象头"><a href="#对象头" class="headerlink" title="对象头"></a>对象头</h4><p>对象头分为两部分，第一部分是存储对象自身运行时数据：哈希码、GC分代年龄、锁状态标志、线程持有的锁、偏向线程ID、偏向时间戳等。第二部分是对象所属类型指针，虚拟机通过这个指针来确定这个对象时哪个类的实例。<br>如果对象时一个Java数组，那么在对象头中还必须有一块用于记录数组长度的数据。</p>
+<h4 id="实例数据"><a href="#实例数据" class="headerlink" title="实例数据"></a>实例数据</h4><p>实例数据就是对象真正存储的有效信息，包括父类的成员变量和本类的成员变量。</p>
+<h4 id="对齐填充"><a href="#对齐填充" class="headerlink" title="对齐填充"></a>对齐填充</h4><p>起占位符的作用，HotSpotVM的自动内存管理系统要求对象起始地址必须是8字节的整数倍，当对象实例数据部分没有对齐时，就需要通过对齐填充来补全。</p>
+<h3 id="对象的访问定位"><a href="#对象的访问定位" class="headerlink" title="对象的访问定位"></a>对象的访问定位</h3><p>主流访问方式有：使用句柄和直接指针两种。</p>
+<ul>
+<li>句柄访问方式（堆中需要有一块叫做“句柄池”的内存空间，用于存放所有对象的地址和所有对象所属类的类信息。<br>引用类型的变量存放的是该对象在句柄池中的地址。访问对象时，首先需要通过引用类型的变量找到该对象的句柄，然后根据句柄中对象的地址再访问对象。）</li>
+<li>直接指针访问方式（引用类型的变量直接存放对象的地址，从而不需要句柄池，通过引用能够直接访问对象。<br>但对象所在的内存空间中需要额外的策略存储对象所属的类信息的地址。）</li>
+</ul>
+<p>两种方式各有优势，使用句柄访问最大好处是reference中存储的是稳定的句柄地址，对象移动时只会改变句柄中的实例数据指针，而reference本身不需要修改。直接指针方式最大的好处是速度更快，节省了一次指针定位的时间开销，对象访问在Java中非常频繁，因此这类开销积少成多后是一项非常可观的执行成本。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/01/05/201901/Java源码分析Vector/" class="prev">上一篇：Java源码分析--Vector</a>
+    
+    
+    <a href="/2018/12/30/201812/MySQL学习慢查询/" class="next">下一篇：MySQL学习--慢查询</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

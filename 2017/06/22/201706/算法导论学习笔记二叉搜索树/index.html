@@ -1,0 +1,188 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>算法导论学习笔记--二叉搜索树 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="二叉搜索树上的基本操作所花费的时间与这颗树的高度成正比。对于有n个结点的一棵完全二叉树来说，这些操作最坏运行时间是O（lgn）。如果这棵树是一条n个结点组成的线性链，那么同样的操作就要花费O（n）的最坏运行时间。在树中查找是否存在value==x的node的代价是O(h),h是树的深度。
+什么是二叉">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="算法导论学习笔记--二叉搜索树"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-06-21T21:28:54.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-06-22
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">算法导论学习笔记--二叉搜索树</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91"><span class="toc-number">1.</span> <span class="toc-text">什么是二叉搜索树</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9F%A5%E8%AF%A2%E4%BA%8C%E5%8F%89%E6%90%9C%E7%B4%A2%E6%A0%91"><span class="toc-number">2.</span> <span class="toc-text">查询二叉搜索树</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9F%A5%E6%89%BE"><span class="toc-number">2.1.</span> <span class="toc-text">查找</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%80%E5%A4%A7%E5%85%B3%E9%94%AE%E5%AD%97%E5%85%83%E7%B4%A0%E5%92%8C%E6%9C%80%E5%B0%8F%E5%85%B3%E9%94%AE%E5%AD%97%E5%85%83%E7%B4%A0"><span class="toc-number">2.2.</span> <span class="toc-text">最大关键字元素和最小关键字元素</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%90%8E%E7%BB%A7%E5%92%8C%E5%89%8D%E9%A9%B1"><span class="toc-number">2.3.</span> <span class="toc-text">后继和前驱</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%92%E5%85%A5%E5%92%8C%E5%88%A0%E9%99%A4"><span class="toc-number">3.</span> <span class="toc-text">插入和删除</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%92%E5%85%A5"><span class="toc-number">3.1.</span> <span class="toc-text">插入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A0%E9%99%A4"><span class="toc-number">3.2.</span> <span class="toc-text">删除</span></a></li></ol></li></ol>
+    </div>
+    
+    <p>二叉搜索树上的基本操作所花费的时间与这颗树的高度成正比。对于有n个结点的一棵完全二叉树来说，这些操作最坏运行时间是O（lgn）。如果这棵树是一条n个结点组成的线性链，那么同样的操作就要花费O（n）的最坏运行时间。在树中查找是否存在value==x的node的代价是O(h),h是树的深度。</p>
+<h3 id="什么是二叉搜索树"><a href="#什么是二叉搜索树" class="headerlink" title="什么是二叉搜索树"></a>什么是二叉搜索树</h3><p>二叉搜索树，又称为二叉查找树或二叉排序树。一棵二叉搜索树是以一棵二叉树来组织。这样一棵树可以使用一个链表 数据结构来表示。每一个结点是一个对象。除了key和卫星数据外，每个结点还包含属性left，right和p，它们分别指向结点的左孩子、右孩子和双亲。如果某个孩子结点和父结点不存在，则对应的属性为NIL.根结点是树中唯一一个父指针为NIL的结点。<br>对于一个二叉搜索树来说：若它的左子树不空，则左子树上所有结点的值均小于它的根结点的值； 若它的右子树不空，则右子树上所有结点的值均大于它的根结点的值；</p>
+<p><img src="/img/blog/2350612-a90d8de44724381a.png" alt="Alt text"></p>
+<p>二叉树允许我们使用简单的中序遍历算法来按序输出二叉树中的所有关键字。中序遍历是因为输出的子树根的关键字位于其左子树的关键字值和右子树的关键字值之间。类似的：<br>先序遍历中输出的根的关键字在其左右子树的关键字值之前，后序遍历输出的根的关键字在其左右关键字值之后。<br>通过调用INORDER-TREE-WALK(T.root)，就可以输出一棵二叉树T中的所有元素。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">INORDER-TREE-WALK(x)&#123;</span><br><span class="line">    if(x !&#x3D; NIL)&#123;</span><br><span class="line">        INORDER-TREE-WALK(x.left);</span><br><span class="line">        print x.key;</span><br><span class="line">        INORDER-TREE-WALK(x.right);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>所以，上图中（a）的中序遍历结果应该为：2，5，5，6，7，8。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">定理 12.1 </span><br><span class="line">如果x是一棵有n个结点的子树的根，那么调用INORDER-TREE-WALK(x)需要O(n)时间。</span><br></pre></td></tr></table></figure>
+<h3 id="查询二叉搜索树"><a href="#查询二叉搜索树" class="headerlink" title="查询二叉搜索树"></a>查询二叉搜索树</h3><h4 id="查找"><a href="#查找" class="headerlink" title="查找"></a>查找</h4><p>在一棵二叉搜索树中查找一个具有给定关键字的结点。输入一个指向树根的结点和一个关键字k，如果这个结点存在，TREE-SEARCH返回一个指向关键字为k的结点的指针，否则返回NIL.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">TREE-SEARCH(x,k)&#123;</span><br><span class="line">    if(x &#x3D;&#x3D; NIL or k &#x3D;&#x3D; x.key)&#123;</span><br><span class="line">        return x;</span><br><span class="line">    &#125;</span><br><span class="line">    if(k &lt; x.key)&#123;</span><br><span class="line">        return TREE-SEARCH(x.left,k);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        return TREE-SEARCH(x.right,k);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TREE-SEARCH(x,k)的运行时间为O(h)<br>我们可以采用while循环来代替递</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">ITERATIVE-TREE-SEARCH(x,k)&#123;</span><br><span class="line">    while(x !&#x3D; NIL and k !&#x3D; x.key)&#123;</span><br><span class="line">        if(k &lt; x.key)&#123;</span><br><span class="line">            x &#x3D; x.left;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            x &#x3D; x.right;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    return x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="最大关键字元素和最小关键字元素"><a href="#最大关键字元素和最小关键字元素" class="headerlink" title="最大关键字元素和最小关键字元素"></a>最大关键字元素和最小关键字元素</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">TREE-MINIMUM(x)&#123;</span><br><span class="line">    while(x.left !&#x3D; NIL)&#123;</span><br><span class="line">        x &#x3D; x.left;</span><br><span class="line">    &#125;</span><br><span class="line">    return x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>TREE-MAXIMUM(x)的代码是对称的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">TREE-MAXIMUM(x)&#123;</span><br><span class="line">    while(x.right !&#x3D; NIL)&#123;</span><br><span class="line">        x &#x3D; x.right;</span><br><span class="line">    &#125;</span><br><span class="line">    return x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="后继和前驱"><a href="#后继和前驱" class="headerlink" title="后继和前驱"></a>后继和前驱</h4><p>给定一个二叉查找树中的结点，有时要求找出其在中序遍历顺序下它的后继。如果所有的关键字均不相同，则某一结点 x 的后继即具有大于 x.key 中的关键字中最小者的那个结点。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line">TREE-SUCCESSOR(x)&#123;</span><br><span class="line">    if(x.right !&#x3D; NIL)&#123;</span><br><span class="line">        return TREE-MINIMUM(x.right);</span><br><span class="line">    &#125;</span><br><span class="line">    y &#x3D; x.p;</span><br><span class="line">    while(y !&#x3D; NIL and x &#x3D;&#x3D; y.right)&#123;</span><br><span class="line">        x &#x3D; y;</span><br><span class="line">        y &#x3D; y.p;</span><br><span class="line">    &#125;</span><br><span class="line">    return y;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">定理 12.2</span><br><span class="line">在一棵高度为h的二叉搜索树上 ，动态集合上的操作SEARCH,MINIMUM,MAXIMUM,SUCCESSOR和PREDECESSOR可以在O（h）时间内完成。</span><br></pre></td></tr></table></figure>
+<h3 id="插入和删除"><a href="#插入和删除" class="headerlink" title="插入和删除"></a>插入和删除</h3><p>插入和删除操作会引起由二叉搜索树表示的动态集合的变化。一定要修改 数据结构来反应变化，但是修改后要保持二叉搜索树的性质。</p>
+<h4 id="插入"><a href="#插入" class="headerlink" title="插入"></a>插入</h4><p>要将一个值v插入到一棵二叉搜索树T中，需要TREE-INSERT.这个过程以结点z作为输入，其中z.key = v,z.left = NIL,z.right = NIL.</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">TREE-INSERT(T,z)&#123;</span><br><span class="line">    y &#x3D; NIL;</span><br><span class="line">    x &#x3D; T.root;</span><br><span class="line">    while(x !&#x3D; NIL)&#123;  &#x2F;&#x2F;找到自己的位置</span><br><span class="line">        y &#x3D; x;</span><br><span class="line">        if(z.key &lt; x.key)&#123;</span><br><span class="line">            x &#x3D; x.left;</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            x &#x3D; x.right;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    z.p &#x3D; y;</span><br><span class="line">    if(y &#x3D;&#x3D; NIL)&#123;</span><br><span class="line">        T.root &#x3D; z;</span><br><span class="line">    &#125;else if(z.key &lt; y.key)&#123;</span><br><span class="line">        y.left &#x3D; z;</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        y.right &#x3D; z;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="删除"><a href="#删除" class="headerlink" title="删除"></a>删除</h4><p>在二叉搜索树T中删除一个结点z的整个策略分为三种情况。<br>1、如果z没有孩子结点，那么简单的删除，并修改父结点，用NIL作为孩子来替换z<br>2、如果z只有一个孩子，那么将这个孩子提升到树中z的位置，并修改z的父结点，用z的孩子来代替掉z。<br>3、如果z有两个孩子，那么找z的后继y（一定在z的右子树中），并让y占据树中z的位置。z原来的右子树变为y的右子树，并且z的左子树成为y的新左子树。<br>TREE-DELETE 过程用于从二叉查找树 T 中删除一个给定的结点 z ，它按如下四种情况组织代码。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">如果结点 z 没有左孩子，那么我们用右孩子替换 z ，其中右孩子可能为 NIL 。右孩子为 NIL 即结点 z 没有孩子结点的情况。</span><br><span class="line">如果结点 z 有且只有左孩子，那么就用左孩子替代结点 z 。</span><br><span class="line">否则，结点 z 有两个子结点。首先找到 z 的后继结点 y ，它位于 z 的右子树且没有左孩子。这里我们打算用 y 替换 z 。</span><br><span class="line">如果 y 是 z 的右孩子，那么直接用 y 替换 z 。</span><br><span class="line">否则，用 y 自己的右孩子替换 y ，再用 y 来替换 z 。</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-79f2defd6e87ffb0.png" alt="Alt text"><br>为了在二叉搜索树内移动子树，定义一个子过程TRANSPLANT，它是用另一颗子树替换一棵子树并成为其双亲的孩子结点。当TRANSPLANT用一棵以v为根的子树来替换一棵以u为根的子树时，结点u的双亲就变为结点v的双亲，并且最后v变成u的双亲响应孩子。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">TRANSPLANT(T,u,v)&#123;</span><br><span class="line">    if (u.p &#x3D;&#x3D; NIL)&#123;</span><br><span class="line">        T.root &#x3D; v;</span><br><span class="line">    &#125;else if(u &#x3D;&#x3D; u.p.left)&#123;</span><br><span class="line">        u.p.left &#x3D; v;</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        u.p.right &#x3D; v;</span><br><span class="line">    &#125;</span><br><span class="line">    if(v !&#x3D; NIL)&#123;</span><br><span class="line">        v.p &#x3D; u.p;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">TREE-DELETE(T,z)&#123;</span><br><span class="line">    if(z.left &#x3D;&#x3D; NIL)&#123;</span><br><span class="line">        TRANSPLANT(T,z,z.right);</span><br><span class="line">    &#125;else if(z.right &#x3D;&#x3D; NIL)&#123;</span><br><span class="line">        TRANSPLANT(T,z,z.left);</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        y &#x3D; TREE-MINIMUM(z.right);</span><br><span class="line">        if (y.p !&#x3D; z)&#123;  &#x2F;&#x2F;如果y的父结点不是z</span><br><span class="line">                TRANSPLANT(T, y, y.right);</span><br><span class="line">                y.right &#x3D; z.right;</span><br><span class="line">                y.right.p &#x3D; y;</span><br><span class="line">        &#125;</span><br><span class="line">        TRANSPLANT(T, z, y);</span><br><span class="line">        y.left &#x3D; z.left;</span><br><span class="line">        y.left.p &#x3D; y;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/07/07/201707/Redis高级应用降低内存占用/" class="prev">上一篇：Redis高级应用--降低内存占用</a>
+    
+    
+    <a href="/2017/06/21/201706/Nginx中优化性能的配置项/" class="next">下一篇：Nginx中优化性能的配置项</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

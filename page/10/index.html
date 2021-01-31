@@ -1,0 +1,498 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>page | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <div class="article-list-wrap">
+  
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/04/27/201704/设计模式模板方法模式/" itemprop="url">设计模式-模板方法模式</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      模版方法模式，定义一个操作中的算法框架，将一些步骤延续到子类中实现。模板方法似的子类可以不改变一个算法的结构即可重新定义该算法的某些特定步骤。算法框架
+1234567891011121314package Template;public abstract class AbstractPerson &#123;	&#x2F;&#x2F;定义整个流程	public void prepareGotoS ...
+      <a href="/2017/04/27/201704/设计模式模板方法模式/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-04-26T23:11:08.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-04-27
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/04/27/201704/设计模式策略模式/" itemprop="url">设计模式-策略模式</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      策略模式（Strategy），定义了算法家族，分别封装起来，让这些算法之间可以互相替换，在这种模式下，替换算法，不会影响使用算法的客户统一接口
+12345package Strategy;public interface Icalculator &#123;	public int calculate(String exp);&#125;
+辅助类
+1234567891011package Stra ...
+      <a href="/2017/04/27/201704/设计模式策略模式/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-04-26T22:44:35.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-04-27
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/04/27/201704/设计模式享元模式/" itemprop="url">设计模式-享元模式</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      享元模式采用一个共享来避免大量拥有相同内容对象的开销。接口
+123456package Flyweight;public interface Flyweight &#123;	public void operation(String state);&#125;
+享元角色类
+123456789101112131415161718package Flyweight;public class Conc ...
+      <a href="/2017/04/27/201704/设计模式享元模式/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-04-26T22:13:12.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-04-27
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/04/27/201704/设计模式组合模式/" itemprop="url">设计模式-组合模式</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      组合模式（Composite）,将对象组合成树形结构表示“部分-整体”的层次结构。组合模式使得用户对单个对象和组合对象的使用具有一致性。
+123456789101112131415161718192021222324252627282930313233343536373839package Composite;import java.util.Enumeration;import java.ut ...
+      <a href="/2017/04/27/201704/设计模式组合模式/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-04-26T20:23:24.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-04-27
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/04/26/201704/设计模式桥接模式/" itemprop="url">设计模式-桥接模式</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      桥接模式（Bridge），将抽象部分与它的实现部分分离，使它们都能独立变化。手机软件类
+12345package Bridge;&#x2F;&#x2F;手机软件类public abstract class HandsetSoft &#123;	public abstract void run();&#125;
+手机游戏类和手机通讯录类
+123456789101112131415161718192 ...
+      <a href="/2017/04/26/201704/设计模式桥接模式/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-04-26T13:11:42.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-04-26
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/04/26/201704/设计模式外观模式/" itemprop="url">设计模式-外观模式</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      外观模式（Facade），为子系统中的一组接口提供一个一致的界面，此模式定义了一个高层的接口，这个接口使子系统更加容易使用。定义3个类
+123456789101112131415161718192021222324252627282930package Facade;public class CPU &#123;	public void startup()&#123;		System.out.p ...
+      <a href="/2017/04/26/201704/设计模式外观模式/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-04-25T22:38:08.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-04-26
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/04/26/201704/设计模式代理模式/" itemprop="url">设计模式-代理模式</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      静态代理模式代理模式就是为其他对象提供一种代理，用来控制对这个对象的访问。其中，RealSubject和Proxy同时实现Subject接口，并且Proxy对象包含RealSubject对象。
+
+引用代理对象的方式间接访问 目标对象，防止直接访问对象给系统带来的不必要复杂性
+通过代理对象对原有的业务增强共用接口123public interface Subject &#123;    void  ...
+      <a href="/2017/04/26/201704/设计模式代理模式/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-04-25T22:18:42.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-04-26
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/04/26/201704/设计模式装饰模式/" itemprop="url">设计模式-装饰模式</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      装饰模式（Decorator）是动态的给一个对象添加一些额外的职责。要求装饰对象和被装饰对象实现同一个接口。共同继承
+12345package Decorator;public interface Sourceable &#123;	public void method();&#125;
+被装饰类
+1234567891011package Decorator;public class Sourc ...
+      <a href="/2017/04/26/201704/设计模式装饰模式/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-04-25T21:58:26.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-04-26
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/04/26/201704/设计模式适配器模式/" itemprop="url">设计模式-适配器模式</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      适配器模式（Adapter），是将一个类的接口转换成客户希望的另外一个接口。适配器模式是原来由于接口不兼容而不能在一起工作的那些类可以在一起工作。
+类适配器原来的方法
+1234567package adapter;public class Source &#123;	public void method1()&#123;		System.out.println(&quot;这是原来的方法&quo ...
+      <a href="/2017/04/26/201704/设计模式适配器模式/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-04-25T20:00:58.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-04-26
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/04/25/201704/设计模式创建者模式/" itemprop="url">设计模式-创建者模式</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      工厂模式是创建单个类。而创建者模式是将各种产品集中管理，创建复合对象，使用同样的构建过程，而创建不同的表示。接口
+123456package Builder;public interface Sender &#123; &#x2F;&#x2F;接口	public void Send();&#125;
+两个实例：
+1234567891011package Builder;public class  ...
+      <a href="/2017/04/25/201704/设计模式创建者模式/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-04-24T22:51:58.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-04-25
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+</div>
+
+<nav id="pagenavi">
+  
+  <a href="/page/9/" class="prev">上一页</a>
+  
+  
+  <a href="/page/11/" class="next">下一页</a>
+  
+</nav>
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

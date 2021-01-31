@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>伸展树学习笔记 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介AVL树的构建过于苛刻，在构建过程中要处处保持它的特性。为此我们引入一个较为宽松的二叉搜索树。
+局部性局部性就是实际计算环境中普遍存在的一种现象，就是说刚被访问的数据，极有可能很快的再次被访问。也就是说刚被访问过的节点，极有可能很快的再次被访问。因此利用局部性，是否能提高访问效率？
+伸展树伸展树">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="伸展树学习笔记"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-08-04T15:36:40.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-08-04
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">伸展树学习笔记</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%B1%80%E9%83%A8%E6%80%A7"><span class="toc-number">1.1.</span> <span class="toc-text">局部性</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BC%B8%E5%B1%95%E6%A0%91"><span class="toc-number">1.2.</span> <span class="toc-text">伸展树</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="toc-number">2.</span> <span class="toc-text">实现</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%8A%82%E7%82%B9"><span class="toc-number">2.1.</span> <span class="toc-text">节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%97%8B%E8%BD%AC"><span class="toc-number">2.2.</span> <span class="toc-text">旋转</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%8F%92%E5%85%A5%E6%93%8D%E4%BD%9C"><span class="toc-number">2.3.</span> <span class="toc-text">插入操作</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%88%A0%E9%99%A4%E8%8A%82%E7%82%B9"><span class="toc-number">2.4.</span> <span class="toc-text">删除节点</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9C%80%E5%9D%8F%E6%83%85%E5%86%B5"><span class="toc-number">2.5.</span> <span class="toc-text">最坏情况</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BC%B8%E5%B1%95%E6%A0%91%EF%BC%9A%E5%8F%8C%E5%B1%82%E4%BC%B8%E5%B1%95"><span class="toc-number">3.</span> <span class="toc-text">伸展树：双层伸展</span></a></li></ol>
+    </div>
+    
+    <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>AVL树的构建过于苛刻，在构建过程中要处处保持它的特性。为此我们引入一个较为宽松的二叉搜索树。</p>
+<h4 id="局部性"><a href="#局部性" class="headerlink" title="局部性"></a>局部性</h4><p>局部性就是实际计算环境中普遍存在的一种现象，就是说刚被访问的数据，极有可能很快的再次被访问。也就是说刚被访问过的节点，极有可能很快的再次被访问。因此利用局部性，是否能提高访问效率？</p>
+<h4 id="伸展树"><a href="#伸展树" class="headerlink" title="伸展树"></a>伸展树</h4><p>伸展树，或者叫自适应查找树，是一种用于保存有序集合的简单高效的数据结构。伸展树实质上是一个二叉查找树。允许查找，插入，删除，删除最小，删除最大，分割，合并等许多操作，这些操作的时间复杂度为O(logN)。由于伸展树可以适应需求序列，因此他们的性能在实际应用中更优秀。</p>
+<h3 id="实现"><a href="#实现" class="headerlink" title="实现"></a>实现</h3><h4 id="节点"><a href="#节点" class="headerlink" title="节点"></a>节点</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">typedef int Type;</span><br><span class="line">typedef struct SplayTreeNode &#123;</span><br><span class="line">    Type key;                        &#x2F;&#x2F; 关键字(键值),用来排序</span><br><span class="line">    struct SplayTreeNode *left;        &#x2F;&#x2F; 左孩子</span><br><span class="line">    struct SplayTreeNode *right;    &#x2F;&#x2F; 右孩子</span><br><span class="line">&#125; Node, *SplayTree; </span><br></pre></td></tr></table></figure>
+<h4 id="旋转"><a href="#旋转" class="headerlink" title="旋转"></a>旋转</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br></pre></td><td class="code"><pre><span class="line">Node* splaytree_splay(SplayTree tree, Type key)</span><br><span class="line">&#123;</span><br><span class="line">    Node N, *l, *r, *c;</span><br><span class="line"></span><br><span class="line">    if (tree &#x3D;&#x3D; NULL)  &#x2F;&#x2F;判断是不是空树，如果是空树，直接返回NULL</span><br><span class="line">    &#123;</span><br><span class="line">            return tree;</span><br><span class="line">    &#125;</span><br><span class="line">    N.left &#x3D; N.right &#x3D; NULL;</span><br><span class="line">    l &#x3D; r &#x3D; &amp;N;</span><br><span class="line"></span><br><span class="line">    for (;;)</span><br><span class="line">    &#123;</span><br><span class="line">        if (key &lt; tree-&gt;key)    &#x2F;&#x2F;没找到key值，但是判断出来key比当前节点小，也就是在树的左边</span><br><span class="line">        &#123;</span><br><span class="line">            if (tree-&gt;left &#x3D;&#x3D; NULL)  &#x2F;&#x2F;当前节点的左子树是NULL，直接退出</span><br><span class="line">                break;</span><br><span class="line">            if (key &lt; tree-&gt;left-&gt;key)  &#x2F;&#x2F;如果key小于当前节点左子树的key</span><br><span class="line">            &#123;</span><br><span class="line">                c &#x3D; tree-&gt;left;                         &#x2F;&#x2F;下面四条语句是当前节点和左孩子节点通过左旋，使左孩子成为根结点</span><br><span class="line">                tree-&gt;left &#x3D; c-&gt;right;</span><br><span class="line">                c-&gt;right &#x3D; tree;</span><br><span class="line">                tree &#x3D; c;</span><br><span class="line">                if (tree-&gt;left &#x3D;&#x3D; NULL) </span><br><span class="line">                    break;</span><br><span class="line">            &#125;</span><br><span class="line">            r-&gt;left &#x3D; tree;                            </span><br><span class="line">            r &#x3D; tree;</span><br><span class="line">            tree &#x3D; tree-&gt;left;</span><br><span class="line">        &#125;else if (key &gt; tree-&gt;key)   &#x2F;&#x2F;找到了key值，key值比当前节点大，也就是在树的右边</span><br><span class="line">        &#123;</span><br><span class="line">            if (tree-&gt;right &#x3D;&#x3D; NULL) </span><br><span class="line">                break;</span><br><span class="line">            if (key &gt; tree-&gt;right-&gt;key) </span><br><span class="line">            &#123;</span><br><span class="line">                c &#x3D; tree-&gt;right;                          &#x2F;* 03, rotate left *&#x2F;</span><br><span class="line">                tree-&gt;right &#x3D; c-&gt;left;</span><br><span class="line">                c-&gt;left &#x3D; tree;</span><br><span class="line">                tree &#x3D; c;</span><br><span class="line">                if (tree-&gt;right &#x3D;&#x3D; NULL) </span><br><span class="line">                    break;</span><br><span class="line">            &#125;</span><br><span class="line">            l-&gt;right &#x3D; tree;                              &#x2F;* 04, link left *&#x2F;</span><br><span class="line">            l &#x3D; tree;</span><br><span class="line">            tree &#x3D; tree-&gt;right;</span><br><span class="line">        &#125;</span><br><span class="line">        else</span><br><span class="line">        &#123;</span><br><span class="line">            break;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    l-&gt;right &#x3D; tree-&gt;left;                                &#x2F;* 05, assemble *&#x2F;</span><br><span class="line">    r-&gt;left &#x3D; tree-&gt;right;</span><br><span class="line">    tree-&gt;left &#x3D; N.right;</span><br><span class="line">    tree-&gt;right &#x3D; N.left;</span><br><span class="line"></span><br><span class="line">    return tree;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="插入操作"><a href="#插入操作" class="headerlink" title="插入操作"></a>插入操作</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;* </span><br><span class="line"> * 将结点插入到伸展树中(不旋转)</span><br><span class="line"> *</span><br><span class="line"> * 参数说明：</span><br><span class="line"> *     tree 伸展树的根结点</span><br><span class="line"> *     z 插入的结点</span><br><span class="line"> * 返回值：</span><br><span class="line"> *     根节点</span><br><span class="line"> *&#x2F;</span><br><span class="line">static Node* splaytree_insert(SplayTree tree, Node *z)</span><br><span class="line">&#123;</span><br><span class="line">    Node *y &#x3D; NULL;</span><br><span class="line">    Node *x &#x3D; tree;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 查找z的插入位置</span><br><span class="line">    while (x !&#x3D; NULL)</span><br><span class="line">    &#123;</span><br><span class="line">        y &#x3D; x;</span><br><span class="line">        if (z-&gt;key &lt; x-&gt;key)</span><br><span class="line">            x &#x3D; x-&gt;left;</span><br><span class="line">        else if (z-&gt;key &gt; x-&gt;key)</span><br><span class="line">            x &#x3D; x-&gt;right;</span><br><span class="line">        else</span><br><span class="line">        &#123;</span><br><span class="line">            printf(&quot;不允许插入相同节点(%d)!\n&quot;, z-&gt;key);</span><br><span class="line">            &#x2F;&#x2F; 释放申请的节点，并返回tree。</span><br><span class="line">            free(z);</span><br><span class="line">            return tree;</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    if (y&#x3D;&#x3D;NULL)</span><br><span class="line">        tree &#x3D; z;</span><br><span class="line">    else if (z-&gt;key &lt; y-&gt;key)</span><br><span class="line">        y-&gt;left &#x3D; z;</span><br><span class="line">    else</span><br><span class="line">        y-&gt;right &#x3D; z;</span><br><span class="line"></span><br><span class="line">    return tree;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;*</span><br><span class="line"> * 创建并返回伸展树结点。</span><br><span class="line"> *</span><br><span class="line"> * 参数说明：</span><br><span class="line"> *     key 是键值。</span><br><span class="line"> *     parent 是父结点。</span><br><span class="line"> *     left 是左孩子。</span><br><span class="line"> *     right 是右孩子。</span><br><span class="line"> *&#x2F;</span><br><span class="line">static Node* create_splaytree_node(Type key, Node *left, Node* right)</span><br><span class="line">&#123;</span><br><span class="line">    Node* p;</span><br><span class="line"></span><br><span class="line">    if ((p &#x3D; (Node *)malloc(sizeof(Node))) &#x3D;&#x3D; NULL)</span><br><span class="line">        return NULL;</span><br><span class="line">    p-&gt;key &#x3D; key;</span><br><span class="line">    p-&gt;left &#x3D; left;</span><br><span class="line">    p-&gt;right &#x3D; right;</span><br><span class="line"></span><br><span class="line">    return p;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">&#x2F;* </span><br><span class="line"> * 新建结点(key)，然后将其插入到伸展树中，并将插入节点旋转为根节点</span><br><span class="line"> *</span><br><span class="line"> * 参数说明：</span><br><span class="line"> *     tree 伸展树的根结点</span><br><span class="line"> *     key 插入结点的键值</span><br><span class="line"> * 返回值：</span><br><span class="line"> *     根节点</span><br><span class="line"> *&#x2F;</span><br><span class="line">Node* insert_splaytree(SplayTree tree, Type key)</span><br><span class="line">&#123;</span><br><span class="line">    Node *z;    &#x2F;&#x2F; 新建结点</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 如果新建结点失败，则返回。</span><br><span class="line">    if ((z&#x3D;create_splaytree_node(key, NULL, NULL)) &#x3D;&#x3D; NULL)</span><br><span class="line">        return tree;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 插入节点</span><br><span class="line">    tree &#x3D; splaytree_insert(tree, z);</span><br><span class="line">    &#x2F;&#x2F; 将节点(key)旋转为根节点</span><br><span class="line">    tree &#x3D; splaytree_splay(tree, key);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="删除节点"><a href="#删除节点" class="headerlink" title="删除节点"></a>删除节点</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;* </span><br><span class="line"> * 删除结点(key为节点的键值)，并返回根节点。</span><br><span class="line"> *</span><br><span class="line"> * 参数说明：</span><br><span class="line"> *     tree 伸展树的根结点</span><br><span class="line"> *     z 删除的结点</span><br><span class="line"> * 返回值：</span><br><span class="line"> *     根节点(根节点是被删除节点的前驱节点)</span><br><span class="line"> *</span><br><span class="line"> *&#x2F;</span><br><span class="line">Node* delete_splaytree(SplayTree tree, Type key)</span><br><span class="line">&#123;</span><br><span class="line">    Node *x;</span><br><span class="line"></span><br><span class="line">    if (tree &#x3D;&#x3D; NULL) </span><br><span class="line">        return NULL;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 查找键值为key的节点，找不到的话直接返回。</span><br><span class="line">    if (splaytree_search(tree, key) &#x3D;&#x3D; NULL)</span><br><span class="line">        return tree;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F; 将key对应的节点旋转为根节点。</span><br><span class="line">    tree &#x3D; splaytree_splay(tree, key);</span><br><span class="line"></span><br><span class="line">    if (tree-&gt;left !&#x3D; NULL)</span><br><span class="line">    &#123;</span><br><span class="line">        &#x2F;&#x2F; 将&quot;tree的前驱节点&quot;旋转为根节点</span><br><span class="line">        x &#x3D; splaytree_splay(tree-&gt;left, key);</span><br><span class="line">        &#x2F;&#x2F; 移除tree节点</span><br><span class="line">        x-&gt;right &#x3D; tree-&gt;right;</span><br><span class="line">    &#125;</span><br><span class="line">    else</span><br><span class="line">        x &#x3D; tree-&gt;right;</span><br><span class="line">    free(tree);</span><br><span class="line">    return x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="最坏情况"><a href="#最坏情况" class="headerlink" title="最坏情况"></a>最坏情况</h4><p><img src="/img/blog/2350612-84ff2cc0aa90773e.png" alt="Alt text"><br>伸展树无需记录节点高度或者平衡因子，编程上比AVL树更容易实现，分摊时间复杂度O（logN），与AVL树相当。<br>但是无法保证单次最坏情况出现，不适用于效率敏感的场景。</p>
+<h3 id="伸展树：双层伸展"><a href="#伸展树：双层伸展" class="headerlink" title="伸展树：双层伸展"></a>伸展树：双层伸展</h3><p>上面介绍的伸展树旋转是逐层上升，这里的双层伸展是向上旋转两层，节点v的位置可能性为：<br><img src="/img/blog/2350612-061606ea5890a66e.png" alt="Alt text"><br>和AVL树的双旋一样。这样做的好处是：在最坏情况下，每一次旋转都会将树的高度将为原来高度的一半</p>
+<p><img src="/img/blog/2350612-e4cf994bbe58eea3.png" alt="Alt text"></p>
+<p>学习资料：</p>
+<ol>
+<li><a target="_blank" rel="noopener" href="http://www.cnblogs.com/skywang12345/p/3604238.html">伸展树(一)之 图文解析 和 C语言的实现</a></li>
+<li>[学堂在线]30240184X 数据结构(下)(自主模式)</li>
+</ol>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/08/05/201708/Java网络编程笔记之多种建立网络连接的方式三/" class="prev">上一篇：Java网络编程笔记之多种建立网络连接的方式（三）</a>
+    
+    
+    <a href="/2017/08/04/201708/Java网络编程笔记之Socket接收和发送数据二/" class="next">下一篇：Java网络编程笔记之Socket接收和发送数据（二）</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

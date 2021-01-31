@@ -1,0 +1,187 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>动态规划 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="动态规划的本质是递归加缓存解决动态规划的四个步骤：
+
+设计暴力算法，找到冗余
+设计并存储状态（一维，二维，三维数组，甚至用Map）
+递归式（状态转移方程）
+自底向上计算最优解（编程方式：把递归改为迭代）  
+
+（递归是自顶向下，循环是自底向上）Leetcode198题
+123456789101112">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="动态规划"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2019-02-14T16:50:02.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-02-15
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">动态规划</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%8A%A8%E6%80%81%E8%A7%84%E5%88%92%E7%9A%84%E6%9C%AC%E8%B4%A8%E6%98%AF%E9%80%92%E5%BD%92%E5%8A%A0%E7%BC%93%E5%AD%98"><span class="toc-number">1.</span> <span class="toc-text">动态规划的本质是递归加缓存</span></a></li></ol>
+    </div>
+    
+    <h4 id="动态规划的本质是递归加缓存"><a href="#动态规划的本质是递归加缓存" class="headerlink" title="动态规划的本质是递归加缓存"></a>动态规划的本质是递归加缓存</h4><p>解决动态规划的四个步骤：</p>
+<ul>
+<li>设计暴力算法，找到冗余</li>
+<li>设计并存储状态（一维，二维，三维数组，甚至用Map）</li>
+<li>递归式（状态转移方程）</li>
+<li>自底向上计算最优解（编程方式：把递归改为迭代）  </li>
+</ul>
+<p>（递归是自顶向下，循环是自底向上）<br>Leetcode198题</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">你是一个专业的小偷，计划偷窃沿街的房屋。每间房内都藏有一定的现金，影响你偷窃的唯一制约因素就是相邻的房屋装有相互连通的防盗系统，如果两间相邻的房屋在同一晚上被小偷闯入，系统会自动报警。</span><br><span class="line"></span><br><span class="line">给定一个代表每个房屋存放金额的非负整数数组，计算你在不触动警报装置的情况下，能够偷窃到的最高金额。</span><br><span class="line"></span><br><span class="line">示例 1:</span><br><span class="line"></span><br><span class="line">输入: [1,2,3,1]</span><br><span class="line">输出: 4</span><br><span class="line">解释: 偷窃 1 号房屋 (金额 &#x3D; 1) ，然后偷窃 3 号房屋 (金额 &#x3D; 3)。</span><br><span class="line">     偷窃到的最高金额 &#x3D; 1 + 3 &#x3D; 4 。</span><br><span class="line">示例 2:</span><br><span class="line"></span><br><span class="line">输入: [2,7,9,3,1]</span><br><span class="line">输出: 12</span><br><span class="line">解释: 偷窃 1 号房屋 (金额 &#x3D; 2), 偷窃 3 号房屋 (金额 &#x3D; 9)，接着偷窃 5 号房屋 (金额 &#x3D; 1)。</span><br><span class="line">     偷窃到的最高金额 &#x3D; 2 + 9 + 1 &#x3D; 12 。</span><br></pre></td></tr></table></figure>
+<p>从题目中可以看出，不能投相同的两间屋子，首先用DFS解决。下图中，根结点是0，表示从0号开始，决定偷还是不偷，如果决定偷0，那么1不能偷，只能偷2；如果不偷0，那么可以偷1.<br><img src="https://www.gwt.fun/upload/c8c88780150a43abb253417c8696d3af_image.png" alt="imagepng"> </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">    public int rob(int[] nums) &#123;</span><br><span class="line">        return dfs(0,nums);</span><br><span class="line">    &#125;</span><br><span class="line">    public int dfs(int idex, int[] nums) &#123;</span><br><span class="line">        if(idex &gt;&#x3D; nums.length) &#123;</span><br><span class="line">            return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        int a &#x3D; nums[idex] + dfs(idex + 2, nums);  &#x2F;&#x2F;从左边开始</span><br><span class="line">        int b &#x3D; 0 + dfs(idex + 1, nums);  &#x2F;&#x2F;从右边开始</span><br><span class="line">        return Math.max(a,b);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>上面的代码可以解决问题，但是超出了时间限制，看上面的图，（2，n）和（3，n）出现了多次，所以在这个程序中有些结点计算了多次，那么可以使用缓存来保存这些节点，在需要的时候取出来。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">    Map&lt;Integer,Integer&gt; cache &#x3D; new HashMap&lt;Integer,Integer&gt;();</span><br><span class="line">    public int rob(int[] nums) &#123;</span><br><span class="line">        return dfs(0,nums);</span><br><span class="line">    &#125;</span><br><span class="line">    public int dfs(int idx, int[] nums) &#123;</span><br><span class="line">        if(idx &gt;&#x3D; nums.length) &#123;</span><br><span class="line">            return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        &#x2F;&#x2F;取之前先判断一下缓存中是否存在值</span><br><span class="line">        if(cache.containsKey(idx)) &#123;</span><br><span class="line">            return cache.get(idx);</span><br><span class="line">        &#125;</span><br><span class="line">        int a &#x3D; nums[idx] + dfs(idx + 2, nums);  &#x2F;&#x2F;从左边开始</span><br><span class="line">        int b &#x3D; 0 + dfs(idx + 1, nums);  &#x2F;&#x2F;从右边开始</span><br><span class="line">        int c &#x3D; Math.max(a,b);</span><br><span class="line">        &#x2F;&#x2F;将每次的值保存在缓存中</span><br><span class="line">        cache.put(idx,c);</span><br><span class="line">        return c;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>递归调用会占用许多空间，下面改为迭代的方式，自底向上来解决问题：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">    Map&lt;Integer,Integer&gt; cache &#x3D; new HashMap&lt;Integer,Integer&gt;();</span><br><span class="line">    public int rob(int[] nums) &#123;</span><br><span class="line">        if(nums.length &#x3D;&#x3D; 0) &#123;</span><br><span class="line">            return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        int n &#x3D; nums.length;</span><br><span class="line">        cache.put(n - 1,nums[n - 1]); &#x2F;&#x2F;最后一个保存进去</span><br><span class="line">        for(int i &#x3D; n - 2; i &gt;&#x3D; 0; i--) &#123;</span><br><span class="line">            int a &#x3D; nums[i] + (cache.containsKey(i + 2) ? cache.get(i + 2) : 0);  &#x2F;&#x2F;从左边开始</span><br><span class="line">            int b &#x3D; 0 + (cache.containsKey(i + 1) ? cache.get(i + 1) : 0);  &#x2F;&#x2F;从右边开始</span><br><span class="line">            cache.put(i,Math.max(a,b));</span><br><span class="line">        &#125;</span><br><span class="line">        </span><br><span class="line">        return cache.get(0);</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>也可以使用数组来替换map，这样可以更节省空间:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br></pre></td><td class="code"><pre><span class="line">class Solution &#123;</span><br><span class="line">    int[] cache &#x3D; new int[100];</span><br><span class="line">    public int rob(int[] nums) &#123;</span><br><span class="line">        if(nums.length &#x3D;&#x3D; 0) &#123;</span><br><span class="line">            return 0;</span><br><span class="line">        &#125;</span><br><span class="line">        if(nums.length &#x3D;&#x3D; 1) &#123;</span><br><span class="line">            return nums[0];</span><br><span class="line">        &#125;</span><br><span class="line">        int n &#x3D; nums.length;</span><br><span class="line">        cache[n - 1] &#x3D; nums[n - 1]; &#x2F;&#x2F;最后一个保存进去</span><br><span class="line">        cache[n - 2] &#x3D; Math.max(nums[n - 1],nums[n - 2]);</span><br><span class="line">        for(int i &#x3D; n - 3; i &gt;&#x3D; 0; i--) &#123;</span><br><span class="line">            cache[i] &#x3D; Math.max(nums[i] + cache[i + 2],cache[i + 1]);</span><br><span class="line">        &#125;</span><br><span class="line">        return cache[0];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2019/02/23/201902/Java基础之线程池/" class="prev">上一篇：Java基础之线程池</a>
+    
+    
+    <a href="/2019/02/14/201902/从线程安全角度看单例模式/" class="next">下一篇：从线程安全角度看单例模式</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>算法导论学习笔记--堆排序 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="堆什么是堆？（二叉）堆是一个数组，可以被看成是完全二叉树，树上的每一个结点对应数组中的元素。除了底层，该树是完全充满的，并且是从左到右填充。表示堆的数组A包括两个属性：A.length通常表示数组元素的个数，A.heap-size表示有多少个堆元素存储在该数组中。0&amp;lt;= A.heap-size">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="算法导论学习笔记--堆排序"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-05-07T18:01:15.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-05-08
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">算法导论学习笔记--堆排序</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86"><span class="toc-number">1.</span> <span class="toc-text">堆</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BB%80%E4%B9%88%E6%98%AF%E5%A0%86%EF%BC%9F"><span class="toc-number">1.1.</span> <span class="toc-text">什么是堆？</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%A0%86%E7%9A%84%E5%88%86%E7%B1%BB"><span class="toc-number">1.2.</span> <span class="toc-text">堆的分类</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%B4%E6%8A%A4%E5%A0%86%E7%9A%84%E6%80%A7%E8%B4%A8"><span class="toc-number">2.</span> <span class="toc-text">维护堆的性质</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%BB%BA%E5%A0%86"><span class="toc-number">3.</span> <span class="toc-text">建堆</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A0%86%E6%8E%92%E5%BA%8F%E7%AE%97%E6%B3%95"><span class="toc-number">4.</span> <span class="toc-text">堆排序算法</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%80%E5%B0%8F%E5%A0%86%E6%80%A7%E8%B4%A8"><span class="toc-number">5.</span> <span class="toc-text">最小堆性质</span></a></li></ol>
+    </div>
+    
+    <h3 id="堆"><a href="#堆" class="headerlink" title="堆"></a>堆</h3><h4 id="什么是堆？"><a href="#什么是堆？" class="headerlink" title="什么是堆？"></a>什么是堆？</h4><p>（二叉）堆是一个数组，可以被看成是完全二叉树，树上的每一个结点对应数组中的元素。除了底层，该树是完全充满的，并且是从左到右填充。表示堆的数组A包括两个属性：A.length通常表示数组元素的个数，A.heap-size表示有多少个堆元素存储在该数组中。0&lt;= A.heap-size&lt;=A.length。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">假设根节点是A[1]</span><br><span class="line">PARENT(i)     &#x2F;&#x2F;父结点</span><br><span class="line">    return [i&#x2F;2]</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">LEFT(i)       &#x2F;&#x2F;左孩子结点</span><br><span class="line">    return[2i]</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">RIGHT(i)    &#x2F;&#x2F;右孩子结点</span><br><span class="line">    return[2i+1]</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-c1a8d70d01f514e3.png" alt="Alt text"></p>
+<h4 id="堆的分类"><a href="#堆的分类" class="headerlink" title="堆的分类"></a>堆的分类</h4><p>二叉堆分为两种形式：最大堆和最小堆。<br>最大堆是指除了根之外的所有结点i都满足：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A[PARENT(i)]  &gt;&#x3D; A[i]</span><br></pre></td></tr></table></figure>
+<p>最小堆是指除了根之外的所有结点i都满足:</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">A[PARENT(i)]  &lt;&#x3D; A[i]</span><br></pre></td></tr></table></figure>
+<p>在堆排序 算法中，使用最大堆。最小堆通常用于构造优先队列。</p>
+<h3 id="维护堆的性质"><a href="#维护堆的性质" class="headerlink" title="维护堆的性质"></a>维护堆的性质</h3><p>MAX-HEAPIFY是用于维护最大堆性质的重要过程。这个函数输入一个数组A和一个下标i。我们假设根结点LEFT(i)和RIGHT(i)的二叉树都是最大堆，这是A[i]可能小于其他孩子，违背最大堆性质。所以需要让A[i]的值在最大堆中“逐级下降”。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line">MAX-HEAPIFY(A,i)&#123;</span><br><span class="line">    l &#x3D; LEFT(i);</span><br><span class="line">    r &#x3D; RIGHT(i);</span><br><span class="line">    if(l &lt;&#x3D; A.heap-size and A[l] &gt; A[i])&#123;    &#x2F;&#x2F;先判断A[i]  和  A[l] 哪个大</span><br><span class="line">        largest &#x3D; l;             &#x2F;&#x2F;选出最大的值，将下标存放在 largest中</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        largest &#x3D; i;</span><br><span class="line">    &#125;</span><br><span class="line">    if(r &lt;&#x3D; A.heap-size and A[r] &gt; A[largest])&#123;  &#x2F;&#x2F; 再判断A[r] 和刚刚判断出来的最大值 比较哪个大</span><br><span class="line">        largest &#x3D; r</span><br><span class="line">    &#125;</span><br><span class="line">    if(largest !&#x3D; i)&#123;&#x2F;&#x2F;如果相等，则表示已经符合最大堆的性质，不相等就交换，然后递归。</span><br><span class="line">        swap(A[i],A[largest]);    &#x2F;&#x2F;交换位置</span><br><span class="line">        i &#x3D; largest;</span><br><span class="line">        largest &#x3D; -1;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<p><img src="/img/blog/2350612-5b740993e5ead461.png" alt="Alt text"><br>对于一棵以i为根结点，大小为n的子树，MAX-HEAPIFY的时间代价包括：调整A[i],A[RIGHT(i)],A[LEFT(i)]的关系的时间代价O(1),加上一棵以i的一个孩子为根结点的子树上运行MAX-HEAPIFY的时间代价（假设递归调用）。因为每个孩子的子树大小至多为2n/3(最坏情况发生在树的最底层恰好半满的时候)。所以递归式运行时间为：T(n) &lt;= T(2n/3) + O(1). 递归式可以解为：T(n) = O(lgn).也就是说，对于一个树高为h的结点来说，MAX-HEAPIFY的时间复杂度是O(h)。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">迭代版</span><br><span class="line">MAX-HEAPIFY(A，i)&#123;</span><br><span class="line">    largest &#x3D; -1;</span><br><span class="line">    while(largest !&#x3D; i)&#123;</span><br><span class="line">        l &#x3D; LEFT(i);</span><br><span class="line">        r &#x3D; RIGHT(i);</span><br><span class="line">        if(l &lt;&#x3D; A.heap-size and A[l] &gt; A[i])&#123;    &#x2F;&#x2F;先判断A[i]  和  A[l] 哪个大</span><br><span class="line">            largest &#x3D; l;             &#x2F;&#x2F;选出最大的值，将下标存放在 largest中</span><br><span class="line">        &#125;else&#123;</span><br><span class="line">            largest &#x3D; i;</span><br><span class="line">        &#125;</span><br><span class="line">        if(r &lt;&#x3D; A.heap-size and A[r] &gt; A[largest])    &#123;  &#x2F;&#x2F; 再判断A[r] 和刚刚判断出来的最大值 比较哪个大</span><br><span class="line">            largest &#x3D; r</span><br><span class="line">        &#125;</span><br><span class="line">        if(largest !&#x3D; i)&#123;&#x2F;&#x2F;如果相等，则表示已经符合最大堆的性质，不相等就交换，然后递归。</span><br><span class="line">            swap(A[i],A[largest]);    &#x2F;&#x2F;交换位置</span><br><span class="line">            MAX-HEAPOFY(A,largest);   &#x2F;&#x2F;进行递归</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="建堆"><a href="#建堆" class="headerlink" title="建堆"></a>建堆</h3><p>我们可以用自底向上的方法利用过程MAX-HEAPIFY把一个大小为n=A.length的数组A[1..n]转换为最大堆。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">BUILD-MAX-HEAP(A)&#123;</span><br><span class="line">    A.heap-size &#x3D; A.length;</span><br><span class="line">    fot(i &#x3D; A.length&#x2F;2 ; i&gt;0; i--)&#123;   &#x2F;&#x2F;结点1就是最大的堆的根结点</span><br><span class="line">        MAX-HEAPIFY(A,i);</span><br><span class="line">     &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>　　可以使用简单的算法估算出BUILD-MAX-HEAP运行时间上界。每次调用MAX-HEAPIFY的 时间复杂度是O(lgn)，BUILD-MAX-HEAP需要O(n)次调用。因此总的时间复杂度是O(nlgn)。这个上界虽然正确，但不是渐进紧确的。<br>　　我们还可以得到一个更紧确的界。可以观察到，不同结点运行MAX-HEAPIFY的时间与该结点的树高度有关系，而且大部分结点高度比较小。因此：包含n个元素的堆的高度为[lgn],高度为h的堆最多包含[n/2^(h+1)]个结点。<br>　　在一个高度为h的结点上运行MAX-HEAPIFY的代价是O(h)，我们可以减BUILD-MAX-HEAP的总代价表示为：</p>
+<p><img src="/img/blog/2350612-c713ae88a445a8aa.png" alt="Alt text"><br>　　最终可以得出BUILD-MAX-HEAP的时间复杂度：</p>
+<p><img src="/img/blog/2350612-4b76689d68a5de2f.png" alt="Alt text"></p>
+<p>因此，在线性时间内，可以把一个无序数组构造成一个最大堆。</p>
+<p><img src="/img/blog/2350612-734343cd7ac076e8.png" alt="Paste_Image.png"></p>
+<h3 id="堆排序算法"><a href="#堆排序算法" class="headerlink" title="堆排序算法"></a>堆排序算法</h3><p>　　堆排序算法利用 BUILD-MAX-HEAP将输入数组A[1..n]建成最大堆，其中n=A.length。因为数组中最大元素总在根结点A[1]中，通过把它与A[n]进行交换，可以将该元素放到正确的位置。如果我们去掉结点n，剩余的结点中，原来根的孩子结点仍然是最大堆，而新的结点有可能会违背最大堆原则，所以调用MAX-HEAPIFY,从而构造出一个新的最大堆。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">HEAPSORT(A)&#123;</span><br><span class="line">    BUILD-MAX-HEAP(A)&#123;</span><br><span class="line">        for(i&#x3D;A.length;i&gt;1;i--)&#123;</span><br><span class="line">            swap(A[1],A[i]);</span><br><span class="line">            A.heap-size &#x3D; A.heap-size - 1;</span><br><span class="line">            MAX-HEAPIFY(A,1);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>HEAPSORT过程的时间复杂度是O(nlgn)，因为每次调用BUILD-MAX-HEAP的时间复杂度是O(n)，而n-1次调用MAX-HEAPIFY，每次的时间是O(lgn)；</p>
+<h3 id="最小堆性质"><a href="#最小堆性质" class="headerlink" title="最小堆性质"></a>最小堆性质</h3><p>最小堆</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">MIN-HEAP(A,i)&#123;</span><br><span class="line">    l &#x3D; LEFT(i);</span><br><span class="line">    r &#x3D; RIGHT(i);</span><br><span class="line">    if(l &lt;&#x3D; A.heap-size and A[l] &lt; A[i])&#123;    &#x2F;&#x2F;先判断A[i]  和  A[l] 哪个小</span><br><span class="line">        largest &#x3D; l;             &#x2F;&#x2F;选出最大的值，将下标存放在 largest中</span><br><span class="line">    &#125;else&#123;</span><br><span class="line">        largest &#x3D; i;</span><br><span class="line">    &#125;</span><br><span class="line">    if(r &lt;&#x3D; A.heap-size and A[r] &lt; A[largest])&#123;  &#x2F;&#x2F; 再判断A[r] 和刚刚判断出来的最大值 比较哪个大</span><br><span class="line">        largest &#x3D; r</span><br><span class="line">    &#125;</span><br><span class="line">    if(largest !&#x3D; i)&#123;&#x2F;&#x2F;如果相等，则表示已经符合最大堆的性质，不相等就交换，然后递归。</span><br><span class="line">        swap(A[i],A[largest]);    &#x2F;&#x2F;交换位置</span><br><span class="line">        MIN-HEAPOFY(A,largest);   &#x2F;&#x2F;进行递归</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/05/09/201705/算法导论学习笔记堆里面的两个性质/" class="prev">上一篇：算法导论学习笔记--堆里面的两个性质</a>
+    
+    
+    <a href="/2017/05/06/201705/大话设计模式总结/" class="next">下一篇：《大话设计模式》总结</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

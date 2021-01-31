@@ -1,0 +1,169 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java并发学习--读写锁ReentrantReadWriteLock | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="简介使用synchronized可以实现同步，但是缺点是同时只有一个线程可以访问共享变量。在大多数情况下，读进程与读进程之间是不存在互斥关系，只有读进程与写进程、写进程与写进程之间才需要互斥操作。synchronized每次只允许一个进程访问，无法实现多个读线程同时执行，而大部分情况下读操作次数多于">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java并发学习--读写锁ReentrantReadWriteLock"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-11-12T20:55:09.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-13
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java并发学习--读写锁ReentrantReadWriteLock</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%80%E4%BB%8B"><span class="toc-number">1.</span> <span class="toc-text">简介</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90"><span class="toc-number">2.</span> <span class="toc-text">例子</span></a></li></ol>
+    </div>
+    
+    <h3 id="简介"><a href="#简介" class="headerlink" title="简介"></a>简介</h3><p>使用synchronized可以实现同步，但是缺点是同时只有一个线程可以访问共享变量。在大多数情况下，读进程与读进程之间是不存在互斥关系，只有读进程与写进程、写进程与写进程之间才需要互斥操作。synchronized每次只允许一个进程访问，无法实现多个读线程同时执行，而大部分情况下读操作次数多于写操作，这大大降低了并发性，因此引入ReentrantReadWriteLock，它的特性是：一个资源可以被多个读操作访问，或者一个写操作访问，但两者不能同时进行。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">线程进入读锁的前提条件：</span><br><span class="line">    没有其他线程的写锁，</span><br><span class="line">    没有写请求或者有写请求，但调用线程和持有锁的线程是同一个</span><br><span class="line"></span><br><span class="line">线程进入写锁的前提条件：</span><br><span class="line">    没有其他线程的读锁</span><br><span class="line">    没有其他线程的写锁</span><br></pre></td></tr></table></figure>
+<p>ReentrantReadWriteLock并没有继承ReentrantLock，也并没有实现Lock接口，而是实现了ReadWriteLock接口，该接口提供readLock()方法获取读锁，writeLock()获取写锁。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class ReentrantReadWriteLock</span><br><span class="line">        implements ReadWriteLock, java.io.Serializable &#123;</span><br><span class="line">    private static final long serialVersionUID &#x3D; -6992448646407690164L;</span><br><span class="line">    &#x2F;** Inner class providing readlock *&#x2F;</span><br><span class="line">    private final ReentrantReadWriteLock.ReadLock readerLock;</span><br><span class="line">    &#x2F;** Inner class providing writelock *&#x2F;</span><br><span class="line">    private final ReentrantReadWriteLock.WriteLock writerLock;</span><br><span class="line">    &#x2F;** Performs all synchronization mechanics *&#x2F;</span><br><span class="line">    final Sync sync;</span><br></pre></td></tr></table></figure>
+<h3 id="例子"><a href="#例子" class="headerlink" title="例子"></a>例子</h3><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br><span class="line">79</span><br><span class="line">80</span><br><span class="line">81</span><br><span class="line">82</span><br><span class="line">83</span><br><span class="line">84</span><br><span class="line">85</span><br><span class="line">86</span><br><span class="line">87</span><br><span class="line">88</span><br><span class="line">89</span><br><span class="line">90</span><br><span class="line">91</span><br></pre></td><td class="code"><pre><span class="line">import java.util.Random;</span><br><span class="line">import java.util.concurrent.locks.ReentrantReadWriteLock;</span><br><span class="line"></span><br><span class="line">public class ReadWriteLockTest &#123;</span><br><span class="line">    public static void main(String[] args) &#123;</span><br><span class="line">        final Queue3 q3 &#x3D; new Queue3();</span><br><span class="line">        for(int i&#x3D;0;i&lt;3;i++)</span><br><span class="line">        &#123;</span><br><span class="line">            new Thread()&#123;</span><br><span class="line">                public void run()&#123;</span><br><span class="line">                    while(true)&#123;</span><br><span class="line">                        q3.get();                        </span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;</span><br><span class="line">                </span><br><span class="line">            &#125;.start();</span><br><span class="line">        &#125;</span><br><span class="line">        for(int i&#x3D;0;i&lt;3;i++)</span><br><span class="line">        &#123;        </span><br><span class="line">            new Thread()&#123;</span><br><span class="line">                public void run()&#123;</span><br><span class="line">                    while(true)&#123;</span><br><span class="line">                        q3.put(new Random().nextInt(10000));</span><br><span class="line">                    &#125;</span><br><span class="line">                &#125;            </span><br><span class="line">                </span><br><span class="line">            &#125;.start();    </span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">                                                                                                                              </span><br><span class="line">class Queue3&#123;</span><br><span class="line">    private Object data &#x3D; null;&#x2F;&#x2F;共享数据，只能有一个线程能写该数据，但可以有多个线程同时读该数据。</span><br><span class="line">    private ReentrantReadWriteLock rwl &#x3D; new ReentrantReadWriteLock();</span><br><span class="line">    public void get()&#123;</span><br><span class="line">        rwl.readLock().lock();&#x2F;&#x2F;上读锁，其他线程只能读不能写</span><br><span class="line">        System.out.println(Thread.currentThread().getName() + &quot; 开始读取数据！&quot;);</span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep((long)(Math.random()*1000));</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        System.out.println(Thread.currentThread().getName() + &quot;读到数据 :&quot; + data);        </span><br><span class="line">        rwl.readLock().unlock(); &#x2F;&#x2F;释放读锁，最好放在finnaly里面</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    public void put(Object data)&#123;</span><br><span class="line"></span><br><span class="line">        rwl.writeLock().lock();&#x2F;&#x2F;上写锁，不允许其他线程读也不允许写</span><br><span class="line">        System.out.println(Thread.currentThread().getName() + &quot; 开始写入数据!&quot;);                    </span><br><span class="line">        try &#123;</span><br><span class="line">            Thread.sleep((long)(Math.random()*1000));</span><br><span class="line">        &#125; catch (InterruptedException e) &#123;</span><br><span class="line">            e.printStackTrace();</span><br><span class="line">        &#125;</span><br><span class="line">        this.data &#x3D; data;        </span><br><span class="line">        System.out.println(Thread.currentThread().getName() + &quot; 写入了数据: &quot; + data);                    </span><br><span class="line">        </span><br><span class="line">        rwl.writeLock().unlock();&#x2F;&#x2F;释放写锁    </span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br><span class="line">&#x2F;*</span><br><span class="line">Thread-1 开始读取数据！</span><br><span class="line">Thread-2 开始读取数据！</span><br><span class="line">Thread-0 开始读取数据！</span><br><span class="line">Thread-1读到数据 :null</span><br><span class="line">Thread-2读到数据 :null</span><br><span class="line">Thread-0读到数据 :null</span><br><span class="line">Thread-5 开始写入数据!</span><br><span class="line">Thread-5 写入了数据: 1050</span><br><span class="line">Thread-5 开始写入数据!</span><br><span class="line">Thread-5 写入了数据: 9298</span><br><span class="line">Thread-3 开始写入数据!</span><br><span class="line">Thread-3 写入了数据: 7597</span><br><span class="line">Thread-3 开始写入数据!</span><br><span class="line">Thread-3 写入了数据: 5022</span><br><span class="line">Thread-3 开始写入数据!</span><br><span class="line">Thread-3 写入了数据: 8640</span><br><span class="line">Thread-3 开始写入数据!</span><br><span class="line">Thread-3 写入了数据: 2022</span><br><span class="line">Thread-4 开始写入数据!</span><br><span class="line">Thread-4 写入了数据: 3460</span><br><span class="line">Thread-4 开始写入数据!</span><br><span class="line">Thread-4 写入了数据: 9046</span><br><span class="line">Thread-4 开始写入数据!</span><br><span class="line">Thread-4 写入了数据: 8768</span><br><span class="line">Thread-4 开始写入数据!</span><br><span class="line">Thread-4 写入了数据: 579</span><br><span class="line">Thread-4 开始写入数据!</span><br><span class="line">Thread-4 写入了数据: 203</span><br><span class="line">*&#x2F;</span><br></pre></td></tr></table></figure>
+<p>学习资料：<br>[1] BrianGoetz, 戈茨, 童云兰. Java并发编程实战[M]. 机械工业出版社, 2012.</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/11/16/201711/Java并发学习重入锁ReentrantLock/" class="prev">上一篇：Java并发学习--重入锁ReentrantLock</a>
+    
+    
+    <a href="/2017/11/11/201711/Java并发学习原子操作类Atomic/" class="next">下一篇：Java并发学习--原子操作类Atomic</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

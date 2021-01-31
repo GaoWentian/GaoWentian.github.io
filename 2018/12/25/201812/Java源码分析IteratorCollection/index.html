@@ -1,0 +1,184 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Java源码分析--Iterator、Collection | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="整体框架
+IteratorIterator是一个接口，是集合的迭代器，集合可以使用Iterator来遍历集合中的元素。
+12345678public interface Iterator&amp;lt;E&amp;gt; &amp;#123;       boolean hasNext();  &amp;#x2F;&amp;#x2F;是否">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Java源码分析--Iterator、Collection"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2018-12-25T10:19:24.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2018-12-25
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Java源码分析--Iterator、Collection</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%95%B4%E4%BD%93%E6%A1%86%E6%9E%B6"><span class="toc-number">1.</span> <span class="toc-text">整体框架</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Iterator"><span class="toc-number">2.</span> <span class="toc-text">Iterator</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Collection"><span class="toc-number">3.</span> <span class="toc-text">Collection</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AbstractCollection"><span class="toc-number">4.</span> <span class="toc-text">AbstractCollection</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#List"><span class="toc-number">5.</span> <span class="toc-text">List</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AbstractList"><span class="toc-number">6.</span> <span class="toc-text">AbstractList</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Set"><span class="toc-number">7.</span> <span class="toc-text">Set</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#AbstractSet"><span class="toc-number">8.</span> <span class="toc-text">AbstractSet</span></a></li></ol>
+    </div>
+    
+    <h3 id="整体框架"><a href="#整体框架" class="headerlink" title="整体框架"></a>整体框架</h3><p><img src="/img/blog/08171028-a5e372741b18431591bb577b1e1c95e6.jpg" alt="Alt text"></p>
+<h3 id="Iterator"><a href="#Iterator" class="headerlink" title="Iterator"></a>Iterator</h3><p>Iterator是一个接口，是集合的迭代器，集合可以使用Iterator来遍历集合中的元素。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public interface Iterator&lt;E&gt; &#123;</span><br><span class="line">   </span><br><span class="line">    boolean hasNext();  &#x2F;&#x2F;是否存在下一个元素</span><br><span class="line"></span><br><span class="line">    E next();           &#x2F;&#x2F;返回迭代的下一个元素。</span><br><span class="line"></span><br><span class="line">    void remove();      &#x2F;&#x2F;从迭代器指向的 collection 中移除迭代器返回的最后一个元素（可选操作）。每次调用 next 只能调用一次此方法。如果进行迭代时用调用此方法之外的其他方式修改了该迭代器所指向的 collection，则迭代器的行为是不确定的。</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<h3 id="Collection"><a href="#Collection" class="headerlink" title="Collection"></a>Collection</h3><p>Collection继承了Iterable，Iterable</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br></pre></td><td class="code"><pre><span class="line">public interface Collection&lt;E&gt; extends Iterable&lt;E&gt; &#123;</span><br><span class="line">    int size();                     &#x2F;&#x2F;返回此 collection 中的元素数。如果此 collection 包含的元素大于 Integer.MAX_VALUE，则返回 Integer.MAX_VALUE。</span><br><span class="line">    </span><br><span class="line">    boolean isEmpty();              &#x2F;&#x2F;如果此 collection 不包含元素，则返回 true。</span><br><span class="line">    </span><br><span class="line">    boolean contains(Object o);     &#x2F;&#x2F;如果此 collection 包含指定的元素，则返回 true。</span><br><span class="line">    </span><br><span class="line">    Iterator&lt;E&gt; iterator();         &#x2F;&#x2F;返回在此 collection 的元素上进行迭代的迭代器。</span><br><span class="line">    </span><br><span class="line">    Object[] toArray();             &#x2F;&#x2F;返回包含此 collection 中所有元素的数组。</span><br><span class="line">    </span><br><span class="line">    &lt;T&gt; T[] toArray(T[] a);         &#x2F;&#x2F;返回包含此 collection 中所有元素的数组；返回数组的运行时类型与指定数组的运行时类型相同。</span><br><span class="line">    </span><br><span class="line">    boolean add(E e);               &#x2F;&#x2F;确保此 collection 包含指定的元素。</span><br><span class="line">    </span><br><span class="line">    boolean remove(Object o);       &#x2F;&#x2F; 从此 collection 中移除指定元素的单个实例，如果存在的话</span><br><span class="line">    </span><br><span class="line">    boolean containsAll(Collection&lt;?&gt; c);&#x2F;&#x2F;如果此 collection 包含指定 collection 中的所有元素，则返回 true。</span><br><span class="line">    </span><br><span class="line">    boolean addAll(Collection&lt;? extends E&gt; c);&#x2F;&#x2F;将指定 </span><br><span class="line">    collection 中的所有元素都添加到此 collection 中</span><br><span class="line">    </span><br><span class="line">    boolean removeAll(Collection&lt;?&gt; c);&#x2F;&#x2F;移除此 collection 中那些也包含在指定 collection 中的所有元素</span><br><span class="line">    </span><br><span class="line">    boolean retainAll(Collection&lt;?&gt; c);&#x2F;&#x2F;仅保留此 collection 中那些也包含在指定 collection 的元素</span><br><span class="line">    </span><br><span class="line">    void clear();                   &#x2F;&#x2F;移除此 collection 中的所有元素</span><br><span class="line">    </span><br><span class="line">    boolean equals(Object o);       &#x2F;&#x2F;比较此 collection 与指定对象是否相等。</span><br><span class="line">    </span><br><span class="line">    int hashCode();                 &#x2F;&#x2F;返回此 collection 的哈希码值。</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="AbstractCollection"><a href="#AbstractCollection" class="headerlink" title="AbstractCollection"></a>AbstractCollection</h3><p>AbstractCollection的定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public abstract class AbstractCollection&lt;E&gt; implements Collection&lt;E&gt; &#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>AbstractCollection是一个抽象类，它实现了除iterator()和size()之外的函数,方便其它类实现Collection，比如ArrayList、LinkedList等，它们这些类想要实现Collection接口，通过继承AbstractCollection就已经实现了大部分的接口。</p>
+<h3 id="List"><a href="#List" class="headerlink" title="List"></a>List</h3><p>List继承于Collection的接口，List是有序的队列。List包含了Collection中的全部接口，也有自己的API接口。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br><span class="line">54</span><br><span class="line">55</span><br><span class="line">56</span><br><span class="line">57</span><br><span class="line">58</span><br><span class="line">59</span><br><span class="line">60</span><br><span class="line">61</span><br><span class="line">62</span><br><span class="line">63</span><br><span class="line">64</span><br><span class="line">65</span><br><span class="line">66</span><br><span class="line">67</span><br><span class="line">68</span><br><span class="line">69</span><br><span class="line">70</span><br><span class="line">71</span><br><span class="line">72</span><br><span class="line">73</span><br><span class="line">74</span><br><span class="line">75</span><br><span class="line">76</span><br><span class="line">77</span><br><span class="line">78</span><br></pre></td><td class="code"><pre><span class="line">public interface List&lt;E&gt; extends Collection&lt;E&gt; &#123;</span><br><span class="line">    &#x2F;&#x2F;Collection的API</span><br><span class="line">    int size();</span><br><span class="line"></span><br><span class="line">    boolean isEmpty();</span><br><span class="line"></span><br><span class="line">    boolean contains(Object o);</span><br><span class="line"></span><br><span class="line">    Iterator&lt;E&gt; iterator();</span><br><span class="line"></span><br><span class="line">    Object[] toArray();</span><br><span class="line"></span><br><span class="line">    &lt;T&gt; T[] toArray(T[] a);</span><br><span class="line"></span><br><span class="line">    boolean add(E e);</span><br><span class="line"></span><br><span class="line">    boolean remove(Object o);</span><br><span class="line"></span><br><span class="line">    boolean containsAll(Collection&lt;?&gt; c);</span><br><span class="line"></span><br><span class="line">    boolean addAll(Collection&lt;? extends E&gt; c);</span><br><span class="line">    boolean removeAll(Collection&lt;?&gt; c);</span><br><span class="line">  </span><br><span class="line">    boolean retainAll(Collection&lt;?&gt; c);</span><br><span class="line">    </span><br><span class="line">    void clear();</span><br><span class="line"></span><br><span class="line">    boolean equals(Object o);</span><br><span class="line">    </span><br><span class="line">    int hashCode();</span><br><span class="line">    </span><br><span class="line">    ListIterator&lt;E&gt; listIterator();</span><br><span class="line">    </span><br><span class="line">    &#x2F;&#x2F;新增的API</span><br><span class="line">    boolean addAll(int index, Collection&lt;? extends E&gt; c); &#x2F;&#x2F;将指定 collection 中的所有元素都插入到列表中的指定位置</span><br><span class="line">     &#x2F;**</span><br><span class="line">     * @since 1.8   jdk1.8引入</span><br><span class="line">     *&#x2F;</span><br><span class="line">    default void replaceAll(UnaryOperator&lt;E&gt; operator) &#123;</span><br><span class="line">        Objects.requireNonNull(operator);&#x2F;&#x2F;判断对象是否为空，空的时候报空指针异常</span><br><span class="line">        final ListIterator&lt;E&gt; li &#x3D; this.listIterator();</span><br><span class="line">        while (li.hasNext()) &#123;</span><br><span class="line">            li.set(operator.apply(li.next()));</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line">    </span><br><span class="line">    @SuppressWarnings(&#123;&quot;unchecked&quot;, &quot;rawtypes&quot;&#125;)</span><br><span class="line">    default void sort(Comparator&lt;? super E&gt; c) &#123;</span><br><span class="line">        Object[] a &#x3D; this.toArray();</span><br><span class="line">        Arrays.sort(a, (Comparator) c);</span><br><span class="line">        ListIterator&lt;E&gt; i &#x3D; this.listIterator();</span><br><span class="line">        for (Object e : a) &#123;</span><br><span class="line">            i.next();</span><br><span class="line">            i.set((E) e);</span><br><span class="line">        &#125;</span><br><span class="line">    &#125;</span><br><span class="line"></span><br><span class="line">    E get(int index);&#x2F;&#x2F;返回列表中指定位置的元素</span><br><span class="line">   </span><br><span class="line">    E set(int index, E element); &#x2F;&#x2F;用指定元素替换列表中指定位置的元素</span><br><span class="line"></span><br><span class="line">    void add(int index, E element);&#x2F;&#x2F;在列表的指定位置插入指定元素</span><br><span class="line">   </span><br><span class="line">    E remove(int index);&#x2F;&#x2F;移除列表中指定位置的元素</span><br><span class="line"></span><br><span class="line">    int indexOf(Object o);&#x2F;&#x2F;返回此列表中第一次出现的指定元素的索引；如果此列表不包含该元素，则返回 -1。</span><br><span class="line">   </span><br><span class="line">    int lastIndexOf(Object o);&#x2F;&#x2F;返回此列表中最后出现的指定元素的索引；如果列表不包含此元素，则返回 -1。</span><br><span class="line"></span><br><span class="line">    ListIterator&lt;E&gt; listIterator(int index);&#x2F;&#x2F;返回列表中元素的列表迭代器（按适当顺序），从列表的指定位置开始。</span><br><span class="line">   </span><br><span class="line">    List&lt;E&gt; subList(int fromIndex, int toIndex);&#x2F;&#x2F;返回列表中指定的 fromIndex（包括 ）和 toIndex（不包括）之间的部分视图。</span><br><span class="line"></span><br><span class="line">    @Override</span><br><span class="line">    default Spliterator&lt;E&gt; spliterator() &#123;</span><br><span class="line">        return Spliterators.spliterator(this, Spliterator.ORDERED);</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="AbstractList"><a href="#AbstractList" class="headerlink" title="AbstractList"></a>AbstractList</h3><p>AbstractList的定义如下：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public abstract class AbstractList&lt;E&gt; extends AbstractCollection&lt;E&gt; implements List&lt;E&gt; &#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>AbstractList继承于AbstractCollection，实现了List接口的抽象类，实现了List中除size()、get(int location)之外的函数(实现了iterator()接口)，从而方便其它类继承List。</p>
+<h3 id="Set"><a href="#Set" class="headerlink" title="Set"></a>Set</h3><p>Set是一个继承于Collection的接口，Set也是集合中的一种。Set是没有重复元素的集合,和数学定义一样。<br>Set的API和Collection的API完全一样。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public interface Set&lt;E&gt; extends Collection&lt;E&gt;&#123;&#125;  &#x2F;&#x2F;定义</span><br></pre></td></tr></table></figure>
+<h3 id="AbstractSet"><a href="#AbstractSet" class="headerlink" title="AbstractSet"></a>AbstractSet</h3><p>AbstractSet的定义如下： </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">public abstract class AbstractSet&lt;E&gt; extends AbstractCollection&lt;E&gt; implements Set&lt;E&gt; &#123;&#125;</span><br></pre></td></tr></table></figure>
+<p>AbstractSet继承于AbstractCollection，Set也就没有自己单独的API,和AbstractCollection一样，它实现了List中除iterator()和size()之外的函数。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2018/12/26/201812/Java源码分析ArrayList/" class="prev">上一篇：Java源码分析--ArrayList</a>
+    
+    
+    <a href="/2018/03/21/201803/Redis设计与实现双端链表/" class="next">下一篇：《Redis设计与实现》：双端链表</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

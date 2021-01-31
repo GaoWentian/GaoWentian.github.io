@@ -1,0 +1,482 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>page | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <div class="article-list-wrap">
+  
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/11/30/201711/Java并发学习CopyOnWrite容器/" itemprop="url">Java并发学习--Copy-On-Write容器</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      介绍　　JDK1.5开始Java并发包提供了两个基于Copy-On-Write实现的并发容器，CopyOnWriteArrayList和CopyOnWriteArraySet。　　“写入时复制（Copy-On-Write）”容器线程安全性在于，只要正确地发布一个事实不可变的对象，那么在访问该对象时就不再需要进一步同步。每次修改时，都会创建并重新发布一个新的容器副本，从而实现可变性。每次修改容器都 ...
+      <a href="/2017/11/30/201711/Java并发学习CopyOnWrite容器/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-11-29T21:43:31.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-30
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/11/28/201711/Java并发学习线程间数据交换Exchanger/" itemprop="url">Java并发学习--线程间数据交换Exchanger</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      Exchanger用于进行线程间的数据交换，允许原子性的交换两个（多个）对象，但同时只有一对才会成功。
+1234567891011121314151617181920212223242526272829303132333435363738394041424344import java.util.concurrent.Exchanger;import java.util.concurrent.Ex ...
+      <a href="/2017/11/28/201711/Java并发学习线程间数据交换Exchanger/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-11-27T20:35:56.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-28
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/11/26/201711/Java并发学习同步屏障CyclicBarrier/" itemprop="url">Java并发学习--同步屏障CyclicBarrier</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      CyclicBarrier和CountDownLatch一样，都是关于线程的计数器。CountDownLatch的计数器只能使用一次。而CyclicBarrier的计数器可以使用reset() 方法重置。所以CyclicBarrier能处理更为复杂的业务场景，比如如果计算发生错误，可以重置计数器，并让线程们重新执行一次。CyclicBarrier还提供其他有用的方法，比如getNumberWai ...
+      <a href="/2017/11/26/201711/Java并发学习同步屏障CyclicBarrier/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-11-25T19:35:00.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-26
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/11/22/201711/Java并发学习闭锁CountDownLatch/" itemprop="url">Java并发学习--闭锁CountDownLatch</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      CountDownLatch是一个同步工具类，它允许一个或多个线程一直等待，直到其他线程的操作执行完后再执行。CountDownLatch有一个正数计数器，countDown方法对计数器做减操作，await方法等待计数器达到0。所有await的线程都会阻塞直到计数器为0或者等待线程中断或者超时。
+12345678910111213141516171819202122232425262728293 ...
+      <a href="/2017/11/22/201711/Java并发学习闭锁CountDownLatch/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-11-21T20:34:11.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-22
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/11/18/201711/Java并发学习信号量Semaphore/" itemprop="url">Java并发学习--信号量 (Semaphore)</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      Semaphore 是一个计数信号量。信号量维护了一个许可的数量。在请求许可可用前会阻塞每一个acquire()，获取许可后并使用完之后调用release()归还许可证。还可以用tryAcquire()方法尝试获取许可证。
+12345678910111213141516171819202122232425262728293031import java.util.concurrent.Execut ...
+      <a href="/2017/11/18/201711/Java并发学习信号量Semaphore/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-11-17T21:33:05.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-18
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/11/16/201711/Java并发学习重入锁ReentrantLock/" itemprop="url">Java并发学习--重入锁ReentrantLock</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      简介　　在Java5.0之前，在协调对共享对象的访问时可以使用的机制只有Synchronized和volatile。Java5.0增加了一个新的机制ReentrantLock。ReentrantLock是一个可重入的互斥锁。　　Synchronized有一些功能性的限制，Synchronized无法中断一个正在等候获得锁的线程，也无法通过投票得到锁，如果不想等下去，也就没法得到锁。 Reentr ...
+      <a href="/2017/11/16/201711/Java并发学习重入锁ReentrantLock/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-11-15T20:31:48.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-16
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/11/13/201711/Java并发学习读写锁ReentrantReadWriteLock/" itemprop="url">Java并发学习--读写锁ReentrantReadWriteLock</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      简介使用synchronized可以实现同步，但是缺点是同时只有一个线程可以访问共享变量。在大多数情况下，读进程与读进程之间是不存在互斥关系，只有读进程与写进程、写进程与写进程之间才需要互斥操作。synchronized每次只允许一个进程访问，无法实现多个读线程同时执行，而大部分情况下读操作次数多于写操作，这大大降低了并发性，因此引入ReentrantReadWriteLock，它的特性是：一个 ...
+      <a href="/2017/11/13/201711/Java并发学习读写锁ReentrantReadWriteLock/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-11-12T20:55:09.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-13
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/11/11/201711/Java并发学习原子操作类Atomic/" itemprop="url">Java并发学习--原子操作类Atomic</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      Java从JDK 1.5开始提供了java.util.concurrent.atomic包，Atomic包里一共提供了13个类，属于4种类型的原子更新方式，分别是原子更新基本类型、原子更新数组、原子更新引用和原子更新属性（字段）。
+1234567891011121314151617原子更新基本类型：　　AtomicBoolean：原子更新布尔类型。　　AtomicInteger：原子更新整型。　 ...
+      <a href="/2017/11/11/201711/Java并发学习原子操作类Atomic/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-11-10T17:44:06.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-11-11
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/09/06/201709/Java使用Googlegson解析json数据/" itemprop="url">Java使用Google-gson解析json数据</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      首先在官网下载插件，是下载的版本是gson-2.8.2.jar，并导入到项目中，github地址为： https://github.com/google/gson
+获取json数据java解析json代码为：
+123456789JsonParser parser &#x3D; new JsonParser();JsonObject object &#x3D; (JsonObject) parse ...
+      <a href="/2017/09/06/201709/Java使用Googlegson解析json数据/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-09-05T20:10:34.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-09-06
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
+    <a href="/2017/09/01/201709/MySQL索引/" itemprop="url">MySQL索引</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      索引分类索引是在mysql的存储引擎层实现，而不是在服务层实现的。所以每种存储引擎的索引都不一定相同。mysql目前有四种索引：
+12341、B-Tree索引：最常见的索引，大部分引擎都支持B树索引2、HASH索引：只有Memory引擎支持。3、R-Tree索引（空间索引）：空间索引是MyISAM的一个特殊索引类型，主要用于地理空间数据类型，使用较少。4、Full-text（全文索引）：全文索引 ...
+      <a href="/2017/09/01/201709/MySQL索引/" class="more-link">
+        继续阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2017-08-31T23:26:21.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-09-01
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+</div>
+
+<nav id="pagenavi">
+  
+  <a href="/page/4/" class="prev">上一页</a>
+  
+  
+  <a href="/page/6/" class="next">下一页</a>
+  
+</nav>
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

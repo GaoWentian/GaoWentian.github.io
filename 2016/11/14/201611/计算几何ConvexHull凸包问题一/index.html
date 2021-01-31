@@ -1,0 +1,179 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>【计算几何】Convex Hull凸包问题（一） | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="一、什么是凸包在桌子上订上几个钉子，然后在这些钉子外围放上一个皮筋，将这些钉子包含进来，就形成了一个凸包。在一些点中，判断出来一个凸包的算法有很多，这里先介绍最基本的算法，然后再深入。
+
+二、算法    一般把p，q，r这些在凸包上的点称为极点。    这里判断一个点是不是极点的方法就是：在这个点画">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="【计算几何】Convex Hull凸包问题（一）"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2016-11-14T10:26:12.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2016-11-14
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">【计算几何】Convex Hull凸包问题（一）</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <p>一、什么是凸包<br>在桌子上订上几个钉子，然后在这些钉子外围放上一个皮筋，将这些钉子包含进来，就形成了一个凸包。在一些点中，判断出来一个凸包的算法有很多，这里先介绍最基本的算法，然后再深入。</p>
+<p><img src="/img/blog/2350612-12ec4e02db80db6d.png" alt="Alt text"></p>
+<p>二、算法<br>    一般把p，q，r这些在凸包上的点称为极点。<br>    这里判断一个点是不是极点的方法就是：在这个点画一条线，如果在这个点的另一侧没有其他的点，我们就认为这是一个极点。但是我们怎么判断这个点的另一侧有没有点呢？</p>
+<p><img src="/img/blog/2350612-102d2efe482d841e.png" alt="Alt text"></p>
+<p>使用三角形来判断一个点是不是极点。在这些点中，任意选择三个点组成三角形，如果有一个点在三角形中，那么我们就认为这个点不是极点。遍历下来就可以确定极点和非极点<br><img src="/img/blog/2350612-520433e9c8864f2a.png" alt="Alt text"></p>
+<p>使用python，算法就是这样</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">pointList &#x3D; [[1,1,1],[1,3,1],[2,4,1],[4,3,1],[2,3,1],[3,0,1],[3,4,1]]    #二维数组，前两位表示坐标（x，y），后一位表示是否为极点，1极点，0非极点</span><br><span class="line">p&#x3D;q&#x3D;r&#x3D;s&#x3D;0</span><br><span class="line">tempNum &#x3D; len(pointList)</span><br><span class="line">for p in range(0,tempNum):</span><br><span class="line">    for q in range(p+1,tempNum):</span><br><span class="line">        for r in range(q+1,tempNum):</span><br><span class="line">            for s in range(0,tempNum):</span><br><span class="line">                if s&#x3D;&#x3D;p or s&#x3D;&#x3D;q or s&#x3D;&#x3D;r or not(pointList[s][2]):</span><br><span class="line">                    continue</span><br><span class="line">                boolValue &#x3D; InTriangle(pointList[p],pointList[q],pointList[r],pointList[s])</span><br><span class="line">                if boolValue:</span><br><span class="line">                    pointList[s][2] &#x3D; 0</span><br></pre></td></tr></table></figure>
+<p>但是怎么判断一个点是否在三角形中呢?<br>我们可以为三角形中的三条边标注方向，如下图。如果点S在向量pq，qr，rp的左侧，我们就认为这个点在三角形内部。当然，如果每条边取相反的方向，这个点在每条边的右侧，我们也可以认为这个点在三角形内部。</p>
+<p><img src="/img/blog/2350612-b09a6af1c0b80258.png" alt="Alt text"></p>
+<p>使用程序就是这样判断</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">def InTriangle (p,q,r,s):</span><br><span class="line">    pqLeft &#x3D; toLeft(p,q,s)</span><br><span class="line">    qrLeft &#x3D; toLeft(q,r,s)</span><br><span class="line">    rpLeft &#x3D; toLeft(r,p,s)</span><br><span class="line">    return (pqLeft &#x3D;&#x3D; qrLeft)and(qrLeft &#x3D;&#x3D; rpLeft)</span><br></pre></td></tr></table></figure>
+<p>我们可以使用线性代数上的二维向量组的行列式来解决判断一个点在直线的位置。连接上图的p，q，s作一个三角形。使用公式：</p>
+<p><img src="/img/blog/2350612-b1f463eb68809db6.png" alt="Alt text"></p>
+<p>这里是2倍的三角形面积，解行列式，如果值大于0，S在向量pq的左侧，小于0，S在向量pq的右侧。 </p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">def Area(p,q,s):</span><br><span class="line">    return                          </span><br><span class="line">           p[0]*q[1]-p[1]*q[0]</span><br><span class="line">          +q[0]*s[1]-q[1]*s[0] </span><br><span class="line">          +s[0]*p[1]-s[1]*p[0]</span><br><span class="line">def toLeft(p,q,s):</span><br><span class="line">    return Area(p,q,s)&gt;0</span><br></pre></td></tr></table></figure>
+<p>完整程序如下</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br></pre></td><td class="code"><pre><span class="line">def Area(p,q,s):</span><br><span class="line">    return p[0]*q[1]-p[1]*q[0]+q[0]*s[1]-q[1]*s[0]+s[0]*p[1]-s[1]*p[0]</span><br><span class="line">def toLeft(p,q,s):</span><br><span class="line">    return Area(p,q,s)&gt;0</span><br><span class="line">def InTriangle (p,q,r,s):</span><br><span class="line">    pqLeft &#x3D; toLeft(p,q,s)</span><br><span class="line">    qrLeft &#x3D; toLeft(q,r,s)</span><br><span class="line">    rpLeft &#x3D; toLeft(r,p,s)</span><br><span class="line">    return (pqLeft &#x3D;&#x3D; qrLeft)and(qrLeft &#x3D;&#x3D; rpLeft)</span><br><span class="line">pointList &#x3D; [[1,1,1],[1,3,1],[2,4,1],[4,3,1],[2,3,1],[3,0,1],[3,4,1]]</span><br><span class="line">tempList &#x3D; []</span><br><span class="line">p&#x3D;q&#x3D;r&#x3D;s&#x3D;0</span><br><span class="line">tempNum &#x3D; len(pointList)</span><br><span class="line">for p in range(0,tempNum):</span><br><span class="line">    for q in range(p+1,tempNum):</span><br><span class="line">        for r in range(q+1,tempNum):</span><br><span class="line">            for s in range(0,tempNum):</span><br><span class="line">                if s&#x3D;&#x3D;p or s&#x3D;&#x3D;q or s&#x3D;&#x3D;r or not(pointList[s][2]):</span><br><span class="line">                    continue</span><br><span class="line">                boolValue &#x3D; InTriangle(pointList[p],pointList[q],pointList[r],pointList[s])</span><br><span class="line">                if boolValue:</span><br><span class="line">                    pointList[s][2] &#x3D; 0</span><br><span class="line">print pointList</span><br></pre></td></tr></table></figure>
+<p><img src="/img/blog/2350612-bb4370bd3e6e0817.png" alt="Alt text"></p>
+<p>这个算法的时间复杂度是O(n^4)，我们只用它来演示原理，不适合在项目中。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2016/11/14/201611/计算几何ConvexHull凸包问题二/" class="prev">上一篇：【计算几何】Convex Hull凸包问题（二）</a>
+    
+    
+    <a href="/2016/10/25/201610/Redis高级应用数据持久化/" class="next">下一篇：Redis高级应用--数据持久化</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

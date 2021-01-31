@@ -1,0 +1,180 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>算法导论学习笔记--基本数据结构 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="栈的几种操作:S.top=0时，表示栈中不包含任何元素，即栈是空的。
+12345678&amp;#x2F;&amp;#x2F;判断栈是不是空的STACK-EMPTY(S)&amp;#123;	if(S.top &amp;#x3D;&amp;#x3D; 0)&amp;#123;		return TRUE;	&amp;#125;else&amp;#123;		ret">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="算法导论学习笔记--基本数据结构"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='../img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2017-05-17T20:21:52.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2017-05-18
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">算法导论学习笔记--基本数据结构</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%A0%88%E7%9A%84%E5%87%A0%E7%A7%8D%E6%93%8D%E4%BD%9C"><span class="toc-number">1.</span> <span class="toc-text">栈的几种操作:</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%98%9F%E5%88%97%E7%9A%84%E5%87%A0%E7%A7%8D%E6%93%8D%E4%BD%9C"><span class="toc-number">2.</span> <span class="toc-text">队列的几种操作</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%93%BE%E8%A1%A8"><span class="toc-number">3.</span> <span class="toc-text">链表</span></a></li></ol>
+    </div>
+    
+    <h3 id="栈的几种操作"><a href="#栈的几种操作" class="headerlink" title="栈的几种操作:"></a>栈的几种操作:</h3><p>S.top=0时，表示栈中不包含任何元素，即栈是空的。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;判断栈是不是空的</span><br><span class="line">STACK-EMPTY(S)&#123;</span><br><span class="line">	if(S.top &#x3D;&#x3D; 0)&#123;</span><br><span class="line">		return TRUE;</span><br><span class="line">	&#125;else&#123;</span><br><span class="line">		return FALSE;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>压入栈操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">PUSH(S,x)&#123;</span><br><span class="line">	&#x2F;&#x2F;要考虑栈是不是满的</span><br><span class="line">	S.top &#x3D; S.top + 1;</span><br><span class="line">	S[S.top] &#x3D; x;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>弹出数据操作：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">POP(S)&#123;</span><br><span class="line">	if(STACK-EMPTY(S))&#123;</span><br><span class="line">		error(空的);</span><br><span class="line">	&#125;else&#123;</span><br><span class="line">		S.top &#x3D; S.top -1</span><br><span class="line">	&#125;</span><br><span class="line">	return S[S.top + 1]</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="队列的几种操作"><a href="#队列的几种操作" class="headerlink" title="队列的几种操作"></a>队列的几种操作</h3><p>Q.head 指向队头元素<br>Q.tail 指向下一个新元素将要插入的位置<br>入队操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">&#x2F;&#x2F;这个是循环队列，暂时没考虑队溢出</span><br><span class="line">ENQUEUE(Q,x)&#123;</span><br><span class="line">	Q[Q.tail] &#x3D; x</span><br><span class="line">	if(Q.tail &#x3D;&#x3D; Q.length)&#123;</span><br><span class="line">		Q.tail &#x3D; 1</span><br><span class="line">	&#125;else&#123;</span><br><span class="line">		Q.tail &#x3D; Q.tail + 1</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>出队操作</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">DEQUEUE(Q)&#123;</span><br><span class="line">	x &#x3D; Q[Q.head]</span><br><span class="line">	if(Q.head &#x3D;&#x3D;  Q.legth)&#123;</span><br><span class="line">		Q.head &#x3D; 1</span><br><span class="line">	&#125;else&#123;</span><br><span class="line">		Q.head &#x3D; Q.head + 1</span><br><span class="line">	&#125;</span><br><span class="line">	return x</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="链表"><a href="#链表" class="headerlink" title="链表"></a>链表</h3><p><img src="/img/blog/1231231313123.png" alt="Alt text"></p>
+<p>链表的搜索<br>查找链表L中第一个关键字为k的元素</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">LIST-SEARCH(L,k)&#123;</span><br><span class="line">	x &#x3D; L.head</span><br><span class="line">	while(x !&#x3D; NULL and x.key !&#x3D; k)&#123;</span><br><span class="line">		x &#x3D; x.next</span><br><span class="line">	&#125;</span><br><span class="line">	return x</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>链表的插入<br>这里是循环链表</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">LIST-INSERT(L,x)&#123;</span><br><span class="line">	x.next &#x3D; L.head</span><br><span class="line">	if(L.head !&#x3D; NULL)&#123; &#x2F;&#x2F;先判断整个链表中有没有值</span><br><span class="line">		L.head.prev &#x3D; x</span><br><span class="line">	&#125;</span><br><span class="line">	L.head &#x3D; x</span><br><span class="line">	x.prev &#x3D; NULL</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>链表删除<br>将元素x在链表L中删除</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">LIST-DELETE(L,x)&#123;</span><br><span class="line">	if(x.prev !&#x3D; NULL)&#123;</span><br><span class="line">		x.prev.next &#x3D; x.next;</span><br><span class="line">	&#125;else&#123;</span><br><span class="line">		L.head &#x3D; x.next;</span><br><span class="line">	&#125;</span><br><span class="line">	if(x.next !&#x3D; NULL)&#123;</span><br><span class="line">		x.next.prev &#x3D; x.prev;</span><br><span class="line">	&#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    <a href="/2017/05/23/201705/Nginx初识/" class="prev">上一篇：Nginx 初识</a>
+    
+    
+    <a href="/2017/05/12/201705/算法导论学习笔记中位数和顺序统计量/" class="next">下一篇：算法导论学习笔记--中位数和顺序统计量</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>
