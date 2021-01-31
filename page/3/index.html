@@ -31,11 +31,11 @@
 
 <body>
   <div class="container">
-    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+    <div class="left-col" style="background-image:url('https://www.gwt.fun/img/sider.jpg')">
       <div class="intrude-less">
         <header id="header" class="inner">
           <a href="/">
-            <div class="profilepic"><img src='../img/user.png'></div>
+            <div class="profilepic"><img src='https://www.gwt.fun/img/user.png'></div>
           </a>
           <div class="author-name"><a href="/">Gavin</a></div>
           
@@ -108,7 +108,7 @@
 懒汉模式懒汉模式就是在对象第一次使用时创建对象，下面这种方式，是非线程安全的，因为当多个线程同时判断成功instance == null，就会创建多个对象。
 1234 ...
       <a href="/2019/02/14/201902/从线程安全角度看单例模式/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -146,7 +146,7 @@
 下面通过例子来演示两个接口的作用和区别。
 Serializable实现对象的序列化，必须实现Ser ...
       <a href="/2019/02/14/201902/Java基础之序列化与反序列化/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -182,7 +182,7 @@ Serializable实现对象的序列化，必须实现Ser ...
       简介程序计数器、虚拟机栈和本地方法栈的生存周期就是线程的生存周期，因此不需要考虑垃圾回收。Java中，GC的对象是堆空间和永久区。
 怎么判断一个对象是否需要回收？引用计数法引用计数法就是给对象中添加一个引用计数器，当有对象引用时，计数器数值加1，引用失效时，计数器数值减1，当计数器数值为0，就通知GC回收对象。图片中的B对象引用了D对象，如果B对象不再引用D对象，D对象的计数器数值就置为0，这样 ...
       <a href="/2019/02/12/201902/深入理解Java虚拟机垃圾收集器与GC参数/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -219,7 +219,7 @@ Serializable实现对象的序列化，必须实现Ser ...
 12Integer i = 100;    //自动装箱int j = i;          //自动拆箱
 In ...
       <a href="/2019/02/10/201902/Java基础之自动拆箱装箱/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -255,7 +255,7 @@ In ...
       介绍String类是final修饰，说明不可以被继承，String一旦被创建就不能改变，对String修改就会创建一个新的字符串，因此禁止使用循环修改字符串。
 Sring在内存中的位置12345678910111213String str1 &#x3D; new String(&quot;hello&quot;);String str2 &#x3D; new String(&quot;hello ...
       <a href="/2019/02/07/201902/Java源码分析String详解/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -290,7 +290,7 @@ Sring在内存中的位置12345678910111213String str1 &#x3D; new String(&quot;h
     
       内存分代策略简介HotSpot中为了提高内存对象内存分配和垃圾回收的效率，将内存分为了新生代（Eden+From Survivor+To Survivor）、老年代（OldGen）和永久代（PermGen）。新创建的对象分配在新生代，多次回收还存活的对象放在老年代，类信息、静态变量和字符串常量等存放在永久代中。新生代中需要频繁执行垃圾回收，老年代中不需要频繁垃圾回收，永久代一般来说不实现垃圾回收 ...
       <a href="/2019/01/30/201901/深入理解Java虚拟机内存分代策略及常用参数配置/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -331,7 +331,7 @@ Annotation不是程序，但是可以对程序作出解释
 内置注解@Override定义在java.lang.Override中，此注释只适用于修辞方法，表示一个方法声明打算重写超类中的另一个方法声明。
 1234   @Overridepublic String toString ()&#123;	retu ...
       <a href="/2019/01/29/201901/Java基础之注解/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -366,7 +366,7 @@ Annotation不是程序，但是可以对程序作出解释
     
       简介Object类在java.lang包中，是所有类的父类，所有类都间接或者直接继承Object类。Object类中主要有registerNatives()、getClass()、hashCode()、equals()、clone()、toString()、notify()、notifyAll()、wait()和finalize()等方法。其中getClass()、notify()、notify ...
       <a href="/2019/01/28/201901/Java源码分析Object详解/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -402,7 +402,7 @@ Annotation不是程序，但是可以对程序作出解释
       介绍HashMap是基于哈希表的Map接口的实现，并允许使用 null 值和 null 键。HashMap在JDK1.8之前使用的是哈希表+链表的方式存储数据。在JDK1.8之后，如果链表过长则将链表转成红黑树。 
 源码分析继承123public class HashMap&lt;K,V&gt; extends AbstractMap&lt;K,V&gt;    implements Map&l ...
       <a href="/2019/01/26/201901/Java源码分析全面解析HashMap/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -441,7 +441,7 @@ Annotation不是程序，但是可以对程序作出解释
 12public Stack() &#123;&#125;
 所有API12345            ...
       <a href="/2019/01/18/201901/Java源码分析Stack/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">

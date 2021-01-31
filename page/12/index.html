@@ -31,11 +31,11 @@
 
 <body>
   <div class="container">
-    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+    <div class="left-col" style="background-image:url('https://www.gwt.fun/img/sider.jpg')">
       <div class="intrude-less">
         <header id="header" class="inner">
           <a href="/">
-            <div class="profilepic"><img src='../img/user.png'></div>
+            <div class="profilepic"><img src='https://www.gwt.fun/img/user.png'></div>
           </a>
           <div class="author-name"><a href="/">Gavin</a></div>
           
@@ -109,7 +109,7 @@
 #####频繁项集在啤酒与尿布的经典例子中，超市通过这个规律将啤酒与尿布捆绑销售，达到了非常好的效果每一件商品可以看成一个项，多个商品或者是购物车中的所有物品可以看成一个项集。
 12itemset:A  set of one or more itemsK-i ...
       <a href="/2016/12/09/201612/频繁项集和关联规则/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -146,7 +146,7 @@
 在直播中有很多的信息。在一张用户表中，使用传统关系型数据库存储用户信息，扩展非常麻烦。redis对用户信息管理，采用hashes数据结构。用户id作为Key，每个用户的信息是Hashes中的Field。当需要对用户信息进行扩展时，使用Hset向用户所在的Hashes中新增一个field。
 场景二：关注列表在直播系统中有许多关注链，可以使用sets ...
       <a href="/2016/12/03/201612/Redis高级应用应用场景学习笔记/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -183,7 +183,7 @@
 
 首先是排序，先选择Y最小的那个点，如果Y最小的点有多个，就选最靠左的那个点。选好第一个点，就开始对所有点进行排序，逆时针开始，按照角度的大小进行排序，角度小的在前，角度大的在后面。对 ...
       <a href="/2016/11/14/201611/计算几何ConvexHull凸包问题四/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -218,7 +218,7 @@
     
       上回介绍的凸包算法的时间复杂度是O(n^3)，还远远不能满足我们的需求，现在来改进这个算法。上个算法是遍历边来找到极边，来判断凸包，但是遍历整个边又要浪费许多时间。于是我们就改进成下面的算法:通过下面的5个图来还原整个算法首先通过遍历，找到一个极点。找到X轴最接近下面的一个点，就可以确定这个点是极点（如果最下面存在一条线，有两个点，我们就选最靠近左面的点。）。这样我们通过O(n)的时间复杂度，就 ...
       <a href="/2016/11/14/201611/计算几何ConvexHull凸包问题三/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -255,7 +255,7 @@
 
 任取两点，做向量pq，如果pq两侧都有值，我们就不认为这是极边，按照这种思路，我们就能写出来算法。而判断一个点是 ...
       <a href="/2016/11/14/201611/计算几何ConvexHull凸包问题二/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -292,7 +292,7 @@
 
 二、算法    一般把p，q，r这些在凸包上的点称为极点。    这里判断一个点是不是极点的方法就是：在这个点画一条线，如果在这个点的另一侧没有其他的点，我们就认为这是一个极点。但是我们怎么判断这个点的另一侧有 ...
       <a href="/2016/11/14/201611/计算几何ConvexHull凸包问题一/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -332,7 +332,7 @@
 
 reids支持两种持久化操作，一种是RDB方式，一种是AOF操作方式。RDB方式 ...
       <a href="/2016/10/25/201610/Redis高级应用数据持久化/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -377,7 +377,7 @@ reids支持两种持久化操作，一种是RDB方式，一种是AOF操作方式
 5.获取数据类型
 1re ...
       <a href="/2016/10/11/201610/Redis数据类型/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -412,7 +412,7 @@ reids支持两种持久化操作，一种是RDB方式，一种是AOF操作方式
     
       一、文件和用户权限1.文件详细信息　　使用ls -l可以查看文件详细信息在显示的文件详细信息中：　　1列：表示文件的属性。“-”表示文件，“d”表示文件夹，“l”表示快捷方式（链接）　　2-4列：表示当前用户对文件的操作权限　　　1). r 可读  2^2 = 4　　　2). w可写  2^1 = 2　　　3). x可执行2^0= 1    (最高权限是7)　　5-7列：表示当前用户所在的用户组 ...
       <a href="/2016/07/21/201607/Linux文件和用户权限以及SSH操作/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">

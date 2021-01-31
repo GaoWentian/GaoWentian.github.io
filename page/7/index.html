@@ -31,11 +31,11 @@
 
 <body>
   <div class="container">
-    <div class="left-col" style="background-image:url('../img/sider.jpg')">
+    <div class="left-col" style="background-image:url('https://www.gwt.fun/img/sider.jpg')">
       <div class="intrude-less">
         <header id="header" class="inner">
           <a href="/">
-            <div class="profilepic"><img src='../img/user.png'></div>
+            <div class="profilepic"><img src='https://www.gwt.fun/img/user.png'></div>
           </a>
           <div class="author-name"><a href="/">Gavin</a></div>
           
@@ -109,7 +109,7 @@
 public InetAddress getInetAddress()通过Socket的这个方法返回一个InetAddress对象。再通过这个对象的get方法，就可以得到服务器的IP、域名等信息。
 12345 ...
       <a href="/2017/08/10/201708/Java网络编程笔记之Socket类的getter和setter方法六/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -146,7 +146,7 @@ public InetAddress getInetAddress()通过Socket的这个方法返回一个InetAd
 连接超时在 Socket 类中只有通过 connect 方法的第二个参数才能指定连接超时的时间。由于使用 connect方法连接服务器必须要指定IP和端口。因此，无效的IP或端口必将引发连接超时错误。
 读取数据超时客户端接收数据可能会因为网络延迟、网络堵塞等原因，使客户端一直处于等待的状态。而客户端在等待一段时间后,如果服务器还没有将数据发送到客户端。 ...
       <a href="/2017/08/08/201708/Java网络编程笔记之Socket超时五/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -181,7 +181,7 @@ public InetAddress getInetAddress()通过Socket的这个方法返回一个InetAd
     
       Socket类的connect方法不提供简单的直接调用IP和端口方式，而是使用SocketAddress类来向connect方法传递服务器的IP和端口。虽然麻烦，但是带来一个好处，就是网络地址可以重用。网络地址重用表现在两个方面：1.通过建立一个SocketAddress对象，可以多次连接同一个服务器时使用这个Socket对象。2.Socket类中提供了两个方法：getRemoteSocketA ...
       <a href="/2017/08/06/201708/Java网络编程笔记之使用SocketAddress管理网络地址四/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -219,7 +219,7 @@ public InetAddress getInetAddress()通过Socket的这个方法返回一个InetAd
 public Socket(String host,int port)一个字符串类型的IP或域名以及一个整形的端口号。
 public Socket(InetAddress inetaddress,int p ...
       <a href="/2017/08/05/201708/Java网络编程笔记之多种建立网络连接的方式三/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -256,7 +256,7 @@ public Socket(InetAddress inetaddress,int p ...
 局部性局部性就是实际计算环境中普遍存在的一种现象，就是说刚被访问的数据，极有可能很快的再次被访问。也就是说刚被访问过的节点，极有可能很快的再次被访问。因此利用局部性，是否能提高访问效率？
 伸展树伸展树，或者叫自适应查找树，是一种用于保存有序集合的简单高效的数据结构。伸展树实质上是一个二叉查找树。允 ...
       <a href="/2017/08/04/201708/伸展树学习笔记/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -291,7 +291,7 @@ public Socket(InetAddress inetaddress,int p ...
     
       TCP 的 Java 支持Java 为 TCP 协议提供了两个类：Socke 类和 ServerSocket 类。一个 Socket 实例代表了TCP连接的一个客户端，而一个ServerSocket实例代表了TCP连接的一个服务器端。服务器端要同时处理 ServerSocket 实例和Socket实例，而客户端只需要使用Socket实例。每个 Socket 实例会关联一个 InputStream ...
       <a href="/2017/08/04/201708/Java网络编程笔记之Socket接收和发送数据二/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -331,7 +331,7 @@ public Socket(InetAddress inetaddress,int p ...
 对于AVL树来说，维护高度平衡所需要的代价比获取的收益大，如果在应用场景中，对查找有特殊要求，对插入删除不频繁，AVL树要优于红黑树。
 实现节 ...
       <a href="/2017/08/04/201708/AVL树学习笔记/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -367,7 +367,7 @@ public Socket(InetAddress inetaddress,int p ...
       简介常用的实现系统间通信的协议有TCP/IP和UDP/IP。TCP/IP 协议族中的主要 socket 类型为流套接字（sockets sockets）和数据报套接字（datagram sockets）。
 TCP/IPTCP/IP是一种可靠的网络数据传输协议。TCP/IP要求通信双方先建立连接，再进行传输，保证数据的可靠性，但是会牺牲一些性能。流套接字将TCP作为其端对端协议（底层使用IP协议） ...
       <a href="/2017/08/03/201708/Java网络编程笔记之InetAddress对象一/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -402,7 +402,7 @@ TCP/IPTCP/IP是一种可靠的网络数据传输协议。TCP/IP要求通信双�
     
       二叉树前序遍历12345678&#x2F;*前序遍历非递归实现伪代码*&#x2F;void PreOrder(r)&#123;   &#x2F;&#x2F;传入树r    if(r !&#x3D; NULL)&#123;     &#x2F;&#x2F;判断是不是NULL，如果是NULL则代表该结点是叶子结点        print  r-&gt;value;        PreOrder( ...
       <a href="/2017/07/28/201707/二叉树的遍历/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
@@ -438,7 +438,7 @@ TCP/IPTCP/IP是一种可靠的网络数据传输协议。TCP/IP要求通信双�
       降低redis内存占用的优点　　1、有助于减少创建快照和加载快照所用的时间　　2、提升载入AOF文件和重写AOF文件时的效率　　3、缩短从服务器同步时间　　4、无需添加额外的硬件
 短结构　　Redis为列表、集合、散列、有序集合提供了一组配置选项，这些选项可以让Redis以更节约的方式存储较短的结构（简称为：短结构）。　　在列表、散列和有序集合的长度较短或者体积较小的时候，Redis提供一种压缩 ...
       <a href="/2017/07/07/201707/Redis高级应用降低内存占用/" class="more-link">
-        继续阅读
+        点击阅读
         <div class="meta meta-index-post-entry">
           
 <div class="date">
