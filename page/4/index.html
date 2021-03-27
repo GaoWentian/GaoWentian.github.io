@@ -100,6 +100,45 @@
   <article class="post">
 
   <h1 class="title" itemprop="name">
+    <a href="/2019/01/18/201901/Java源码分析Stack/" itemprop="url">Java源码分析--Stack</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      介绍Stack是一种先进后出的数据结构，继承于Vector，所以Stack是通过数组实现。
+源码分析继承12publicclass Stack&lt;E&gt; extends Vector&lt;E&gt; &#123;&#125;
+构造函数Stack只有一个默认的构造函数，创建一个空的栈。
+12public Stack() &#123;&#125;
+所有API12345            ...
+      <a href="/2019/01/18/201901/Java源码分析Stack/" class="more-link">
+        点击阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2019-01-17T20:24:51.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2019-01-18
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
     <a href="/2019/01/05/201901/Java源码分析Vector/" itemprop="url">Java源码分析--Vector</a>
   </h1>
   <div class="entry-content" itemprop="articleBody">
@@ -428,43 +467,6 @@ IteratorIterator是一个接口，是集合的迭代器，集合可以使用Iter
       data-updated="true"
        itemprop="datePublished">
   2018-03-21
-</time>
-
-
-
-
-
-</div>
-
-        </div>
-      </a>
-    
-  </div>
-
-
-</article>
-  
-  <article class="post">
-
-  <h1 class="title" itemprop="name">
-    <a href="/2018/03/19/201803/Redis设计与实现简单动态字符串/" itemprop="url">《Redis设计与实现》：简单动态字符串</a>
-  </h1>
-  <div class="entry-content" itemprop="articleBody">
-    
-      简介Redis构建了一种名为简单动态字符串（simple dynamic string ，SDS）的抽象类型，用来保存字符串。
-SDS 实现shs.h文件中sdshdr结构体表示了一个SDS的值：
-12345678struct sdshdr &#123;    &#x2F;&#x2F; buf 中已占用空间的长度      int len;    &#x2F;&#x2F; buf 中剩余可用空间 ...
-      <a href="/2018/03/19/201803/Redis设计与实现简单动态字符串/" class="more-link">
-        点击阅读
-        <div class="meta meta-index-post-entry">
-          
-<div class="date">
-
-<time datetime="2018-03-18T22:41:48.000Z"
-      
-      data-updated="true"
-       itemprop="datePublished">
-  2018-03-19
 </time>
 
 

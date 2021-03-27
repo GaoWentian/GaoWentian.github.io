@@ -1,0 +1,250 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+  <meta charset="utf-8">
+  <link rel="dns-prefetch" href="http://example.com">
+  
+  <title>Spring-IOC和Bean管理 | Hexo</title>
+  <meta name="author" content="Gavin">
+  
+  <meta name="description" content="IOCIOC（控制反转），把对象的创建和对象之间的调用过程交给Spring进行管理，可以降低代码耦合度。
+IOC容器IOC思想基于IOC容器实现，IOC容器是 Spring 框架的核心。容器创建对象，把它们连接在一起，配置它们，并管理他们的整个生命周期从创建到销毁。Spring提供了两种容器：Bea">
+  
+  
+  <meta name="viewport" content="width=device-width,minimum-scale=1,initial-scale=1">
+
+  <meta property="og:title" content="Spring-IOC和Bean管理"/>
+  <meta property="og:site_name" content="Hexo"/>
+
+  
+    <meta property="og:image" content=""/>
+  
+
+  <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+
+  <link rel="preload" as="style" href="/css/style.css" media="screen" type="text/css">
+  <link rel="stylesheet" href="/css/style.css" media="screen" type="text/css">
+
+  <link rel="icon" class="js-site-favicon" type="image/svg+xml" href="https://github.githubassets.com/favicons/favicon.svg">
+  <link href="https://unpkg.com" rel="dns-prefetch" />
+  <link href="https://busuanzi.ibruce.info" rel="dns-prefetch" />
+  <link href="https://cdn1.lncld.net" rel="dns-prefetch" />
+  
+<meta name="generator" content="Hexo 5.3.0"></head>
+
+<body>
+  <div class="container">
+    <div class="left-col" style="background-image:url('https://www.gwt.fun/img/sider.jpg')">
+      <div class="intrude-less">
+        <header id="header" class="inner">
+          <a href="/">
+            <div class="profilepic"><img src='https://www.gwt.fun/img/user.png'></div>
+          </a>
+          <div class="author-name"><a href="/">Gavin</a></div>
+          
+          <nav id="main-nav">
+            <ul class="main">
+              
+              <li>
+                
+                  <a href="/archives">归档</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/tags">专题</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/friendlinks">友链</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/life">关于</a>
+                
+              </li>
+              
+              <li>
+                
+                  <a href="/search">搜索</a>
+                
+              </li>
+              
+            </ul>
+          </nav>
+          <nav id="sub-nav">
+            <div class="social">
+              
+              
+              
+              <a class="github" target="_blank" rel="noopener" href="https://github.com/" title="Github">Github</a>
+              
+              
+
+              
+              <a class="rss" href="/atom.xml" title="RSS">RSS</a>
+              
+            </div>
+          </nav>
+        </header>
+      </div>
+    </div>
+    <div class="mid-col">
+      <div class="mid-col-container">
+        <div id="content" class="inner">
+          <article class="post">
+
+  
+    <div class="meta">
+      
+<div class="date">
+
+<time datetime="2021-03-26T16:00:00.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2021-03-27
+</time>
+
+
+
+
+
+</div>
+
+    </div>
+  
+  <h1 class="title" itemprop="name">Spring-IOC和Bean管理</h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+    <div class="post-toc">
+      <div class="toc-title">TOC</div>
+      <ol class="toc"><li class="toc-item toc-level-3"><a class="toc-link" href="#IOC"><span class="toc-number">1.</span> <span class="toc-text">IOC</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#IOC%E5%AE%B9%E5%99%A8"><span class="toc-number">2.</span> <span class="toc-text">IOC容器</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#BeanFactory%E5%AE%B9%E5%99%A8"><span class="toc-number">2.1.</span> <span class="toc-text">BeanFactory容器</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#ApplicationContext%E5%AE%B9%E5%99%A8"><span class="toc-number">2.2.</span> <span class="toc-text">ApplicationContext容器</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%88%9B%E5%BB%BABean%E5%AE%9E%E4%BE%8B"><span class="toc-number">3.</span> <span class="toc-text">创建Bean实例</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#xml%E6%96%B9%E5%BC%8F"><span class="toc-number">3.1.</span> <span class="toc-text">xml方式</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%B3%A8%E8%A7%A3%E6%96%B9%E5%BC%8F"><span class="toc-number">3.2.</span> <span class="toc-text">注解方式</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#Bean%E6%B3%A8%E5%85%A5"><span class="toc-number">4.</span> <span class="toc-text">Bean注入</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E6%9E%84%E9%80%A0%E5%87%BD%E6%95%B0%E6%B3%A8%E5%85%A5"><span class="toc-number">4.1.</span> <span class="toc-text">构造函数注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#SET%E6%96%B9%E6%B3%95%E6%B3%A8%E5%85%A5"><span class="toc-number">4.2.</span> <span class="toc-text">SET方法注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E6%B3%A8%E5%85%A5"><span class="toc-number">4.3.</span> <span class="toc-text">自动注入</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E5%9F%BA%E4%BA%8E%E6%B3%A8%E8%A7%A3%E6%96%B9%E5%BC%8F%E5%AE%9E%E7%8E%B0%E6%B3%A8%E5%85%A5"><span class="toc-number">4.4.</span> <span class="toc-text">基于注解方式实现注入</span></a></li></ol></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%BB%84%E4%BB%B6%E6%89%AB%E6%8F%8F"><span class="toc-number">5.</span> <span class="toc-text">组件扫描</span></a><ol class="toc-child"><li class="toc-item toc-level-4"><a class="toc-link" href="#%E4%BD%9C%E7%94%A8%E5%9F%9F"><span class="toc-number">5.1.</span> <span class="toc-text">作用域</span></a></li><li class="toc-item toc-level-4"><a class="toc-link" href="#%E7%94%9F%E5%91%BD%E5%91%A8%E6%9C%9F"><span class="toc-number">5.2.</span> <span class="toc-text">生命周期</span></a><ol class="toc-child"><li class="toc-item toc-level-5"><a class="toc-link" href="#singleton"><span class="toc-number">5.2.1.</span> <span class="toc-text">singleton</span></a></li><li class="toc-item toc-level-5"><a class="toc-link" href="#prototype"><span class="toc-number">5.2.2.</span> <span class="toc-text">prototype</span></a></li></ol></li><li class="toc-item toc-level-4"><a class="toc-link" href="#BeanPostProcessor-Bean%E5%90%8E%E7%BD%AE%E5%A4%84%E7%90%86%E5%99%A8"><span class="toc-number">5.3.</span> <span class="toc-text">BeanPostProcessor Bean后置处理器</span></a></li></ol></li></ol>
+    </div>
+    
+    <h3 id="IOC"><a href="#IOC" class="headerlink" title="IOC"></a>IOC</h3><p>IOC（控制反转），把对象的创建和对象之间的调用过程交给Spring进行管理，可以降低代码耦合度。</p>
+<h3 id="IOC容器"><a href="#IOC容器" class="headerlink" title="IOC容器"></a>IOC容器</h3><p>IOC思想基于IOC容器实现，IOC容器是 Spring 框架的核心。容器创建对象，把它们连接在一起，配置它们，并管理他们的整个生命周期从创建到销毁。<br>Spring提供了两种容器：BeanFactory 容器和ApplicationContext 容器。</p>
+<ul>
+<li>BeanFactory 容器是IOC容器的基本实现，一般BeanFactory 容器不提供给开发人员使用，并且BeanFactory 容器在加载配置文件时不会创建对象，在使用对象时才会创建对象。</li>
+<li>ApplicationContext 容器包括BeanFactory 容器所有功能，是BeanFactory接口的实现类，ApplicationContext 容器包含了更多的功能，开发人员一般使用ApplicationContext 容器。</li>
+</ul>
+<h4 id="BeanFactory容器"><a href="#BeanFactory容器" class="headerlink" title="BeanFactory容器"></a>BeanFactory容器</h4><p>BeanFactory容器构建核心容器时，创建对象时采用的策略是延迟加载的方式，什么时候根据id获取对象，什么时候创建对象。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">public class MainApp &#123;</span><br><span class="line"></span><br><span class="line">  public static void main(String[] args) &#123;</span><br><span class="line">    &#x2F;&#x2F;XmlBeanFactory 类已经标注弃用</span><br><span class="line">    BeanFactory factory &#x3D; new XmlBeanFactory(new ClassPathResource(&quot;&quot;bean&#x2F;user.xml&quot;&quot;));</span><br><span class="line">    User user &#x3D; (User) factory.getBean(&quot;helloworld&quot;);</span><br><span class="line">    user.getMassage();</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>XmlBeanFactory生成工厂bean，使用ClassPathResource加载Beans.xml配置文件。</p>
+<h4 id="ApplicationContext容器"><a href="#ApplicationContext容器" class="headerlink" title="ApplicationContext容器"></a>ApplicationContext容器</h4><p>ApplicationContext创建核心容器时，创建对象采用的策略是立即加载的方式，也就是说读取完配置文件就创建配置文件中配置的对象，适合单例模式创建对象使用。<br>ApplicationContext是BeanFactory的子接口，可以加载配置文件中的bean，并且包含BeanFactory接口中所有功能。ApplicationContext有三种实现方式：</p>
+<ul>
+<li>FileSystemXmlApplicationContext（从XML文件中获取bean，需要完整路径）</li>
+<li>ClassPathXmlApplicationContex （从XML文件中获取bean，不需要完整路径，但是需要CLASSPATH环境变量）</li>
+<li>WebXmlApplicationContext（在一个 web 应用程序的范围内加载在 XML 文件中已被定义的 bean）<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">public static void main(String[] args) &#123;</span><br><span class="line">  ApplicationContext context &#x3D; new ClassPathXmlApplicationContext(&quot;bean&#x2F;user.xml&quot;);</span><br><span class="line">  User user &#x3D; context.getBean(&quot;user&quot;, User.class);</span><br><span class="line">  System.out.println(user);</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="创建Bean实例"><a href="#创建Bean实例" class="headerlink" title="创建Bean实例"></a>创建Bean实例</h3><h4 id="xml方式"><a href="#xml方式" class="headerlink" title="xml方式"></a>xml方式</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id&#x3D;&quot;User&quot; class&#x3D;&quot;com.xxx.xxx.User&quot;&gt;&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+<h4 id="注解方式"><a href="#注解方式" class="headerlink" title="注解方式"></a>注解方式</h4></li>
+<li>@Component  可以用在任何地方</li>
+<li>@Service    业务层</li>
+<li>@Controller 视图层</li>
+<li>@Repository 数据层</li>
+</ul>
+<p>上面4个注解可以用在类上，根据业务进行使用，例如@Service用在业务逻辑层的类上，一般不推荐混用。<br>以@Component为例：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@Component(value&#x3D;&quot;userService&quot;)</span><br><span class="line">public class UserService&#123;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>其中@Component中的value值和bean标签中的id值相同，这里也可以忽略value值，默认是类名并且首字母小写。</p>
+<h3 id="Bean注入"><a href="#Bean注入" class="headerlink" title="Bean注入"></a>Bean注入</h3><p>注入方式：</p>
+<ul>
+<li>使用构造函数</li>
+<li>使用set方法</li>
+<li>使用注解的方式</li>
+</ul>
+<p>首先创建User类</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br></pre></td><td class="code"><pre><span class="line">public class User &#123;</span><br><span class="line">  private int id;</span><br><span class="line">  private String name;</span><br><span class="line"></span><br><span class="line">  public User() &#123;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public int getId() &#123;</span><br><span class="line">    return id;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public void setId(int id) &#123;</span><br><span class="line">    this.id &#x3D; id;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public String getName() &#123;</span><br><span class="line">    return name;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public void setName(String name) &#123;</span><br><span class="line">    this.name &#x3D; name;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public User(int id, String name) &#123;</span><br><span class="line">    this.id &#x3D; id;</span><br><span class="line">    this.name &#x3D; name;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="构造函数注入"><a href="#构造函数注入" class="headerlink" title="构造函数注入"></a>构造函数注入</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&quot;</span><br><span class="line">  xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema-instance&quot;</span><br><span class="line">  xsi:schemaLocation&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&#x2F;spring-beans.xsd&quot;&gt;</span><br><span class="line">  &lt;!-- User Bean 创建--&gt;</span><br><span class="line">  &lt;bean id&#x3D;&quot;user&quot; class&#x3D;&quot;fun.gwt.bean.User&quot;&gt;</span><br><span class="line">    &lt;constructor-arg index&#x3D;&quot;0&quot; type&#x3D;&quot;int&quot; value&#x3D;&quot;1&quot; &#x2F;&gt;</span><br><span class="line">    &lt;constructor-arg index&#x3D;&quot;1&quot; type&#x3D;&quot;java.lang.String&quot; value&#x3D;&quot;gavin&quot; &#x2F;&gt;</span><br><span class="line">  &lt;&#x2F;bean&gt;</span><br><span class="line">&lt;&#x2F;beans&gt;</span><br></pre></td></tr></table></figure>
+<p>构造函数注入方式使用索引和类型相结合，能更好地适应复杂构造函数传参。</p>
+<h4 id="SET方法注入"><a href="#SET方法注入" class="headerlink" title="SET方法注入"></a>SET方法注入</h4><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line">&lt;?xml version&#x3D;&quot;1.0&quot; encoding&#x3D;&quot;UTF-8&quot;?&gt;</span><br><span class="line">&lt;beans xmlns&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&quot;</span><br><span class="line">  xmlns:xsi&#x3D;&quot;http:&#x2F;&#x2F;www.w3.org&#x2F;2001&#x2F;XMLSchema-instance&quot;</span><br><span class="line">  xsi:schemaLocation&#x3D;&quot;http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans http:&#x2F;&#x2F;www.springframework.org&#x2F;schema&#x2F;beans&#x2F;spring-beans.xsd&quot;&gt;</span><br><span class="line">  &lt;!-- User Bean 创建--&gt;</span><br><span class="line">  &lt;bean id&#x3D;&quot;user&quot; class&#x3D;&quot;fun.gwt.bean.User&quot;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;id&quot; value&#x3D;&quot;1&quot; &#x2F;&gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;name&quot; value&#x3D;&quot;gavin&quot; &#x2F;&gt;</span><br><span class="line">  &lt;&#x2F;bean&gt;</span><br><span class="line">&lt;&#x2F;beans&gt;</span><br></pre></td></tr></table></figure>
+<p>set方法注入，name为方法传参的名称。</p>
+<h4 id="自动注入"><a href="#自动注入" class="headerlink" title="自动注入"></a>自动注入</h4><p>Bean标签的属性autowire,配置自动装配：</p>
+<ul>
+<li>byName 注入值bean的id和类属性名称相同；</li>
+<li>byType 注入值bean的类型和类属性的类型相同；注意：不能存在两个类型相同的bean（bean的id不同 ）<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">public class User&#123;</span><br><span class="line">    private Scope scope;</span><br><span class="line">&#125;</span><br><span class="line">&lt;bean  id&#x3D;&quot;user&quot; class&#x3D;&quot;com.xxx.xxx.User&quot; autowire&#x3D;&quot;byType&quot;&gt;&lt;&#x2F;bean&gt;</span><br><span class="line">&lt;!-- 此时同时存在两个Bean，在autowire的值为byName时会选择第一个bean，如果为byType时，会报错。--&gt;</span><br><span class="line">&lt;bean  id&#x3D;&quot;scope&quot; class&#x3D;&quot;com.xxx.xxx.Scope&quot; &gt;&lt;&#x2F;bean&gt;</span><br><span class="line">&lt;bean  id&#x3D;&quot;scope1&quot; class&#x3D;&quot;com.xxx.xxx.Scope&quot; &gt;&lt;&#x2F;bean&gt; </span><br></pre></td></tr></table></figure>
+<h4 id="基于注解方式实现注入"><a href="#基于注解方式实现注入" class="headerlink" title="基于注解方式实现注入"></a>基于注解方式实现注入</h4>注解方式实现注入有四个注解能实现：</li>
+<li>@Autowired</li>
+<li>@Qualifier</li>
+<li>@Resource</li>
+<li>@Value</li>
+</ul>
+<p>其中最常用的是前三种。<br>@Autowired：根据属性类型进行自动注入（也就是byType）。<br>@Qualifier：根据属性名称进行注入，需要和@Autowired一起使用。当接口有多个实现类时，需要使用@Qualifier按照名称指定注入的bean</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class UserService&#123;</span><br><span class="line">    </span><br><span class="line">    @Autowired</span><br><span class="line">    @Qualifier(value&#x3D;&quot;userDaoImpl&quot;)</span><br><span class="line">    private UserDao userDao;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>@Resource：可以根据类型注入，可以根据名称注入。注意：@Resource不是Spring包的，而是javax包下的，因此Spring不推荐使用@Resource注解，可以使用@Qualifier注解。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line">public class UserService&#123;</span><br><span class="line">    </span><br><span class="line">    @Resource &#x2F;&#x2F;根据类型注入</span><br><span class="line">    private UserDao userDao;</span><br><span class="line">    </span><br><span class="line">    @Resource(name&#x3D;&quot;userDao&quot;) &#x2F;&#x2F;根据名称注入</span><br><span class="line">    private UserDao userDao;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>@Value：注入普通类型属性。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">public class UserSerivce&#123;</span><br><span class="line"></span><br><span class="line">    &#x2F;&#x2F;此时name的值变为gavin</span><br><span class="line">    @Value(value&#x3D;&quot;gavin&quot;)</span><br><span class="line">    private String name;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h3 id="组件扫描"><a href="#组件扫描" class="headerlink" title="组件扫描"></a>组件扫描</h3><p>开启自动注入后，需要配置组件扫描。组件扫描相当于告诉Spring需要扫描哪些包才能获取到Bean。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">@Configuration  &#x2F;&#x2F;配置类，代替xml文件</span><br><span class="line">@ComponentScan(basePackages&#x3D;&quot;com.xxx.xxx&quot;) &#x2F;&#x2F;扫描该目录下的bean，用于自动注入</span><br><span class="line">public class SpringConfig&#123;</span><br><span class="line">    </span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<h4 id="作用域"><a href="#作用域" class="headerlink" title="作用域"></a>作用域</h4><p>Spring支持singleton、prototype、request、session和global session五种作用域。</p>
+<ul>
+<li>singleton是单例类型，在创建容器时就创建bean对象，每次使用时返回同一bean对象。</li>
+<li>prototype 每次使用bean时都会创建一个新的bean对象。</li>
+<li>request 每次Http请求都会创建一个Bean，请求处理完成后会销毁Bean。</li>
+<li>session仅用在WebApplicationContext环境中，每个Http Session创建并使用一个Bean，Session结束后会销毁Bean。</li>
+</ul>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id&#x3D;&quot;user&quot; class&#x3D;&quot;fun.gwt.bean.User&quot;&gt;&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">ApplicationContext context &#x3D; new ClassPathXmlApplicationContext(&quot;bean&#x2F;user.xml&quot;);</span><br><span class="line">User user &#x3D; context.getBean(&quot;user&quot;, User.class);</span><br><span class="line">System.out.println(user);</span><br><span class="line">User user2 &#x3D; context.getBean(&quot;user&quot;, User.class);</span><br><span class="line">System.out.println(user2);</span><br><span class="line">&#x2F;* 输出：</span><br><span class="line">fun.gwt.bean.User@1794d431</span><br><span class="line">fun.gwt.bean.User@1794d431</span><br><span class="line">*&#x2F;</span><br></pre></td></tr></table></figure>
+<p>Spring默认使用singleton的方式创建Bean，每次获取的Bean都是相同的。<br>修改作用域为prototype后，每次创建的Bean对象地址都不同。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id&#x3D;&quot;user&quot; class&#x3D;&quot;fun.gwt.bean.User&quot; scope&#x3D;&quot;prototype&quot;&gt;&lt;&#x2F;bean&gt;</span><br><span class="line">&#x2F;*</span><br><span class="line">fun.gwt.bean.User@685cb137</span><br><span class="line">fun.gwt.bean.User@6a41eaa2</span><br><span class="line">*&#x2F;</span><br></pre></td></tr></table></figure>
+<h4 id="生命周期"><a href="#生命周期" class="headerlink" title="生命周期"></a>生命周期</h4><p>Bean的生命周期为：Bean定义-Bean初始化-Bean使用-Bean销毁。使用init-method属性，可以指定一个方法，在实例化Bean时调用方法，destroy-method属性指定一个方法，当容器中移除bean时，调动该方法。<br>首先定义HelloWorld类。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br></pre></td><td class="code"><pre><span class="line">public class HelloWorld &#123;</span><br><span class="line">  private String massage;</span><br><span class="line"></span><br><span class="line">  public void getMassage() &#123;</span><br><span class="line">    System.out.println(massage);</span><br><span class="line">  &#125;</span><br><span class="line">  public void setMassage(String massage) &#123;</span><br><span class="line">    this.massage &#x3D; massage;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  public String toString() &#123;</span><br><span class="line">    return &quot;HelloWorld&#123;&quot; +</span><br><span class="line">        &quot;massage&#x3D;&#39;&quot; + massage + &#39;\&#39;&#39; +</span><br><span class="line">        &#39;&#125;&#39;;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public void init() &#123;</span><br><span class="line">    System.out.println(&quot;初始化了&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public void destroy() &#123;</span><br><span class="line">    System.out.println(&quot;销毁了&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>当使用singleton时和prototype不一样，具体区别如下</p>
+<h5 id="singleton"><a href="#singleton" class="headerlink" title="singleton"></a>singleton</h5><p>Beans.xml文件：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id&#x3D;&quot;helloworld&quot; class&#x3D;&quot;fun.gwt.HelloWorld&quot; scope&#x3D;&quot;singleton&quot; init-method&#x3D;&quot;init&quot; destroy-method&#x3D;&quot;destroy&quot; &gt;</span><br><span class="line">    &lt;property name&#x3D;&quot;massage&quot; value&#x3D;&quot;Hello World!&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">AbstractApplicationContext context &#x3D; new ClassPathXmlApplicationContext(&quot;Beans.xml&quot;);</span><br><span class="line">HelloWorld helloWorld &#x3D; (HelloWorld) context.getBean(&quot;helloworld&quot;);</span><br><span class="line">HelloWorld helloWorld1 &#x3D; (HelloWorld) context.getBean(&quot;helloworld&quot;);</span><br><span class="line">System.out.println(helloWorld.toString());</span><br><span class="line">context.close();</span><br></pre></td></tr></table></figure>
+<p>执行上面的语句，控制台输出：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">初始化了</span><br><span class="line">HelloWorld&#123;massage&#x3D;&#39;Hello World!&#39;&#125;</span><br><span class="line">销毁了</span><br></pre></td></tr></table></figure>
+<p>虽然获取两次bean对象，但是只初始化一次。</p>
+<h5 id="prototype"><a href="#prototype" class="headerlink" title="prototype"></a>prototype</h5><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id&#x3D;&quot;helloworld&quot; class&#x3D;&quot;fun.gwt.HelloWorld&quot; scope&#x3D;&quot;prototype&quot; init-method&#x3D;&quot;init&quot; destroy-method&#x3D;&quot;destroy&quot; &gt;</span><br><span class="line">  &lt;property name&#x3D;&quot;massage&quot; value&#x3D;&quot;Hello World!&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br></pre></td></tr></table></figure>
+<p>使用相同的执行语句，修改scope为prototype，执行后结果为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">初始化了</span><br><span class="line">初始化了</span><br><span class="line">HelloWorld&#123;massage&#x3D;&#39;Hello World!&#39;&#125;</span><br></pre></td></tr></table></figure>
+<p>此时调用两次bean，初始化了两次。但是没有调用destory函数。原因是protorype和destroy-method不能共存，当使用prototype时，Spring容器不能对bean的整个生命周期进行管理，对象的销毁和资源回收由使用者管理。sinleton整个生命周期由容器负责。</p>
+<h4 id="BeanPostProcessor-Bean后置处理器"><a href="#BeanPostProcessor-Bean后置处理器" class="headerlink" title="BeanPostProcessor Bean后置处理器"></a>BeanPostProcessor Bean后置处理器</h4><p>BeanPostProcessor可以在初始化前后对bean进行处理。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br></pre></td><td class="code"><pre><span class="line">package fun.gwt;</span><br><span class="line"></span><br><span class="line">public class HelloWorld &#123;</span><br><span class="line">  private String massage;</span><br><span class="line"></span><br><span class="line">  public void getMassage() &#123;</span><br><span class="line">    System.out.println(massage);</span><br><span class="line">  &#125;</span><br><span class="line">  public void setMassage(String massage) &#123;</span><br><span class="line">    this.massage &#x3D; massage;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line"></span><br><span class="line">  public void init() &#123;</span><br><span class="line">    System.out.println(&quot;初始化了&quot;);</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  public void destroy() &#123;</span><br><span class="line">    System.out.println(&quot;销毁了&quot;);</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br><span class="line"></span><br></pre></td></tr></table></figure>
+<p>创建InitHelloWorld类实现接口BeanPostProcessor。</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">public class InitHelloWorld implements BeanPostProcessor &#123;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  public Object postProcessBeforeInitialization(Object bean, String beanName) throws BeansException &#123;</span><br><span class="line">    System.out.println(&quot;BeforeInitialization: &quot; + beanName);</span><br><span class="line">    return bean;</span><br><span class="line">  &#125;</span><br><span class="line"></span><br><span class="line">  @Override</span><br><span class="line">  public Object postProcessAfterInitialization(Object bean, String beanName) throws BeansException &#123;</span><br><span class="line">    System.out.println(&quot;AfterInitialization: &quot; + beanName);</span><br><span class="line">    return bean;</span><br><span class="line">  &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+<p>修改Beans.xml文件为：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">&lt;bean id&#x3D;&quot;helloworld&quot; class&#x3D;&quot;fun.gwt.HelloWorld&quot; scope&#x3D;&quot;singleton&quot; init-method&#x3D;&quot;init&quot; destroy-method&#x3D;&quot;destroy&quot; &gt;</span><br><span class="line">  &lt;property name&#x3D;&quot;massage&quot; value&#x3D;&quot;Hello World!&quot; &#x2F;&gt;</span><br><span class="line">&lt;&#x2F;bean&gt;</span><br><span class="line"></span><br><span class="line">&lt;bean class&#x3D;&quot;fun.gwt.InitHelloWorld&quot; &#x2F;&gt;</span><br></pre></td></tr></table></figure>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">AbstractApplicationContext context &#x3D; new ClassPathXmlApplicationContext(&quot;Beans.xml&quot;);</span><br><span class="line">    HelloWorld helloWorld &#x3D; (HelloWorld) context.getBean(&quot;helloworld&quot;);</span><br><span class="line">    helloWorld.getMassage();</span><br><span class="line">    context.registerShutdownHook();</span><br></pre></td></tr></table></figure>
+<p>最后执行之后，显示：</p>
+<figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">BeforeInitialization: helloworld</span><br><span class="line">初始化了</span><br><span class="line">AfterInitialization: helloworld</span><br><span class="line">Hello World!</span><br><span class="line">销毁了</span><br></pre></td></tr></table></figure>
+<p>看到在初始化前后可以进行处理。</p>
+
+
+    
+
+      
+  </div>
+
+</article>
+
+
+  <nav id="pagenavi">
+    
+    
+    <a href="/2020/11/05/202011/三Java并发Volatile和CAS/" class="next">下一篇：（三）Java并发-Volatile和CAS</a>
+    
+  </nav>
+
+        </div>
+        
+        
+      </div>
+      <footer id="footer" class="inner">
+        © 2021 - Gavin -
+        <span id="busuanzi_container_site_pv">PV <span id="busuanzi_value_site_pv"></span></span>
+        <p>Powered by <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a> & <a target="_blank" rel="noopener" href="https://github.com/thinkerchan/hexo-theme-greyshade">GreyShade</a></p>
+      </footer>
+    </div>
+  </div>
+  
+  <script async defer src="https://busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script>
+  
+</body>
+</html>

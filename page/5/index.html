@@ -100,6 +100,43 @@
   <article class="post">
 
   <h1 class="title" itemprop="name">
+    <a href="/2018/03/19/201803/Redis设计与实现简单动态字符串/" itemprop="url">《Redis设计与实现》：简单动态字符串</a>
+  </h1>
+  <div class="entry-content" itemprop="articleBody">
+    
+      简介Redis构建了一种名为简单动态字符串（simple dynamic string ，SDS）的抽象类型，用来保存字符串。
+SDS 实现shs.h文件中sdshdr结构体表示了一个SDS的值：
+12345678struct sdshdr &#123;    &#x2F;&#x2F; buf 中已占用空间的长度      int len;    &#x2F;&#x2F; buf 中剩余可用空间 ...
+      <a href="/2018/03/19/201803/Redis设计与实现简单动态字符串/" class="more-link">
+        点击阅读
+        <div class="meta meta-index-post-entry">
+          
+<div class="date">
+
+<time datetime="2018-03-18T22:41:48.000Z"
+      
+      data-updated="true"
+       itemprop="datePublished">
+  2018-03-19
+</time>
+
+
+
+
+
+</div>
+
+        </div>
+      </a>
+    
+  </div>
+
+
+</article>
+  
+  <article class="post">
+
+  <h1 class="title" itemprop="name">
     <a href="/2017/11/30/201711/Java并发学习CopyOnWrite容器/" itemprop="url">Java并发学习--Copy-On-Write容器</a>
   </h1>
   <div class="entry-content" itemprop="articleBody">
@@ -402,42 +439,6 @@
       data-updated="true"
        itemprop="datePublished">
   2017-09-06
-</time>
-
-
-
-
-
-</div>
-
-        </div>
-      </a>
-    
-  </div>
-
-
-</article>
-  
-  <article class="post">
-
-  <h1 class="title" itemprop="name">
-    <a href="/2017/09/01/201709/MySQL索引/" itemprop="url">MySQL索引</a>
-  </h1>
-  <div class="entry-content" itemprop="articleBody">
-    
-      索引分类索引是在mysql的存储引擎层实现，而不是在服务层实现的。所以每种存储引擎的索引都不一定相同。mysql目前有四种索引：
-12341、B-Tree索引：最常见的索引，大部分引擎都支持B树索引2、HASH索引：只有Memory引擎支持。3、R-Tree索引（空间索引）：空间索引是MyISAM的一个特殊索引类型，主要用于地理空间数据类型，使用较少。4、Full-text（全文索引）：全文索引 ...
-      <a href="/2017/09/01/201709/MySQL索引/" class="more-link">
-        点击阅读
-        <div class="meta meta-index-post-entry">
-          
-<div class="date">
-
-<time datetime="2017-08-31T23:26:21.000Z"
-      
-      data-updated="true"
-       itemprop="datePublished">
-  2017-09-01
 </time>
 
 
